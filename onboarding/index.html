@@ -7,14 +7,14 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 :root {
-  --navy:#0B1F3A; --navy2:#152d50; --blue:#1D6AE5; --blue-h:#1558c4;
-  --blue-pale:#EEF4FF; --blue-mid:#C7D9FA;
-  --green:#16A34A; --green-pale:#F0FDF4; --green-mid:#BBF7D0;
-  --orange:#EA6C00; --orange-pale:#FFF3E8;
-  --red:#DC2626; --red-pale:#FEF2F2;
-  --g50:#F8FAFC; --g100:#F1F5F9; --g200:#E2E8F0; --g300:#CBD5E1;
-  --g400:#94A3B8; --g500:#64748B; --g600:#475569; --g700:#334155; --g800:#1E293B;
-  --r:10px; --r-lg:16px; --font:'Plus Jakarta Sans',sans-serif;
+  --navy:#0B1F3A;--navy2:#152d50;--blue:#1D6AE5;--blue-h:#1558c4;
+  --blue-pale:#EEF4FF;--blue-mid:#C7D9FA;
+  --green:#16A34A;--green-pale:#F0FDF4;--green-mid:#BBF7D0;
+  --orange:#EA6C00;--orange-pale:#FFF3E8;
+  --red:#DC2626;--red-pale:#FEF2F2;
+  --g50:#F8FAFC;--g100:#F1F5F9;--g200:#E2E8F0;--g300:#CBD5E1;
+  --g400:#94A3B8;--g500:#64748B;--g600:#475569;--g700:#334155;--g800:#1E293B;
+  --r:10px;--r-lg:16px;--font:'Plus Jakarta Sans',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:100vh;font-size:15px}
@@ -57,7 +57,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
 .msg-error{background:var(--red-pale);border:1px solid #fecaca;border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;display:none}
 .msg-ok{background:var(--green-pale);border:1px solid var(--green-mid);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:14px;display:none}
-.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite}
+.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* TOPBAR */
@@ -96,7 +96,6 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .mod-icon.locked{background:var(--g100)}
 .mod-icon.active-card{background:var(--blue-pale)}
 .mod-icon.completed{background:var(--green-pale)}
-.mod-body{}
 .mod-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px}
 .mod-num{font-size:11px;font-weight:600;color:var(--g400);letter-spacing:.08em;text-transform:uppercase}
 .mod-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px}
@@ -172,7 +171,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .citem.chk .cbox{background:var(--blue);border-color:var(--blue)}
 .cbox svg{display:none}
 .citem.chk .cbox svg{display:block}
-.saved-ind{font-size:11px;color:var(--green);margin-top:4px;opacity:0;transition:opacity .3s;height:0}
+.saved-ind{font-size:11px;color:var(--green);margin-top:4px;opacity:0;transition:opacity .3s}
 .saved-ind.show{opacity:1}
 
 /* STICKY */
@@ -190,13 +189,18 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .broker-card h3{font-size:16px;font-weight:600;margin-bottom:3px}
 .broker-meta{font-size:13px;color:var(--g400);margin-bottom:14px;font-family:monospace}
 .mod-pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.mpill{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:5px}
+.mpill{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:500}
 .mpill.locked{background:var(--g100);color:var(--g400)}
 .mpill.active{background:var(--orange-pale);color:var(--orange)}
 .mpill.completed{background:var(--green-pale);color:var(--green)}
+.broker-actions{display:flex;gap:8px;flex-wrap:wrap}
 .unlock-btn{font-size:12px;padding:5px 12px;border:1px solid var(--blue-mid);color:var(--blue);background:none;border-radius:6px;cursor:pointer;font-family:var(--font);transition:all .15s}
 .unlock-btn:hover{background:var(--blue);color:white}
-.broker-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:12px}
+.loading-overlay p{font-size:14px;color:var(--g500)}
+.big-spin{width:36px;height:36px;border:3px solid var(--g200);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
 
 @media(max-width:640px){
   .auth-left{display:none}
@@ -218,7 +222,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
     </div>
     <div class="auth-pitch">
       <h2>Configurez votre agent IA Inboxia en quelques étapes</h2>
-      <p>Ce questionnaire nous permet de personnaliser votre environnement Procyo. Complétez à votre rythme — vos réponses sont sauvegardées automatiquement.</p>
+      <p>Ce questionnaire nous permet de personnaliser votre environnement Procyo. Complétez à votre rythme — vos réponses sont synchronisées sur tous vos appareils.</p>
       <div class="auth-steps">
         <div class="auth-step"><div class="step-dot">1</div><div class="step-text"><strong>Module 1</strong> — Identité, équipe, compagnies et paramètres de base</div></div>
         <div class="auth-step"><div class="step-dot">2</div><div class="step-text"><strong>Module 2</strong> — Personnalisation de l'agent IA Inboxia</div></div>
@@ -233,28 +237,24 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-tab on" onclick="switchTab('login')">Se connecter</div>
         <div class="auth-tab" onclick="switchTab('register')">Créer un compte</div>
       </div>
-
-      <!-- LOGIN -->
       <div class="auth-form on" id="form-login">
         <h3>Bon retour 👋</h3>
-        <p class="auth-sub">Accédez à votre questionnaire d'onboarding</p>
+        <p class="auth-sub">Accédez à votre questionnaire depuis n'importe quel appareil</p>
         <div class="msg-error" id="login-err"></div>
         <div class="field"><label>Adresse email</label><input type="email" id="login-email" placeholder="vous@cabinet.be" autocomplete="email"></div>
         <div class="field"><label>Mot de passe</label><input type="password" id="login-pwd" placeholder="••••••••" autocomplete="current-password"></div>
         <button class="btn btn-primary" id="btn-login" onclick="doLogin()">Se connecter</button>
         <p style="margin-top:16px;font-size:13px;color:var(--g400);text-align:center">Pas encore de compte ? <a href="#" onclick="switchTab('register');return false" style="color:var(--blue)">Créer un accès</a></p>
       </div>
-
-      <!-- REGISTER -->
       <div class="auth-form" id="form-register">
         <h3>Créer votre accès</h3>
-        <p class="auth-sub">Votre email devient votre identifiant permanent</p>
+        <p class="auth-sub">Vos réponses seront accessibles depuis tous vos appareils</p>
         <div class="msg-error" id="reg-err"></div>
         <div class="msg-ok" id="reg-ok"></div>
-        <div class="field"><label>Adresse email professionnelle</label><input type="email" id="reg-email" placeholder="vous@cabinet.be" autocomplete="email"><div class="field-hint">Cette adresse sera utilisée pour les rappels de complétion</div></div>
+        <div class="field"><label>Adresse email professionnelle</label><input type="email" id="reg-email" placeholder="vous@cabinet.be"><div class="field-hint">Utilisée pour les rappels et la connexion</div></div>
         <div class="field"><label>Nom de votre cabinet (optionnel)</label><input type="text" id="reg-company" placeholder="Cabinet Dupont Assurances"></div>
-        <div class="field"><label>Mot de passe</label><input type="password" id="reg-pwd" placeholder="Min. 8 caractères" autocomplete="new-password"></div>
-        <div class="field"><label>Confirmer le mot de passe</label><input type="password" id="reg-pwd2" placeholder="••••••••" autocomplete="new-password"></div>
+        <div class="field"><label>Mot de passe</label><input type="password" id="reg-pwd" placeholder="Min. 8 caractères"></div>
+        <div class="field"><label>Confirmer le mot de passe</label><input type="password" id="reg-pwd2" placeholder="••••••••"></div>
         <button class="btn btn-primary" id="btn-reg" onclick="doRegister()">Créer mon accès</button>
         <p style="margin-top:16px;font-size:13px;color:var(--g400);text-align:center">Déjà un compte ? <a href="#" onclick="switchTab('login');return false" style="color:var(--blue)">Se connecter</a></p>
       </div>
@@ -275,15 +275,13 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       <button class="topbar-btn" onclick="doLogout()">Déconnexion</button>
     </div>
   </div>
-
-  <!-- HOME -->
   <div id="screen-home">
     <div class="home-wrap">
       <div class="home-head">
         <h1 id="greeting">Votre espace Procyo</h1>
-        <p>Complétez chaque module à votre rythme. Vos réponses sont sauvegardées automatiquement et transmises à votre équipe Procyo.</p>
+        <p>Complétez chaque module à votre rythme. Vos réponses sont synchronisées automatiquement sur tous vos appareils.</p>
       </div>
-      <div class="progress-card" id="prog-card">
+      <div class="progress-card">
         <div class="pc-stat"><div class="pc-num" id="pc-ans">0</div><div class="pc-label">Répondues</div></div>
         <div class="pc-div"></div>
         <div class="pc-stat"><div class="pc-num" id="pc-tot">0</div><div class="pc-label">Questions</div></div>
@@ -296,8 +294,6 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       <div class="mod-list" id="mod-list"></div>
     </div>
   </div>
-
-  <!-- QUESTIONS -->
   <div id="screen-questions">
     <div class="q-wrap">
       <button class="back-btn" onclick="showHome()">
@@ -317,13 +313,11 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       <div id="sections-wrap"></div>
       <div style="height:80px"></div>
       <div class="sticky-bar">
-        <span class="save-st" id="save-st">Sauvegarde automatique activée</span>
+        <span class="save-st" id="save-st">Synchronisé sur tous vos appareils</span>
         <button class="btn-save" onclick="saveAll()">Sauvegarder</button>
       </div>
     </div>
   </div>
-
-  <!-- ADMIN -->
   <div id="screen-admin">
     <div class="admin-wrap">
       <button class="back-btn" onclick="showHome()">
@@ -338,423 +332,473 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 
 <script>
 // ══════════════════════════════════════════════════════════════
-// CONFIG — remplacer avant mise en production
+// CONFIG
 // ══════════════════════════════════════════════════════════════
+const SB_URL = 'https://rzeequxjvsoqvbetxmev.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6ZWVxdXhqdnNvcXZiZXR4bWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NDE3NDksImV4cCI6MjA5NTAxNzc0OX0.ogJp7NDVnVlU63fkzbbo8LTvuBtLd1IU6aDE5I8o2tM';
+const ADMIN_EMAILS = ['cedric@auditassur.be','admin@procyo.com'];
 const ODOO_CONFIG = {
-  url:      'https://VOTRE_ODOO_URL',   // ex: https://procyo.odoo.com
-  db:       'VOTRE_DB_NAME',
-  username: 'API_USER@procyo.com',       // compte technique dédié
-  password: 'API_PASSWORD',              // clé API ou mot de passe
+  url: 'https://VOTRE_ODOO_URL',
+  db: 'VOTRE_DB',
+  username: 'api@procyo.com',
+  password: 'API_PASSWORD',
 };
-const ADMIN_EMAILS = ['admin@procyo.com']; // emails avec accès admin
+
+// ══════════════════════════════════════════════════════════════
+// SUPABASE HELPERS
+// ══════════════════════════════════════════════════════════════
+async function sbFetch(path, method='GET', body=null) {
+  const opts = {
+    method,
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : '',
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SB_URL + '/rest/v1/' + path, opts);
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+async function sbGet(table, filters='') {
+  return sbFetch(table + '?' + filters);
+}
+async function sbInsert(table, data) {
+  return sbFetch(table, 'POST', data);
+}
+async function sbUpdate(table, filters, data) {
+  return sbFetch(table + '?' + filters, 'PATCH', data);
+}
+async function sbUpsert(table, data, onConflict) {
+  const res = await fetch(SB_URL + '/rest/v1/' + table + '?on_conflict=' + onConflict, {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates,return=representation',
+    },
+    body: JSON.stringify(data)
+  });
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PASSWORD HASH
+// ══════════════════════════════════════════════════════════════
+async function hashPassword(pwd) {
+  const enc = new TextEncoder().encode(pwd);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
 
 // ══════════════════════════════════════════════════════════════
 // QUESTIONS DATA
 // ══════════════════════════════════════════════════════════════
 const MODULES = [
-  {
-    id:'module1', title:'Mise en production',
-    desc:'Configuration de base : identité du bureau, équipe, compagnies et paramètres de communication.',
-    icon:'⚙️',
-    sections:[
-      {id:'A',name:'Identité et structure du bureau',questions:[
-        {id:'A1',type:'text',label:'Raison sociale exacte (telle qu\'au registre BCE) ?'},
-        {id:'A2',type:'text',label:'Nom commercial si différent ?'},
-        {id:'A3',type:'text',label:'Numéro BCE / TVA ?'},
-        {id:'A4',type:'text',label:'Numéro FSMA ?'},
-        {id:'A5',type:'radio',label:'Forme juridique ?',options:['SRL','SA','SPRL','Indépendant','Autre']},
-        {id:'A6',type:'text',label:'Adresse du siège social ?'},
-        {id:'A7',type:'textarea',label:'Adresses des succursales / bureaux secondaires ?'},
-        {id:'A8',type:'text',label:'Téléphone principal ?'},
-        {id:'A9',type:'text',label:'Email principal ?'},
-        {id:'A10',type:'text',label:'Site web ?'},
-        {id:'A11',type:'textarea',label:'Liste des collaborateurs (prénom, nom, fonction, email, tél) ?'},
-        {id:'A12',type:'text',label:'Gestionnaire principal par défaut ?'},
-        {id:'A13',type:'text',label:'DPO / Responsable RGPD (nom + email) ?'},
-        {id:'A14',type:'textarea',label:'Horaires d\'ouverture par jour ?'},
-        {id:'A15',type:'text',label:'Période de fermeture annuelle ?'},
-      ]},
-      {id:'B',name:'Signature et ton de communication',questions:[
-        {id:'B1',type:'textarea',label:'Signature standard à apposer en fin de mail (texte exact) ?'},
-        {id:'B2',type:'radio',label:'Vouvoiement ou tutoiement par défaut ?',options:['Vouvoiement','Tutoiement']},
-        {id:'B3',type:'radio',label:'Ton souhaité ?',options:['Sobre','Chaleureux','Technique','Formel','Familier']},
-        {id:'B4',type:'radio',label:'Niveau d\'empathie en cas de sinistre / décès ?',options:['Factuel','Nuancé','Empathique appuyé']},
-        {id:'B5',type:'text',label:'Formule de politesse préférée ?'},
-        {id:'B6',type:'radio',label:'Adresser le client par ?',options:['Son prénom','Son nom de famille','Monsieur / Madame']},
-        {id:'B7',type:'radio',label:'Langue de réponse par défaut ?',options:['FR','NL','EN','Langue du mail entrant']},
-        {id:'B8',type:'radio',label:'Mention "Réponse rédigée avec assistance IA" ?',options:['Toujours','Jamais','Au choix du gestionnaire']},
-        {id:'B9',type:'textarea',label:'Disclaimer RGPD court à inclure ? Si oui, texte exact :'},
-      ]},
-      {id:'C',name:'Périmètre métier et portefeuille',questions:[
-        {id:'C1',type:'checkbox',label:'Branches d\'assurance traitées activement :',options:['Auto (RC, Omnium, Mini-omnium)','Habitation / incendie','RC Vie privée / familiale','Hospitalisation','Soins de santé ambulatoires','Vie individuelle','Vie groupe','Protection juridique','Accidents corporels','Accidents du travail','Voyage / annulation','Décès / obsèques','RC professionnelle','Multirisques PME','Cyber-risques','Crédit / caution']},
-        {id:'C2',type:'textarea',label:'Branches que vous ne traitez jamais ?'},
-        {id:'C3',type:'radio',label:'Proportion PP / PM dans le portefeuille ?',options:['Majorité PP (>70%)','Mixte 50/50','Majorité PM (>70%)']},
-        {id:'C4',type:'checkbox',label:'Profils-types de clients :',options:['Familles / particuliers','Indépendants / professions libérales','Médecins / paramédicaux','Avocats / notaires','PME 1-50 salariés','Entreprises 50-250','Grandes entreprises','ASBL / associations','Copropriétés / syndics','Flottes auto / transporteurs']},
-        {id:'C5',type:'text',label:'Nombre approximatif de contrats actifs ?'},
-        {id:'C6',type:'text',label:'Nombre approximatif de mails entrants clients par jour ?'},
-      ]},
-      {id:'D',name:'Compagnies partenaires',questions:[
-        {id:'D1',type:'textarea',label:'Listez vos compagnies avec mandat actif (nom, branches couvertes) :'},
-        {id:'D2',type:'textarea',label:'Compagnie préférée par branche (auto, habitation, hospi, vie…) :'},
-        {id:'D3',type:'textarea',label:'Compagnies à éviter ou en cours de retrait (raison) ?'},
-        {id:'D4',type:'radio',label:'Convention RDR (auto) appliquée ?',options:['Systématiquement','Cas par cas','Pas appliquée']},
-        {id:'D5',type:'textarea',label:'Compagnies avec délégation de gestion sinistres (vous gérez en interne) ?'},
-      ]},
-      {id:'E',name:'Boîtes mail et filtres',questions:[
-        {id:'E1',type:'text',label:'Adresse email principale à surveiller par Inboxia ?'},
-        {id:'E2',type:'textarea',label:'Adresses secondaires (sinistres@, info@, contact@) à traiter ?'},
-        {id:'E3',type:'checkbox',label:'Mails à NE PAS traiter automatiquement :',options:['Mails entre collègues','Mails d\'une compagnie (B2B)','Mails de l\'Ombudsman / FSMA / APD','Mails d\'un avocat ou huissier','Mails de fournisseurs','Mails marketing / newsletters','Mails marqués "Confidentiel"']},
-        {id:'E4',type:'checkbox',label:'Catégories requérant validation humaine avant brouillon :',options:['Sinistre corporel','Décès du client','Litige / contestation','Demande de résiliation','Plainte / réclamation','Demande RGPD','Réclamation Ombudsman','Mise en demeure','Suspicion de fraude']},
-      ]},
-    ]
-  },
-  {
-    id:'module2', title:'Personnalisation de l\'agent IA',
-    desc:'Paramétrez le comportement d\'Inboxia : workflows, devis, sinistres, modifications de contrat.',
-    icon:'🤖',
-    sections:[
-      {id:'F',name:'Demandes de documentation',questions:[
-        {id:'F1',type:'radio',label:'Quand un client demande les CG d\'un produit, vous :',options:['Joignez le PDF directement','Renvoyez vers le portail compagnie','Attendez confirmation du gestionnaire']},
-        {id:'F2',type:'radio',label:'Pour les Conditions Particulières (police personnelle) :',options:['Générez depuis BRIO','Renvoyez vers le portail compagnie','Demandez au gestionnaire']},
-        {id:'F3',type:'text',label:'Sous quel délai considérez-vous normal de fournir des CP ?'},
-        {id:'F4',type:'checkbox',label:'Types d\'attestation fournis régulièrement :',options:['Attestation d\'assurance','Attestation antécédents auto','Attestation RC pro','Attestation hospitalisation pour employeur','Attestation primes payées (fiscale)','Carte verte (auto)','Attestation pour visa / voyage']},
-        {id:'F5',type:'text',label:'Délai moyen pour produire une attestation ?'},
-        {id:'F6',type:'radio',label:'L\'IA peut-elle pré-rédiger l\'attestation ?',options:['Oui, en autonomie','Non, seulement confirmer la prise en compte']},
-      ]},
-      {id:'G',name:'Devis et nouvelles souscriptions',questions:[
-        {id:'G1',type:'checkbox',label:'Pour un devis AUTO, infos obligatoires :',options:['Marque / modèle / version','Date de mise en circulation','Conducteur principal (DOB, permis depuis)','Usage (privé / pro / mixte)','Antécédents 5 ans (bonus-malus)','Formule demandée (RC / Omnium / Mini)','Date de prise d\'effet']},
-        {id:'G2',type:'checkbox',label:'Pour un devis HABITATION, infos obligatoires :',options:['Adresse complète du bien','Propriétaire / locataire','Type (maison / appartement / commerce)','Surface habitable (m²)','Année de construction','Capital contenu souhaité','Zone inondable ?','Date de prise d\'effet']},
-        {id:'G3',type:'radio',label:'L\'IA peut-elle poser les questions de tarification en autonomie ?',options:['Oui, en autonomie','Non, attend validation gestionnaire']},
-        {id:'G4',type:'radio',label:'L\'IA peut-elle proposer un tarif préliminaire ?',options:['Oui','Non']},
-        {id:'G5',type:'radio',label:'L\'IA peut-elle proposer une remise commerciale ?',options:['Oui','Non','Avec un plafond défini']},
-        {id:'G6',type:'text',label:'Validité d\'un devis par défaut (en jours) ?'},
-      ]},
-      {id:'H',name:'Modifications de contrat',questions:[
-        {id:'H1',type:'radio',label:'Changement d\'adresse — l\'IA peut patcher BRIO directement ?',options:['Oui','Non']},
-        {id:'H2',type:'radio',label:'Changement IBAN — l\'IA peut modifier directement ?',options:['Oui','Non','Sous condition (vérification téléphonique)']},
-        {id:'H3',type:'radio',label:'Changement de véhicule — l\'IA peut générer la suspension provisoire ?',options:['Oui','Non']},
-        {id:'H4',type:'radio',label:'Ajout d\'un conducteur — l\'IA peut accepter sans surprime ?',options:['Oui','Non','Cas par cas']},
-        {id:'H5',type:'radio',label:'Changement de formule (RC → Omnium) — effet ?',options:['Immédiat','À l\'échéance']},
-        {id:'H6',type:'radio',label:'Changement de formule — nécessite validation ?',options:['L\'IA gère','Validation gestionnaire requise']},
-      ]},
-      {id:'I',name:'Déclarations de sinistres',questions:[
-        {id:'I1',type:'checkbox',label:'Sinistre AUTO — pièces minimales requises :',options:['Constat européen amiable','Photos des dégâts','PV de police','Numéros de plaque des autres véhicules','Devis de réparation']},
-        {id:'I2',type:'radio',label:'Mesures conservatoires à toujours mentionner ?',options:['Oui, systématiquement','Non','Selon la situation']},
-        {id:'I3',type:'radio',label:'Délai légal de 8 jours à rappeler systématiquement ?',options:['Oui','Non']},
-        {id:'I4',type:'checkbox',label:'Sinistre HABITATION — pièces minimales requises :',options:['Description des circonstances','Photos des dégâts','Devis de réparation','PV pompiers (si incendie)','PV police (si vol)','Liste contenu volé']},
-        {id:'I5',type:'radio',label:'Sinistre CORPOREL — l\'IA peut proposer un brouillon ?',options:['Oui','Non, bloquer systématiquement']},
-        {id:'I6',type:'radio',label:'Sinistre corporel — délai d\'alerte gestionnaire ?',options:['Immédiat','Sous 1h','Sous 24h']},
-      ]},
-      {id:'J',name:'Suivi de sinistres et cycle de vie',questions:[
-        {id:'J1',type:'radio',label:'L\'IA peut lister les intervenants connus sur un dossier ?',options:['Oui','Non']},
-        {id:'J2',type:'radio',label:'L\'IA peut mentionner les montants déjà indemnisés ?',options:['Oui','Non']},
-        {id:'J3',type:'radio',label:'L\'IA peut donner une date prévisionnelle de clôture ?',options:['Oui','Non','Sur demande explicite']},
-        {id:'J4',type:'radio',label:'L\'IA peut annoncer un refus d\'indemnisation ?',options:['Oui','Non, toujours bloquer']},
-        {id:'J5',type:'radio',label:'Résiliation à l\'échéance par le client — tentative de rétention ?',options:['Systématique','Non, accusé de réception neutre','Selon le profil client']},
-        {id:'J6',type:'radio',label:'L\'IA vérifie automatiquement les dates légales de préavis ?',options:['Oui','Non']},
-      ]},
-    ]
-  },
-  {
-    id:'module3', title:'Scénarios avancés',
-    desc:'BRIO, procédures spéciales, frontières de l\'IA et paramètres de monitoring.',
-    icon:'🔬',
-    sections:[
-      {id:'K',name:'Création d\'activités BRIO',questions:[
-        {id:'K1',type:'checkbox',label:'Catégories déclenchant systématiquement une activité BRIO :',options:['Déclaration sinistre','Demande modification contrat','Demande devis','Réclamation / plainte','Demande résiliation','Demande documentation','Premier contact prospect','Mail nécessitant un suivi']},
-        {id:'K2',type:'text',label:'Type d\'activité par défaut (code BRIO ou libellé) ?'},
-        {id:'K3',type:'radio',label:'Destinataire par défaut d\'une activité ?',options:['Gestionnaire du dossier','Gestionnaire de la party','Toujours le même collaborateur']},
-        {id:'K4',type:'radio',label:'Priorité par défaut ?',options:['Haute','Normale','Basse']},
-        {id:'K5',type:'text',label:'Délai d\'échéance par défaut (en jours) ?'},
-        {id:'K6',type:'radio',label:'Activité visible dans My Broker par défaut ?',options:['Oui','Non']},
-      ]},
-      {id:'L',name:'Classement de documents BRIO',questions:[
-        {id:'L1',type:'radio',label:'Pièce jointe reçue — entité par défaut pour classement ?',options:['Party','Contract','Claimfolder','Risk object']},
-        {id:'L2',type:'textarea',label:'Qualifiers BRIO utilisés (constat, CI, attestation, devis, PV, photos…) — indiquez vos codes :'},
-        {id:'L3',type:'radio',label:'Constat reçu → ouverture sinistre automatique ?',options:['Oui','Non']},
-        {id:'L4',type:'radio',label:'Acte décès reçu → ouverture sinistre vie ?',options:['Oui','Non']},
-        {id:'L5',type:'radio',label:'Acte mariage → mise à jour party + co-preneur ?',options:['Oui','Non']},
-      ]},
-      {id:'M',name:'Procédures spéciales',questions:[
-        {id:'M1',type:'radio',label:'Sinistre corporel — alerte gestionnaire par quel canal ?',options:['Téléphone','SMS','Teams / Slack','Email urgent']},
-        {id:'M2',type:'radio',label:'Mention "recontacté sous 24h" pour sinistre corporel ?',options:['Oui, systématique','Non']},
-        {id:'M3',type:'text',label:'DPO responsable RGPD — nom et email ?'},
-        {id:'M4',type:'radio',label:'Mail Ombudsman reçu — procédure ?',options:['Transfert gérant + accusé réception 4 semaines','Réponse directe par gestionnaire','Escalade immédiate']},
-        {id:'M5',type:'radio',label:'Plainte qualité service — escalade au gérant ?',options:['Systématique','Seulement si répétée','Non']},
-        {id:'M6',type:'radio',label:'Suspicion de fraude — action immédiate ?',options:['Blocage + alerte compliance','Validation manuelle gestionnaire','Transfert gérant']},
-      ]},
-      {id:'N',name:'Frontières de l\'IA',questions:[
-        {id:'N1',type:'radio',label:'L\'IA peut envoyer un brouillon directement au client SANS validation ?',options:['Oui','Non']},
-        {id:'N2',type:'checkbox',label:'L\'IA peut modifier automatiquement dans BRIO :',options:['Email party','Téléphone party','Adresse postale party','IBAN','Date carte d\'identité','Plaque véhicule','Date d\'effet contrat']},
-        {id:'N3',type:'radio',label:'L\'IA peut créer un sinistre dans BRIO automatiquement ?',options:['Oui','Non','Sous conditions']},
-        {id:'N4',type:'radio',label:'L\'IA peut classer un document dans BRIO automatiquement ?',options:['Oui','Non']},
-        {id:'N5',type:'radio',label:'L\'IA peut créer une activité dans BRIO automatiquement ?',options:['Oui','Non']},
-        {id:'N6',type:'text',label:'Montant maximum qu\'une indemnisation que l\'IA peut mentionner sans validation (€) ?'},
-        {id:'N7',type:'radio',label:'Mail contenant "avocat / huissier / tribunal" → l\'IA bloque ?',options:['Oui, systématiquement','Non']},
-      ]},
-      {id:'O',name:'Segmentation, rappels et monitoring',questions:[
-        {id:'O1',type:'radio',label:'Avez-vous une segmentation client formalisée ?',options:['Oui (VIP, Standard, Prospect, Contentieux)','Non']},
-        {id:'O2',type:'radio',label:'Comportement spécial pour les VIP ?',options:['Validation humaine systématique','Ton particulier uniquement','Non']},
-        {id:'O3',type:'radio',label:'Avez-vous un système de relance auto (client non répondant) ?',options:['Oui','Non']},
-        {id:'O4',type:'checkbox',label:'Délais de relance souhaités :',options:['J+7','J+14','J+21','J+30']},
-        {id:'O5',type:'radio',label:'Rapport quotidien des mails traités par l\'IA ?',options:['Oui, par email','Oui, dans un dashboard','Non']},
-        {id:'O6',type:'radio',label:'Alerte en temps réel quand l\'IA bloque un mail sensible ?',options:['Oui','Non']},
-        {id:'O7',type:'radio',label:'L\'IA peut suggérer des opportunités cross-sell dans ses brouillons ?',options:['Oui','Non']},
-        {id:'O8',type:'radio',label:'L\'IA peut détecter les gaps de couverture dans un dossier client ?',options:['Oui','Non']},
-      ]},
-    ]
-  }
+  {id:'module1',title:'Mise en production',desc:'Configuration de base : identité du bureau, équipe, compagnies et paramètres de communication.',icon:'⚙️',sections:[
+    {id:'A',name:'Identité et structure du bureau',questions:[
+      {id:'A1',type:'text',label:'Raison sociale exacte (telle qu\'au registre BCE) ?'},
+      {id:'A2',type:'text',label:'Nom commercial si différent ?'},
+      {id:'A3',type:'text',label:'Numéro BCE / TVA ?'},
+      {id:'A4',type:'text',label:'Numéro FSMA ?'},
+      {id:'A5',type:'radio',label:'Forme juridique ?',options:['SRL','SA','SPRL','Indépendant','Autre']},
+      {id:'A6',type:'text',label:'Adresse du siège social ?'},
+      {id:'A7',type:'textarea',label:'Adresses des succursales / bureaux secondaires ?'},
+      {id:'A8',type:'text',label:'Téléphone principal ?'},
+      {id:'A9',type:'text',label:'Email principal ?'},
+      {id:'A10',type:'text',label:'Site web ?'},
+      {id:'A11',type:'textarea',label:'Liste des collaborateurs (prénom, nom, fonction, email, tél) ?'},
+      {id:'A12',type:'text',label:'Gestionnaire principal par défaut ?'},
+      {id:'A13',type:'text',label:'DPO / Responsable RGPD (nom + email) ?'},
+      {id:'A14',type:'textarea',label:'Horaires d\'ouverture par jour ?'},
+      {id:'A15',type:'text',label:'Période de fermeture annuelle ?'},
+    ]},
+    {id:'B',name:'Signature et ton de communication',questions:[
+      {id:'B1',type:'textarea',label:'Signature standard à apposer en fin de mail (texte exact) ?'},
+      {id:'B2',type:'radio',label:'Vouvoiement ou tutoiement par défaut ?',options:['Vouvoiement','Tutoiement']},
+      {id:'B3',type:'radio',label:'Ton souhaité ?',options:['Sobre','Chaleureux','Technique','Formel','Familier']},
+      {id:'B4',type:'radio',label:'Niveau d\'empathie en cas de sinistre / décès ?',options:['Factuel','Nuancé','Empathique appuyé']},
+      {id:'B5',type:'text',label:'Formule de politesse préférée ?'},
+      {id:'B6',type:'radio',label:'Adresser le client par ?',options:['Son prénom','Son nom de famille','Monsieur / Madame']},
+      {id:'B7',type:'radio',label:'Langue de réponse par défaut ?',options:['FR','NL','EN','Langue du mail entrant']},
+      {id:'B8',type:'radio',label:'Mention "Réponse rédigée avec assistance IA" ?',options:['Toujours','Jamais','Au choix du gestionnaire']},
+      {id:'B9',type:'textarea',label:'Disclaimer RGPD court à inclure ? Si oui, texte exact :'},
+    ]},
+    {id:'C',name:'Périmètre métier et portefeuille',questions:[
+      {id:'C1',type:'checkbox',label:'Branches d\'assurance traitées activement :',options:['Auto (RC, Omnium, Mini-omnium)','Habitation / incendie','RC Vie privée / familiale','Hospitalisation','Soins de santé ambulatoires','Vie individuelle','Vie groupe','Protection juridique','Accidents corporels','Accidents du travail','Voyage / annulation','Décès / obsèques','RC professionnelle','Multirisques PME','Cyber-risques','Crédit / caution']},
+      {id:'C2',type:'textarea',label:'Branches que vous ne traitez jamais ?'},
+      {id:'C3',type:'radio',label:'Proportion PP / PM dans le portefeuille ?',options:['Majorité PP (>70%)','Mixte 50/50','Majorité PM (>70%)']},
+      {id:'C4',type:'checkbox',label:'Profils-types de clients :',options:['Familles / particuliers','Indépendants / professions libérales','Médecins / paramédicaux','Avocats / notaires','PME 1-50 salariés','Entreprises 50-250','Grandes entreprises','ASBL / associations','Copropriétés / syndics','Flottes auto / transporteurs']},
+      {id:'C5',type:'text',label:'Nombre approximatif de contrats actifs ?'},
+      {id:'C6',type:'text',label:'Nombre approximatif de mails entrants clients par jour ?'},
+    ]},
+    {id:'D',name:'Compagnies partenaires',questions:[
+      {id:'D1',type:'textarea',label:'Listez vos compagnies avec mandat actif (nom, branches couvertes) :'},
+      {id:'D2',type:'textarea',label:'Compagnie préférée par branche :'},
+      {id:'D3',type:'textarea',label:'Compagnies à éviter ou en cours de retrait (raison) ?'},
+      {id:'D4',type:'radio',label:'Convention RDR (auto) appliquée ?',options:['Systématiquement','Cas par cas','Pas appliquée']},
+      {id:'D5',type:'textarea',label:'Compagnies avec délégation de gestion sinistres ?'},
+    ]},
+    {id:'E',name:'Boîtes mail et filtres',questions:[
+      {id:'E1',type:'text',label:'Adresse email principale à surveiller par Inboxia ?'},
+      {id:'E2',type:'textarea',label:'Adresses secondaires à traiter ?'},
+      {id:'E3',type:'checkbox',label:'Mails à NE PAS traiter automatiquement :',options:['Mails entre collègues','Mails d\'une compagnie (B2B)','Mails de l\'Ombudsman / FSMA / APD','Mails d\'un avocat ou huissier','Mails de fournisseurs','Mails marketing / newsletters','Mails marqués "Confidentiel"']},
+      {id:'E4',type:'checkbox',label:'Catégories requérant validation humaine :',options:['Sinistre corporel','Décès du client','Litige / contestation','Demande de résiliation','Plainte / réclamation','Demande RGPD','Réclamation Ombudsman','Mise en demeure','Suspicion de fraude']},
+    ]},
+  ]},
+  {id:'module2',title:'Personnalisation de l\'agent IA',desc:'Paramétrez le comportement d\'Inboxia : workflows, devis, sinistres, modifications de contrat.',icon:'🤖',sections:[
+    {id:'F',name:'Demandes de documentation',questions:[
+      {id:'F1',type:'radio',label:'Quand un client demande les CG d\'un produit, vous :',options:['Joignez le PDF directement','Renvoyez vers le portail compagnie','Attendez confirmation du gestionnaire']},
+      {id:'F2',type:'radio',label:'Pour les Conditions Particulières :',options:['Générez depuis BRIO','Renvoyez vers le portail compagnie','Demandez au gestionnaire']},
+      {id:'F3',type:'text',label:'Délai normal pour fournir des CP ?'},
+      {id:'F4',type:'checkbox',label:'Types d\'attestation fournis régulièrement :',options:['Attestation d\'assurance','Attestation antécédents auto','Attestation RC pro','Attestation hospitalisation pour employeur','Attestation primes payées (fiscale)','Carte verte (auto)','Attestation pour visa / voyage']},
+      {id:'F5',type:'text',label:'Délai moyen pour produire une attestation ?'},
+      {id:'F6',type:'radio',label:'L\'IA peut-elle pré-rédiger l\'attestation ?',options:['Oui, en autonomie','Non, seulement confirmer la prise en compte']},
+    ]},
+    {id:'G',name:'Devis et nouvelles souscriptions',questions:[
+      {id:'G1',type:'checkbox',label:'Pour un devis AUTO, infos obligatoires :',options:['Marque / modèle / version','Date de mise en circulation','Conducteur principal (DOB, permis depuis)','Usage (privé / pro / mixte)','Antécédents 5 ans (bonus-malus)','Formule demandée (RC / Omnium / Mini)','Date de prise d\'effet']},
+      {id:'G2',type:'checkbox',label:'Pour un devis HABITATION, infos obligatoires :',options:['Adresse complète du bien','Propriétaire / locataire','Type (maison / appartement / commerce)','Surface habitable (m²)','Année de construction','Capital contenu souhaité','Zone inondable ?','Date de prise d\'effet']},
+      {id:'G3',type:'radio',label:'L\'IA peut-elle poser les questions de tarification en autonomie ?',options:['Oui, en autonomie','Non, attend validation gestionnaire']},
+      {id:'G4',type:'radio',label:'L\'IA peut-elle proposer un tarif préliminaire ?',options:['Oui','Non']},
+      {id:'G5',type:'radio',label:'L\'IA peut-elle proposer une remise commerciale ?',options:['Oui','Non','Avec un plafond défini']},
+      {id:'G6',type:'text',label:'Validité d\'un devis par défaut (en jours) ?'},
+    ]},
+    {id:'H',name:'Modifications de contrat',questions:[
+      {id:'H1',type:'radio',label:'Changement d\'adresse — l\'IA peut patcher BRIO directement ?',options:['Oui','Non']},
+      {id:'H2',type:'radio',label:'Changement IBAN — l\'IA peut modifier directement ?',options:['Oui','Non','Sous condition (vérification téléphonique)']},
+      {id:'H3',type:'radio',label:'Changement de véhicule — l\'IA peut générer la suspension provisoire ?',options:['Oui','Non']},
+      {id:'H4',type:'radio',label:'Ajout d\'un conducteur — l\'IA peut accepter sans surprime ?',options:['Oui','Non','Cas par cas']},
+      {id:'H5',type:'radio',label:'Changement de formule — effet ?',options:['Immédiat','À l\'échéance']},
+      {id:'H6',type:'radio',label:'Changement de formule — nécessite validation ?',options:['L\'IA gère','Validation gestionnaire requise']},
+    ]},
+    {id:'I',name:'Déclarations de sinistres',questions:[
+      {id:'I1',type:'checkbox',label:'Sinistre AUTO — pièces minimales requises :',options:['Constat européen amiable','Photos des dégâts','PV de police','Numéros de plaque des autres véhicules','Devis de réparation']},
+      {id:'I2',type:'radio',label:'Mesures conservatoires à toujours mentionner ?',options:['Oui, systématiquement','Non','Selon la situation']},
+      {id:'I3',type:'radio',label:'Délai légal de 8 jours à rappeler systématiquement ?',options:['Oui','Non']},
+      {id:'I4',type:'checkbox',label:'Sinistre HABITATION — pièces minimales requises :',options:['Description des circonstances','Photos des dégâts','Devis de réparation','PV pompiers (si incendie)','PV police (si vol)','Liste contenu volé']},
+      {id:'I5',type:'radio',label:'Sinistre CORPOREL — l\'IA peut proposer un brouillon ?',options:['Oui','Non, bloquer systématiquement']},
+      {id:'I6',type:'radio',label:'Sinistre corporel — délai d\'alerte gestionnaire ?',options:['Immédiat','Sous 1h','Sous 24h']},
+    ]},
+    {id:'J',name:'Suivi de sinistres',questions:[
+      {id:'J1',type:'radio',label:'L\'IA peut lister les intervenants connus sur un dossier ?',options:['Oui','Non']},
+      {id:'J2',type:'radio',label:'L\'IA peut mentionner les montants déjà indemnisés ?',options:['Oui','Non']},
+      {id:'J3',type:'radio',label:'L\'IA peut donner une date prévisionnelle de clôture ?',options:['Oui','Non','Sur demande explicite']},
+      {id:'J4',type:'radio',label:'L\'IA peut annoncer un refus d\'indemnisation ?',options:['Oui','Non, toujours bloquer']},
+      {id:'J5',type:'radio',label:'Résiliation à l\'échéance — tentative de rétention ?',options:['Systématique','Non, accusé de réception neutre','Selon le profil client']},
+      {id:'J6',type:'radio',label:'L\'IA vérifie automatiquement les dates légales de préavis ?',options:['Oui','Non']},
+    ]},
+  ]},
+  {id:'module3',title:'Scénarios avancés',desc:'BRIO, procédures spéciales, frontières de l\'IA et paramètres de monitoring.',icon:'🔬',sections:[
+    {id:'K',name:'Création d\'activités BRIO',questions:[
+      {id:'K1',type:'checkbox',label:'Catégories déclenchant une activité BRIO :',options:['Déclaration sinistre','Demande modification contrat','Demande devis','Réclamation / plainte','Demande résiliation','Demande documentation','Premier contact prospect','Mail nécessitant un suivi']},
+      {id:'K2',type:'text',label:'Type d\'activité par défaut (code BRIO ou libellé) ?'},
+      {id:'K3',type:'radio',label:'Destinataire par défaut d\'une activité ?',options:['Gestionnaire du dossier','Gestionnaire de la party','Toujours le même collaborateur']},
+      {id:'K4',type:'radio',label:'Priorité par défaut ?',options:['Haute','Normale','Basse']},
+      {id:'K5',type:'text',label:'Délai d\'échéance par défaut (en jours) ?'},
+      {id:'K6',type:'radio',label:'Activité visible dans My Broker par défaut ?',options:['Oui','Non']},
+    ]},
+    {id:'L',name:'Classement de documents BRIO',questions:[
+      {id:'L1',type:'radio',label:'Entité par défaut pour classement ?',options:['Party','Contract','Claimfolder','Risk object']},
+      {id:'L2',type:'textarea',label:'Qualifiers BRIO utilisés :'},
+      {id:'L3',type:'radio',label:'Constat reçu → ouverture sinistre automatique ?',options:['Oui','Non']},
+      {id:'L4',type:'radio',label:'Acte décès reçu → ouverture sinistre vie ?',options:['Oui','Non']},
+      {id:'L5',type:'radio',label:'Acte mariage → mise à jour party + co-preneur ?',options:['Oui','Non']},
+    ]},
+    {id:'M',name:'Procédures spéciales',questions:[
+      {id:'M1',type:'radio',label:'Sinistre corporel — alerte gestionnaire par quel canal ?',options:['Téléphone','SMS','Teams / Slack','Email urgent']},
+      {id:'M2',type:'radio',label:'Mention "recontacté sous 24h" pour sinistre corporel ?',options:['Oui, systématique','Non']},
+      {id:'M3',type:'text',label:'DPO responsable RGPD — nom et email ?'},
+      {id:'M4',type:'radio',label:'Mail Ombudsman reçu — procédure ?',options:['Transfert gérant + accusé réception 4 semaines','Réponse directe par gestionnaire','Escalade immédiate']},
+      {id:'M5',type:'radio',label:'Plainte qualité service — escalade au gérant ?',options:['Systématique','Seulement si répétée','Non']},
+      {id:'M6',type:'radio',label:'Suspicion de fraude — action immédiate ?',options:['Blocage + alerte compliance','Validation manuelle gestionnaire','Transfert gérant']},
+    ]},
+    {id:'N',name:'Frontières de l\'IA',questions:[
+      {id:'N1',type:'radio',label:'L\'IA peut envoyer un brouillon directement SANS validation ?',options:['Oui','Non']},
+      {id:'N2',type:'checkbox',label:'L\'IA peut modifier automatiquement dans BRIO :',options:['Email party','Téléphone party','Adresse postale party','IBAN','Date carte d\'identité','Plaque véhicule','Date d\'effet contrat']},
+      {id:'N3',type:'radio',label:'L\'IA peut créer un sinistre dans BRIO automatiquement ?',options:['Oui','Non','Sous conditions']},
+      {id:'N4',type:'radio',label:'L\'IA peut classer un document dans BRIO automatiquement ?',options:['Oui','Non']},
+      {id:'N5',type:'radio',label:'L\'IA peut créer une activité dans BRIO automatiquement ?',options:['Oui','Non']},
+      {id:'N6',type:'text',label:'Montant max qu\'une indemnisation que l\'IA peut mentionner sans validation (€) ?'},
+      {id:'N7',type:'radio',label:'Mail contenant "avocat / huissier / tribunal" → l\'IA bloque ?',options:['Oui, systématiquement','Non']},
+    ]},
+    {id:'O',name:'Segmentation, rappels et monitoring',questions:[
+      {id:'O1',type:'radio',label:'Avez-vous une segmentation client formalisée ?',options:['Oui (VIP, Standard, Prospect, Contentieux)','Non']},
+      {id:'O2',type:'radio',label:'Comportement spécial pour les VIP ?',options:['Validation humaine systématique','Ton particulier uniquement','Non']},
+      {id:'O3',type:'radio',label:'Système de relance auto (client non répondant) ?',options:['Oui','Non']},
+      {id:'O4',type:'checkbox',label:'Délais de relance souhaités :',options:['J+7','J+14','J+21','J+30']},
+      {id:'O5',type:'radio',label:'Rapport quotidien des mails traités par l\'IA ?',options:['Oui, par email','Oui, dans un dashboard','Non']},
+      {id:'O6',type:'radio',label:'Alerte en temps réel quand l\'IA bloque un mail sensible ?',options:['Oui','Non']},
+      {id:'O7',type:'radio',label:'L\'IA peut suggérer des opportunités cross-sell ?',options:['Oui','Non']},
+      {id:'O8',type:'radio',label:'L\'IA peut détecter les gaps de couverture ?',options:['Oui','Non']},
+    ]},
+  ]},
 ];
 
 // ══════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════
-let currentUser = null;   // { email, company, isAdmin }
+let currentUser = null; // { id, email, company_name, module1_status, module2_status, module3_status }
 let currentMod  = null;
+let localCache  = {};   // { question_id: value } — cache local pour éviter trop de requêtes
 let saveTimer   = null;
-let odooUid     = null;   // Odoo session uid après authenticate
-
-// ══════════════════════════════════════════════════════════════
-// LOCAL STORAGE HELPERS
-// ══════════════════════════════════════════════════════════════
-const KEY = {
-  users:    'procyo_users',
-  session:  'procyo_session',
-  data:     (email, mid) => 'procyo_' + btoa(email) + '_' + mid,
-  statuses: (email) => 'procyo_status_' + btoa(email),
-};
-
-function getUsers()        { try { return JSON.parse(localStorage.getItem(KEY.users)||'{}'); } catch(e){return{};} }
-function saveUsers(u)      { localStorage.setItem(KEY.users, JSON.stringify(u)); }
-function getStatuses(email){ try { return JSON.parse(localStorage.getItem(KEY.statuses(email))||'{"module1":"active","module2":"locked","module3":"locked"}'); } catch(e){ return {module1:'active',module2:'locked',module3:'locked'}; } }
-function saveStatuses(email, s){ localStorage.setItem(KEY.statuses(email), JSON.stringify(s)); }
-function getData(email, mid){ try { return JSON.parse(localStorage.getItem(KEY.data(email,mid))||'{}'); } catch(e){return{};} }
-function saveData(email, mid, d){ localStorage.setItem(KEY.data(email,mid), JSON.stringify(d)); }
+let odooUid     = null;
 
 // ══════════════════════════════════════════════════════════════
 // AUTH
 // ══════════════════════════════════════════════════════════════
 function switchTab(t) {
-  document.querySelectorAll('.auth-tab').forEach((el,i) => el.classList.toggle('on', (t==='login'&&i===0)||(t==='register'&&i===1)));
-  document.getElementById('form-login').classList.toggle('on', t==='login');
-  document.getElementById('form-register').classList.toggle('on', t==='register');
+  document.querySelectorAll('.auth-tab').forEach((el,i) => el.classList.toggle('on',(t==='login'&&i===0)||(t==='register'&&i===1)));
+  document.getElementById('form-login').classList.toggle('on',t==='login');
+  document.getElementById('form-register').classList.toggle('on',t==='register');
 }
 
-function doLogin() {
+async function doLogin() {
   const email = document.getElementById('login-email').value.trim().toLowerCase();
   const pwd   = document.getElementById('login-pwd').value;
   const errEl = document.getElementById('login-err');
   errEl.style.display = 'none';
-  if (!email || !pwd) { showMsg(errEl,'Veuillez remplir tous les champs.'); return; }
-  const users = getUsers();
-  if (!users[email]) { showMsg(errEl,'Aucun compte trouvé pour cet email.'); return; }
-  if (users[email].pwd !== hashPwd(pwd)) { showMsg(errEl,'Mot de passe incorrect.'); return; }
-  currentUser = { email, company: users[email].company, isAdmin: ADMIN_EMAILS.includes(email) };
-  localStorage.setItem(KEY.session, JSON.stringify(currentUser));
-  enterApp();
+  if (!email||!pwd) { showMsg(errEl,'Veuillez remplir tous les champs.'); return; }
+  setLoading(true,'Connexion en cours…');
+  try {
+    const hash = await hashPassword(pwd);
+    const rows = await sbGet('brokers', 'email=eq.'+encodeURIComponent(email)+'&select=*');
+    if (!rows||rows.length===0) { showMsg(errEl,'Aucun compte trouvé pour cet email.'); return; }
+    if (rows[0].password_hash !== hash) { showMsg(errEl,'Mot de passe incorrect.'); return; }
+    currentUser = rows[0];
+    localStorage.setItem('procyo_session', JSON.stringify({id:currentUser.id,email:currentUser.email}));
+    await loadAnswersCache();
+    enterApp();
+  } catch(e) {
+    showMsg(errEl, 'Erreur de connexion : ' + e.message);
+  } finally { setLoading(false); }
 }
 
-function doRegister() {
+async function doRegister() {
   const email   = document.getElementById('reg-email').value.trim().toLowerCase();
   const company = document.getElementById('reg-company').value.trim();
   const pwd     = document.getElementById('reg-pwd').value;
   const pwd2    = document.getElementById('reg-pwd2').value;
   const errEl   = document.getElementById('reg-err');
   const okEl    = document.getElementById('reg-ok');
-  errEl.style.display = 'none'; okEl.style.display = 'none';
-  if (!email || !pwd) { showMsg(errEl,'Email et mot de passe requis.'); return; }
+  errEl.style.display='none'; okEl.style.display='none';
+  if (!email||!pwd) { showMsg(errEl,'Email et mot de passe requis.'); return; }
   if (!/\S+@\S+\.\S+/.test(email)) { showMsg(errEl,'Adresse email invalide.'); return; }
-  if (pwd.length < 8) { showMsg(errEl,'Le mot de passe doit faire au moins 8 caractères.'); return; }
-  if (pwd !== pwd2) { showMsg(errEl,'Les mots de passe ne correspondent pas.'); return; }
-  const users = getUsers();
-  if (users[email]) { showMsg(errEl,'Un compte existe déjà pour cet email.'); return; }
-  users[email] = { pwd: hashPwd(pwd), company, created: new Date().toISOString() };
-  saveUsers(users);
-  showMsg(okEl, '✓ Compte créé ! Connexion en cours…');
-  setTimeout(() => {
-    currentUser = { email, company, isAdmin: ADMIN_EMAILS.includes(email) };
-    localStorage.setItem(KEY.session, JSON.stringify(currentUser));
-    enterApp();
-  }, 1000);
-}
-
-function doLogout() {
-  currentUser = null; odooUid = null;
-  localStorage.removeItem(KEY.session);
-  document.getElementById('screen-auth').style.display = 'flex';
-  document.getElementById('screen-app').classList.add('hidden');
-  document.getElementById('login-pwd').value = '';
-}
-
-function hashPwd(p) {
-  // Simple hash côté client (le vrai hash se ferait server-side en prod)
-  let h = 0;
-  for (let i = 0; i < p.length; i++) { h = ((h << 5) - h) + p.charCodeAt(i); h |= 0; }
-  return h.toString(36) + p.length;
-}
-
-function showMsg(el, msg) { el.textContent = msg; el.style.display = 'block'; }
-
-function checkSession() {
+  if (pwd.length<8) { showMsg(errEl,'Le mot de passe doit faire au moins 8 caractères.'); return; }
+  if (pwd!==pwd2) { showMsg(errEl,'Les mots de passe ne correspondent pas.'); return; }
+  setLoading(true,'Création du compte…');
   try {
-    const s = JSON.parse(localStorage.getItem(KEY.session)||'null');
-    if (s && s.email && getUsers()[s.email]) { currentUser = s; enterApp(); return; }
-  } catch(e) {}
+    const existing = await sbGet('brokers','email=eq.'+encodeURIComponent(email)+'&select=id');
+    if (existing&&existing.length>0) { showMsg(errEl,'Un compte existe déjà pour cet email.'); return; }
+    const hash = await hashPassword(pwd);
+    const rows = await sbInsert('brokers', { email, password_hash:hash, company_name:company||null });
+    currentUser = rows[0];
+    localStorage.setItem('procyo_session', JSON.stringify({id:currentUser.id,email:currentUser.email}));
+    showMsg(okEl,'✓ Compte créé ! Connexion en cours…');
+    setTimeout(() => enterApp(), 800);
+  } catch(e) {
+    showMsg(errEl,'Erreur lors de la création : '+e.message);
+  } finally { setLoading(false); }
+}
+
+async function doLogout() {
+  currentUser=null; localCache={}; odooUid=null;
+  localStorage.removeItem('procyo_session');
+  document.getElementById('screen-auth').style.display='flex';
+  document.getElementById('screen-app').classList.add('hidden');
+  document.getElementById('login-pwd').value='';
+}
+
+function showMsg(el,msg){el.textContent=msg;el.style.display='block';}
+
+async function checkSession() {
+  try {
+    const s = JSON.parse(localStorage.getItem('procyo_session')||'null');
+    if (!s||!s.id) return;
+    setLoading(true,'Chargement…');
+    const rows = await sbGet('brokers','id=eq.'+s.id+'&select=*');
+    if (rows&&rows.length>0) {
+      currentUser = rows[0];
+      await loadAnswersCache();
+      enterApp();
+    }
+  } catch(e) { console.warn('Session check failed',e); }
+  finally { setLoading(false); }
 }
 
 function enterApp() {
-  document.getElementById('screen-auth').style.display = 'none';
+  document.getElementById('screen-auth').style.display='none';
   document.getElementById('screen-app').classList.remove('hidden');
-  document.getElementById('tb-email').textContent = currentUser.email;
-  if (currentUser.isAdmin) document.getElementById('btn-admin').classList.remove('hidden');
+  document.getElementById('tb-email').textContent=currentUser.email;
+  if (ADMIN_EMAILS.includes(currentUser.email)) document.getElementById('btn-admin').classList.remove('hidden');
   showHome();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ANSWERS CACHE
+// ══════════════════════════════════════════════════════════════
+async function loadAnswersCache() {
+  const rows = await sbGet('answers','broker_id=eq.'+currentUser.id+'&select=question_id,answer_value');
+  localCache = {};
+  (rows||[]).forEach(r => { localCache[r.question_id] = r.answer_value; });
+}
+
+async function saveAnswer(qid, val) {
+  localCache[qid] = val;
+  await sbUpsert('answers', { broker_id:currentUser.id, question_id:qid, answer_value:val, updated_at:new Date().toISOString() }, 'broker_id,question_id');
+}
+
+async function saveBatch() {
+  if (!currentUser) return;
+  const inputs = document.querySelectorAll('.q-input');
+  const promises = [];
+  inputs.forEach(inp => {
+    const val = inp.value.trim();
+    if (val && localCache[inp.dataset.qid] !== val) {
+      localCache[inp.dataset.qid] = val;
+      promises.push(sbUpsert('answers', { broker_id:currentUser.id, question_id:inp.dataset.qid, answer_value:val, updated_at:new Date().toISOString() }, 'broker_id,question_id'));
+    }
+  });
+  await Promise.all(promises);
 }
 
 // ══════════════════════════════════════════════════════════════
 // HOME
 // ══════════════════════════════════════════════════════════════
 function showHome() {
-  currentMod = null;
+  currentMod=null;
   hideAll();
-  document.getElementById('screen-home').style.display = 'block';
-  const name = currentUser.company || currentUser.email.split('@')[0];
-  document.getElementById('greeting').textContent = 'Bonjour, ' + name + ' 👋';
+  document.getElementById('screen-home').style.display='block';
+  const name = currentUser.company_name || currentUser.email.split('@')[0];
+  document.getElementById('greeting').textContent = 'Bonjour, '+name+' 👋';
   renderModules();
   renderGlobalProgress();
 }
 
+function getProgress(mid) {
+  const mod = MODULES.find(m=>m.id===mid);
+  let ans=0,tot=0;
+  mod.sections.forEach(s=>s.questions.forEach(q=>{
+    tot++;
+    const v=localCache[q.id];
+    if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&v.length===0)) ans++;
+  }));
+  return {ans,tot};
+}
+
 function renderModules() {
   const list = document.getElementById('mod-list');
-  list.innerHTML = '';
-  const statuses = getStatuses(currentUser.email);
-  MODULES.forEach((mod, i) => {
-    const status = statuses[mod.id];
-    const { ans, tot } = getProgress(mod.id);
-    const pct = tot > 0 ? Math.round(ans/tot*100) : 0;
-    const isDone = ans >= tot && tot > 0;
-    const effectiveStatus = isDone ? 'completed' : status;
-
+  list.innerHTML='';
+  MODULES.forEach((mod,i)=>{
+    const status = currentUser[mod.id+'_status']||'locked';
+    const {ans,tot} = getProgress(mod.id);
+    const pct = tot>0?Math.round(ans/tot*100):0;
+    const isDone = ans>=tot&&tot>0;
+    const es = isDone?'completed':status;
     const card = document.createElement('div');
-    card.className = 'mod-card ' + (status === 'locked' ? 'locked' : effectiveStatus === 'completed' ? 'completed' : 'active-card');
-
-    let badge = '';
-    if (effectiveStatus === 'completed') badge = '<div class="mod-badge mb-done"><span class="bdot"></span>Clôturé</div>';
-    else if (status === 'active') badge = '<div class="mod-badge mb-active"><span class="bdot"></span>Accessible</div>';
-    else badge = '<div class="mod-badge mb-locked"><span class="bdot"></span>Non disponible</div>';
-
-    card.innerHTML = `
-      <div class="mod-icon ${status === 'locked' ? 'locked' : effectiveStatus === 'completed' ? 'completed' : 'active-card'}">${mod.icon}</div>
+    card.className='mod-card '+(status==='locked'?'locked':es==='completed'?'completed':'active-card');
+    let badge='';
+    if(es==='completed') badge='<div class="mod-badge mb-done"><span class="bdot"></span>Clôturé</div>';
+    else if(status==='active') badge='<div class="mod-badge mb-active"><span class="bdot"></span>Accessible</div>';
+    else badge='<div class="mod-badge mb-locked"><span class="bdot"></span>Non disponible</div>';
+    card.innerHTML=`
+      <div class="mod-icon ${status==='locked'?'locked':es==='completed'?'completed':'active-card'}">${mod.icon}</div>
       <div class="mod-body">
-        <div class="mod-meta">
-          <span class="mod-num">Module ${i+1}</span>
-          ${badge}
-        </div>
+        <div class="mod-meta"><span class="mod-num">Module ${i+1}</span>${badge}</div>
         <div class="mod-title">${mod.title}</div>
         <div class="mod-desc">${mod.desc}</div>
       </div>
       <div class="mod-prog">
-        ${status === 'locked'
-          ? '<div class="lock-icon">🔒</div>'
-          : `<div class="prog-bar"><div class="prog-fill${effectiveStatus==='completed'?' done-fill':''}" style="width:${pct}%"></div></div>
-             <div class="prog-txt">${ans}/${tot} questions</div>`}
-      </div>
-    `;
-    if (status !== 'locked') card.addEventListener('click', () => openModule(i));
+        ${status==='locked'
+          ?'<div class="lock-icon">🔒</div>'
+          :`<div class="prog-bar"><div class="prog-fill${es==='completed'?' done-fill':''}" style="width:${pct}%"></div></div>
+            <div class="prog-txt">${ans}/${tot} questions</div>`}
+      </div>`;
+    if(status!=='locked') card.addEventListener('click',()=>openModule(i));
     list.appendChild(card);
   });
 }
 
 function renderGlobalProgress() {
-  let totalAns = 0, totalTot = 0;
-  MODULES.forEach(mod => { const p = getProgress(mod.id); totalAns += p.ans; totalTot += p.tot; });
-  const pct = totalTot > 0 ? Math.round(totalAns/totalTot*100) : 0;
-  document.getElementById('pc-ans').textContent = totalAns;
-  document.getElementById('pc-tot').textContent = totalTot;
-  document.getElementById('pc-pct').textContent = pct + '%';
-  document.getElementById('pc-fill').style.width = pct + '%';
+  let ta=0,tt=0;
+  MODULES.forEach(m=>{const p=getProgress(m.id);ta+=p.ans;tt+=p.tot;});
+  const pct=tt>0?Math.round(ta/tt*100):0;
+  document.getElementById('pc-ans').textContent=ta;
+  document.getElementById('pc-tot').textContent=tt;
+  document.getElementById('pc-pct').textContent=pct+'%';
+  document.getElementById('pc-fill').style.width=pct+'%';
 }
 
 // ══════════════════════════════════════════════════════════════
-// PROGRESS
+// AUTO-UNLOCK
 // ══════════════════════════════════════════════════════════════
-function getProgress(mid) {
-  const data = getData(currentUser.email, mid);
-  const mod = MODULES.find(m => m.id === mid);
-  let ans = 0, tot = 0;
-  mod.sections.forEach(s => s.questions.forEach(q => {
-    tot++;
-    const v = data[q.id];
-    if (v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && v.length === 0)) ans++;
-  }));
-  return { ans, tot };
-}
-
-function checkAutoUnlock(mid) {
-  const { ans, tot } = getProgress(mid);
-  if (ans >= tot && tot > 0) {
-    const statuses = getStatuses(currentUser.email);
-    if (mid === 'module1' && statuses.module2 === 'locked') {
-      statuses.module1 = 'completed';
-      statuses.module2 = 'active';
-      saveStatuses(currentUser.email, statuses);
-      showUnlockToast('Module 2 débloqué ! 🎉');
-    } else if (mid === 'module2' && statuses.module3 === 'locked') {
-      statuses.module2 = 'completed';
-      statuses.module3 = 'active';
-      saveStatuses(currentUser.email, statuses);
-      showUnlockToast('Module 3 débloqué ! 🎉');
-    } else if (mid === 'module3') {
-      statuses.module3 = 'completed';
-      saveStatuses(currentUser.email, statuses);
-    }
+async function checkAutoUnlock(mid) {
+  const {ans,tot} = getProgress(mid);
+  if (ans<tot||tot===0) return;
+  let changed=false;
+  if(mid==='module1'&&currentUser.module2_status==='locked'){
+    currentUser.module2_status='active'; changed=true;
+    await sbUpdate('brokers','id=eq.'+currentUser.id,{module2_status:'active',module1_completed_at:new Date().toISOString()});
+    showUnlockToast('Module 2 débloqué ! 🎉');
+  } else if(mid==='module2'&&currentUser.module3_status==='locked'){
+    currentUser.module3_status='active'; changed=true;
+    await sbUpdate('brokers','id=eq.'+currentUser.id,{module3_status:'active',module2_completed_at:new Date().toISOString()});
+    showUnlockToast('Module 3 débloqué ! 🎉');
+  } else if(mid==='module3'&&currentUser.module3_status!=='completed'){
+    currentUser.module3_status='completed'; changed=true;
+    await sbUpdate('brokers','id=eq.'+currentUser.id,{module3_status:'completed',module3_completed_at:new Date().toISOString()});
   }
+  if(changed) renderModules();
 }
 
 function showUnlockToast(msg) {
-  const t = document.createElement('div');
-  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:12px 24px;border-radius:30px;font-size:14px;font-weight:500;z-index:999;box-shadow:0 4px 16px rgba(22,163,74,.3);animation:fadeInUp .3s ease';
-  t.textContent = msg;
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:white;padding:12px 24px;border-radius:30px;font-size:14px;font-weight:500;z-index:999;box-shadow:0 4px 16px rgba(22,163,74,.3)';
+  t.textContent=msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+  setTimeout(()=>t.remove(),3500);
 }
 
 // ══════════════════════════════════════════════════════════════
-// MODULE / QUESTIONS
+// MODULE VIEW
 // ══════════════════════════════════════════════════════════════
 function openModule(idx) {
-  currentMod = idx;
-  const mod = MODULES[idx];
+  currentMod=idx;
+  const mod=MODULES[idx];
   hideAll();
-  document.getElementById('screen-questions').style.display = 'block';
-  document.getElementById('q-badge').textContent = 'Module ' + (idx+1);
-  document.getElementById('q-title').textContent = mod.title;
-  document.getElementById('q-sub').textContent = mod.desc;
+  document.getElementById('screen-questions').style.display='block';
+  document.getElementById('q-badge').textContent='Module '+(idx+1);
+  document.getElementById('q-title').textContent=mod.title;
+  document.getElementById('q-sub').textContent=mod.desc;
   renderSections(mod);
   updateQProgress(mod);
   renderNotif(idx);
 }
 
 function renderNotif(idx) {
-  const mod = MODULES[idx];
-  const { ans, tot } = getProgress(mod.id);
-  const notif = document.getElementById('q-notif');
-  if (ans >= tot && tot > 0) {
-    notif.innerHTML = '<div class="done-bar"><h3>🎉 Module complété !</h3><p>Toutes les questions ont été répondues. Votre équipe Procyo a été notifiée.</p></div>';
-  } else {
-    notif.innerHTML = '<div class="notif-bar"><span>📧</span><span><strong>Rappel quotidien actif.</strong> Tant que ce module n\'est pas clôturé, vous recevez un email de rappel chaque jour. Complétez à votre rythme, vos réponses sont sauvegardées.</span></div>';
-  }
+  const {ans,tot}=getProgress(MODULES[idx].id);
+  const n=document.getElementById('q-notif');
+  if(ans>=tot&&tot>0) n.innerHTML='<div class="done-bar"><h3>🎉 Module complété !</h3><p>Toutes les questions ont été répondues. Votre équipe Procyo a été notifiée.</p></div>';
+  else n.innerHTML='<div class="notif-bar"><span>📧</span><span><strong>Rappel quotidien actif.</strong> Tant que ce module n\'est pas clôturé, vous recevez un email de rappel chaque jour. Vos réponses sont synchronisées sur tous vos appareils.</span></div>';
 }
 
 function renderSections(mod) {
-  const wrap = document.getElementById('sections-wrap');
-  wrap.innerHTML = '';
-  const data = getData(currentUser.email, mod.id);
-  mod.sections.forEach(sec => {
-    const { sa, st } = secProg(sec, data);
-    const block = document.createElement('div');
-    block.className = 'sec-block';
-    block.innerHTML = `
-      <div class="sec-head" onclick="toggleSec('${sec.id}', this)">
+  const wrap=document.getElementById('sections-wrap');
+  wrap.innerHTML='';
+  mod.sections.forEach(sec=>{
+    const {sa,st}=secProg(sec);
+    const block=document.createElement('div');
+    block.className='sec-block';
+    block.innerHTML=`
+      <div class="sec-head" onclick="toggleSec('${sec.id}',this)">
         <div class="sec-head-l">
           <div class="sec-letter">${sec.id}</div>
           <div class="sec-name">${sec.name}</div>
@@ -765,290 +809,206 @@ function renderSections(mod) {
           <span class="sec-chev" id="schev-${sec.id}">▾</span>
         </div>
       </div>
-      <div class="sec-body" id="sbody-${sec.id}"></div>
-    `;
-    const body = block.querySelector('#sbody-' + sec.id);
-    sec.questions.forEach(q => body.appendChild(buildQuestion(q, data[q.id], mod.id)));
+      <div class="sec-body" id="sbody-${sec.id}"></div>`;
+    const body=block.querySelector('#sbody-'+sec.id);
+    sec.questions.forEach(q=>body.appendChild(buildQuestion(q,localCache[q.id])));
     wrap.appendChild(block);
   });
 }
 
-function secProg(sec, data) {
-  let sa = 0, st = sec.questions.length;
-  sec.questions.forEach(q => {
-    const v = data[q.id];
-    if (v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && v.length===0)) sa++;
-  });
-  return { sa, st };
+function secProg(sec) {
+  let sa=0,st=sec.questions.length;
+  sec.questions.forEach(q=>{const v=localCache[q.id];if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&v.length===0))sa++;});
+  return {sa,st};
 }
 
-function toggleSec(id, hdr) {
-  document.getElementById('sbody-' + id).classList.toggle('open');
-  document.getElementById('schev-' + id).classList.toggle('open');
+function toggleSec(id,hdr) {
+  document.getElementById('sbody-'+id).classList.toggle('open');
+  document.getElementById('schev-'+id).classList.toggle('open');
 }
 
-function buildQuestion(q, saved, mid) {
-  const el = document.createElement('div');
-  el.className = 'q-item';
-  el.id = 'qi-' + q.id;
-  const lbl = `<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}</div>`;
-  let inp = '';
-  if (q.type === 'text') {
-    inp = `<input type="text" class="q-input${saved?' ans':''}" data-qid="${q.id}" data-mid="${mid}" value="${escA(saved||'')}" placeholder="Votre réponse…">`;
-  } else if (q.type === 'textarea') {
-    inp = `<textarea class="q-input${saved?' ans':''}" data-qid="${q.id}" data-mid="${mid}" rows="3" placeholder="Votre réponse…">${escH(saved||'')}</textarea>`;
-  } else if (q.type === 'radio') {
-    inp = '<div class="radios">' + q.options.map(o =>
-      `<div class="rbtn${saved===o?' sel':''}" data-qid="${q.id}" data-mid="${mid}" data-val="${escA(o)}" onclick="pickRadio(this)">${escH(o)}</div>`
-    ).join('') + '</div>';
-  } else if (q.type === 'checkbox') {
-    const chk = Array.isArray(saved) ? saved : [];
-    inp = '<div class="checks">' + q.options.map(o =>
-      `<div class="citem${chk.includes(o)?' chk':''}" data-qid="${q.id}" data-mid="${mid}" data-val="${escA(o)}" onclick="toggleChk(this)">
-        <div class="cbox"><svg width="10" height="8" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1"/></svg></div>
-        ${escH(o)}
-      </div>`
-    ).join('') + '</div>';
+function buildQuestion(q,saved) {
+  const el=document.createElement('div');
+  el.className='q-item';
+  el.id='qi-'+q.id;
+  const lbl=`<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}</div>`;
+  let inp='';
+  if(q.type==='text') inp=`<input type="text" class="q-input${saved?' ans':''}" data-qid="${q.id}" value="${escA(saved||'')}" placeholder="Votre réponse…">`;
+  else if(q.type==='textarea') inp=`<textarea class="q-input${saved?' ans':''}" data-qid="${q.id}" rows="3" placeholder="Votre réponse…">${escH(saved||'')}</textarea>`;
+  else if(q.type==='radio') inp='<div class="radios">'+q.options.map(o=>`<div class="rbtn${saved===o?' sel':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="pickRadio(this)">${escH(o)}</div>`).join('')+'</div>';
+  else if(q.type==='checkbox'){
+    const chk=Array.isArray(saved)?saved:[];
+    inp='<div class="checks">'+q.options.map(o=>`<div class="citem${chk.includes(o)?' chk':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="toggleChk(this)"><div class="cbox"><svg width="10" height="8" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1"/></svg></div>${escH(o)}</div>`).join('')+'</div>';
   }
-  el.innerHTML = lbl + inp + `<div class="saved-ind" id="si-${q.id}">✓ Sauvegardé</div>`;
-  setTimeout(() => {
-    el.querySelectorAll('.q-input').forEach(inp => {
-      inp.addEventListener('input', () => {
-        inp.classList.toggle('ans', inp.value.trim() !== '');
-        debounceSave(inp.dataset.mid);
-        flashSaved(inp.dataset.qid);
-      });
-      inp.addEventListener('blur', () => saveAll());
+  el.innerHTML=lbl+inp+`<div class="saved-ind" id="si-${q.id}">✓ Synchronisé</div>`;
+  setTimeout(()=>{
+    el.querySelectorAll('.q-input').forEach(i=>{
+      i.addEventListener('input',()=>{i.classList.toggle('ans',i.value.trim()!=='');debounceSave(i.dataset.qid,i.value);});
+      i.addEventListener('blur',()=>{if(i.value.trim()) persistAnswer(i.dataset.qid,i.value);});
     });
-  }, 0);
+  },0);
   return el;
 }
 
-function pickRadio(el) {
-  const { qid, mid, val } = el.dataset;
-  el.closest('.radios').querySelectorAll('.rbtn').forEach(b => b.classList.remove('sel'));
+async function pickRadio(el) {
+  const {qid,val}=el.dataset;
+  el.closest('.radios').querySelectorAll('.rbtn').forEach(b=>b.classList.remove('sel'));
   el.classList.add('sel');
-  qSave(mid, qid, val);
-  flashSaved(qid);
+  await persistAnswer(qid,val);
   updateQProgress(MODULES[currentMod]);
   updateSecProg(qid);
+  await checkAutoUnlock(MODULES[currentMod].id);
 }
 
-function toggleChk(el) {
-  const { qid, mid } = el.dataset;
+async function toggleChk(el) {
+  const {qid}=el.dataset;
   el.classList.toggle('chk');
-  const vals = Array.from(el.closest('.checks').querySelectorAll('.citem.chk')).map(c => c.dataset.val);
-  qSave(mid, qid, vals);
-  flashSaved(qid);
+  const vals=Array.from(el.closest('.checks').querySelectorAll('.citem.chk')).map(c=>c.dataset.val);
+  await persistAnswer(qid,vals);
   updateQProgress(MODULES[currentMod]);
+  updateSecProg(qid);
+  await checkAutoUnlock(MODULES[currentMod].id);
+}
+
+async function persistAnswer(qid,val) {
+  await saveAnswer(qid,val);
+  flashSaved(qid);
   updateSecProg(qid);
 }
 
-function qSave(mid, qid, val) {
-  const d = getData(currentUser.email, mid);
-  d[qid] = val;
-  saveData(currentUser.email, mid, d);
-  checkAutoUnlock(mid);
+function debounceSave(qid,val) {
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>persistAnswer(qid,val),1200);
+}
+
+async function saveAll() {
+  const st=document.getElementById('save-st');
+  st.textContent='Synchronisation…';
+  try {
+    await saveBatch();
+    await checkAutoUnlock(MODULES[currentMod].id);
+    updateQProgress(MODULES[currentMod]);
+    renderNotif(currentMod);
+    st.textContent='✓ Synchronisé';
+    st.className='save-st ok';
+    setTimeout(()=>{st.textContent='Synchronisé sur tous vos appareils';st.className='save-st';},2500);
+    pushToOdoo(MODULES[currentMod].id).catch(e=>console.warn('Odoo:',e));
+  } catch(e) {
+    st.textContent='Erreur de sync — réessayez';
+    console.error(e);
+  }
 }
 
 function updateQProgress(mod) {
-  const { ans, tot } = getProgress(mod.id);
-  const pct = tot > 0 ? Math.round(ans/tot*100) : 0;
-  document.getElementById('q-prog-lbl').textContent = ans + ' / ' + tot + ' questions';
-  document.getElementById('q-prog-fill').style.width = pct + '%';
+  const {ans,tot}=getProgress(mod.id);
+  const pct=tot>0?Math.round(ans/tot*100):0;
+  document.getElementById('q-prog-lbl').textContent=ans+' / '+tot+' questions';
+  document.getElementById('q-prog-fill').style.width=pct+'%';
 }
 
 function updateSecProg(qid) {
-  if (currentMod === null) return;
-  const mod = MODULES[currentMod];
-  const data = getData(currentUser.email, mod.id);
-  mod.sections.forEach(sec => {
-    if (!sec.questions.find(q => q.id === qid)) return;
-    const { sa, st } = secProg(sec, data);
-    const fill = document.getElementById('smf-' + sec.id);
-    const pt = document.querySelector('#sbody-' + sec.id)?.previousElementSibling?.querySelector('.sec-pt');
-    if (fill) { fill.style.width = st > 0 ? Math.round(sa/st*100)+'%' : '0%'; fill.classList.toggle('full', sa>=st); }
-    if (pt) pt.textContent = sa + '/' + st;
+  if(currentMod===null) return;
+  const mod=MODULES[currentMod];
+  mod.sections.forEach(sec=>{
+    if(!sec.questions.find(q=>q.id===qid)) return;
+    const {sa,st}=secProg(sec);
+    const fill=document.getElementById('smf-'+sec.id);
+    const pt=document.querySelector('#sbody-'+sec.id)?.previousElementSibling?.querySelector('.sec-pt');
+    if(fill){fill.style.width=st>0?Math.round(sa/st*100)+'%':'0%';fill.classList.toggle('full',sa>=st);}
+    if(pt) pt.textContent=sa+'/'+st;
   });
 }
 
 function flashSaved(qid) {
-  const el = document.getElementById('si-' + qid);
-  if (!el) return;
+  const el=document.getElementById('si-'+qid);
+  if(!el) return;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2000);
-}
-
-function saveAll() {
-  if (currentMod === null) return;
-  const mod = MODULES[currentMod];
-  const d = getData(currentUser.email, mod.id);
-  document.querySelectorAll('.q-input').forEach(inp => { d[inp.dataset.qid] = inp.value; });
-  saveData(currentUser.email, mod.id, d);
-  checkAutoUnlock(mod.id);
-  updateQProgress(mod);
-  renderNotif(currentMod);
-  const st = document.getElementById('save-st');
-  st.textContent = '✓ Sauvegardé';
-  st.className = 'save-st ok';
-  setTimeout(() => { st.textContent = 'Sauvegarde automatique activée'; st.className = 'save-st'; }, 2500);
-  // Envoi Odoo asynchrone (non bloquant)
-  pushToOdoo(mod.id).catch(e => console.warn('Odoo sync:', e));
-}
-
-function debounceSave(mid) {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    if (currentMod !== null) {
-      const d = getData(currentUser.email, MODULES[currentMod].id);
-      document.querySelectorAll('.q-input').forEach(inp => { d[inp.dataset.qid] = inp.value; });
-      saveData(currentUser.email, MODULES[currentMod].id, d);
-    }
-  }, 1200);
+  setTimeout(()=>el.classList.remove('show'),2000);
 }
 
 // ══════════════════════════════════════════════════════════════
-// ODOO XML-RPC INTEGRATION
+// ODOO SYNC (non bloquant)
 // ══════════════════════════════════════════════════════════════
-async function odooCall(endpoint, method, params) {
-  const res = await fetch(ODOO_CONFIG.url + endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { service: 'object', method, args: params } })
-  });
-  const json = await res.json();
-  if (json.error) throw new Error(json.error.data?.message || json.error.message);
-  return json.result;
-}
-
-async function odooAuthenticate() {
-  if (odooUid) return odooUid;
-  const res = await fetch(ODOO_CONFIG.url + '/web/session/authenticate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsonrpc: '2.0', method: 'call', params: {
-      db: ODOO_CONFIG.db, login: ODOO_CONFIG.username, password: ODOO_CONFIG.password
-    }})
-  });
-  const json = await res.json();
-  odooUid = json.result?.uid;
-  return odooUid;
-}
-
 async function pushToOdoo(mid) {
   try {
     const uid = await odooAuthenticate();
     if (!uid) return;
-    const data = getData(currentUser.email, mid);
-    const statuses = getStatuses(currentUser.email);
-
-    // Chercher si un enregistrement procyo.onboarding existe déjà pour cet email
-    const existing = await odooCall('/web/dataset/call_kw', 'execute_kw', [
-      ODOO_CONFIG.db, uid, ODOO_CONFIG.password,
-      'procyo.onboarding', 'search_read',
-      [[['broker_email', '=', currentUser.email]]],
-      { fields: ['id'], limit: 1 }
-    ]);
-
-    const vals = {
-      broker_email: currentUser.email,
-      module1_status: statuses.module1 || 'active',
-      module2_status: statuses.module2 || 'locked',
-      module3_status: statuses.module3 || 'locked',
-      ...data
-    };
-
-    if (existing && existing.length > 0) {
-      await odooCall('/web/dataset/call_kw', 'execute_kw', [
-        ODOO_CONFIG.db, uid, ODOO_CONFIG.password,
-        'procyo.onboarding', 'write',
-        [[existing[0].id], vals], {}
-      ]);
-    } else {
-      await odooCall('/web/dataset/call_kw', 'execute_kw', [
-        ODOO_CONFIG.db, uid, ODOO_CONFIG.password,
-        'procyo.onboarding', 'create',
-        [vals], {}
-      ]);
-    }
-    console.log('✓ Odoo sync OK');
-  } catch(e) {
-    console.warn('Odoo push failed (données conservées localement):', e.message);
-  }
+    const vals = { broker_email: currentUser.email, module1_status: currentUser.module1_status, module2_status: currentUser.module2_status, module3_status: currentUser.module3_status };
+    Object.entries(localCache).forEach(([k,v]) => { vals[k] = Array.isArray(v) ? v.join(', ') : v; });
+    const existing = await odooCall([ODOO_CONFIG.db,uid,ODOO_CONFIG.password,'procyo.onboarding','search_read',[[['broker_email','=',currentUser.email]]],{fields:['id'],limit:1}]);
+    if (existing&&existing.length>0) await odooCall([ODOO_CONFIG.db,uid,ODOO_CONFIG.password,'procyo.onboarding','write',[[existing[0].id],vals],{}]);
+    else await odooCall([ODOO_CONFIG.db,uid,ODOO_CONFIG.password,'procyo.onboarding','create',[vals],{}]);
+  } catch(e) { console.warn('Odoo push failed:',e.message); }
+}
+async function odooAuthenticate() {
+  if(odooUid) return odooUid;
+  const res=await fetch(ODOO_CONFIG.url+'/web/session/authenticate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',method:'call',params:{db:ODOO_CONFIG.db,login:ODOO_CONFIG.username,password:ODOO_CONFIG.password}})});
+  const j=await res.json(); odooUid=j.result?.uid; return odooUid;
+}
+async function odooCall(args) {
+  const res=await fetch(ODOO_CONFIG.url+'/web/dataset/call_kw',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',method:'call',params:{service:'object',method:'execute_kw',args}})});
+  const j=await res.json(); if(j.error) throw new Error(j.error.data?.message); return j.result;
 }
 
 // ══════════════════════════════════════════════════════════════
 // ADMIN
 // ══════════════════════════════════════════════════════════════
-function showAdmin() {
-  if (!currentUser?.isAdmin) return;
+async function showAdmin() {
+  if(!currentUser||!ADMIN_EMAILS.includes(currentUser.email)) return;
   hideAll();
-  document.getElementById('screen-admin').style.display = 'block';
-  renderAdmin();
+  document.getElementById('screen-admin').style.display='block';
+  setLoading(true,'Chargement des courtiers…');
+  try {
+    const brokers = await sbGet('brokers','select=id,email,company_name,module1_status,module2_status,module3_status,created_at&order=created_at.desc');
+    const list=document.getElementById('admin-list');
+    list.innerHTML='';
+    if(!brokers||brokers.length===0){list.innerHTML='<p style="color:var(--g400);font-size:14px">Aucun courtier inscrit.</p>';return;}
+    for(const b of brokers) {
+      const answers = await sbGet('answers','broker_id=eq.'+b.id+'&select=question_id');
+      const card=document.createElement('div');
+      card.className='broker-card';
+      const pills=MODULES.map((mod,i)=>{
+        const st=b[mod.id+'_status']||'locked';
+        const modAnswers=(answers||[]).filter(a=>mod.sections.some(s=>s.questions.some(q=>q.id===a.question_id))).length;
+        const {tot}=getProgressFor(mod,{});
+        return `<div class="mpill ${st}">M${i+1} — ${modAnswers}/? — ${st==='completed'?'Clôturé ✓':st==='active'?'Accessible 📋':'Verrouillé 🔒'}</div>`;
+      }).join('');
+      const unlocks=MODULES.map((mod,i)=>b[mod.id+'_status']==='locked'?`<button class="unlock-btn" onclick="adminUnlock('${b.id}','${mod.id}',this)">Débloquer M${i+1}</button>`:'').join('');
+      card.innerHTML=`<h3>${escH(b.company_name||b.email)}</h3><div class="broker-meta">${b.email} — inscrit le ${new Date(b.created_at).toLocaleDateString('fr-BE')}</div><div class="mod-pills">${pills}</div>${unlocks?`<div class="broker-actions">${unlocks}</div>`:''}`;
+      list.appendChild(card);
+    }
+  } finally { setLoading(false); }
 }
 
-function renderAdmin() {
-  const list = document.getElementById('admin-list');
-  list.innerHTML = '';
-  const users = getUsers();
-  if (Object.keys(users).length === 0) {
-    list.innerHTML = '<p style="color:var(--g400);font-size:14px">Aucun courtier inscrit pour l\'instant.</p>';
-    return;
-  }
-  Object.entries(users).forEach(([email, u]) => {
-    const statuses = getStatuses(email);
-    const card = document.createElement('div');
-    card.className = 'broker-card';
-    const pills = MODULES.map((mod, i) => {
-      const { ans, tot } = (() => {
-        const d = getData(email, mod.id);
-        let a=0, t=0;
-        mod.sections.forEach(s => s.questions.forEach(q => { t++; const v=d[q.id]; if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&v.length===0)) a++; }));
-        return { ans:a, tot:t };
-      })();
-      const st = ans >= tot && tot > 0 ? 'completed' : statuses[mod.id];
-      const lbl = st==='completed'?'Clôturé ✓' : st==='active'?'Accessible 📋':'Verrouillé 🔒';
-      return `<div class="mpill ${st}">M${i+1} — ${ans}/${tot} — ${lbl}</div>`;
-    }).join('');
-    const unlockBtns = MODULES.map((mod, i) => {
-      const st = statuses[mod.id];
-      if (st === 'locked') return `<button class="unlock-btn" onclick="adminUnlock('${email}','${mod.id}')">Débloquer Module ${i+1}</button>`;
-      return '';
-    }).join('');
-    card.innerHTML = `
-      <h3>${escH(u.company || email)}</h3>
-      <div class="broker-meta">${email}</div>
-      <div class="mod-pills">${pills}</div>
-      ${unlockBtns ? `<div class="broker-actions">${unlockBtns}</div>` : ''}
-    `;
-    list.appendChild(card);
-  });
-}
+function getProgressFor(mod,cache){let ans=0,tot=0;mod.sections.forEach(s=>s.questions.forEach(q=>{tot++;const v=cache[q.id];if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&v.length===0))ans++;}));return{ans,tot};}
 
-function adminUnlock(email, mid) {
-  const s = getStatuses(email);
-  s[mid] = 'active';
-  saveStatuses(email, s);
-  renderAdmin();
+async function adminUnlock(brokerId,mid,btn) {
+  btn.disabled=true; btn.textContent='…';
+  await sbUpdate('brokers','id=eq.'+brokerId,{[mid+'_status']:'active'});
+  btn.textContent='✓ Débloqué'; btn.style.color='var(--green)';
 }
 
 // ══════════════════════════════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════════════════════════════
-function hideAll() {
-  ['screen-home','screen-questions','screen-admin'].forEach(id => {
-    document.getElementById(id).style.display = 'none';
-  });
+function hideAll(){['screen-home','screen-questions','screen-admin'].forEach(id=>document.getElementById(id).style.display='none');}
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escA(s){return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+function setLoading(show,msg='Chargement…') {
+  let ov=document.getElementById('loading-overlay');
+  if(show){
+    if(!ov){ov=document.createElement('div');ov.id='loading-overlay';ov.className='loading-overlay';ov.innerHTML=`<div class="big-spin"></div><p>${msg}</p>`;document.body.appendChild(ov);}
+    ov.querySelector('p').textContent=msg;
+  } else { if(ov) ov.remove(); }
 }
-function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function escA(s) { return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
 // ══════════════════════════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('login-pwd').addEventListener('keypress', e => { if(e.key==='Enter') doLogin(); });
-  document.getElementById('reg-pwd2').addEventListener('keypress', e => { if(e.key==='Enter') doRegister(); });
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('login-pwd').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin();});
+  document.getElementById('reg-pwd2').addEventListener('keypress',e=>{if(e.key==='Enter')doRegister();});
   checkSession();
 });
 </script>
