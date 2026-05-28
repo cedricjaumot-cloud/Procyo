@@ -969,6 +969,8 @@ function buildQuestion(q,saved){
       });
       s.addEventListener('change',()=>persistAnswer(s.dataset.qid,s.value));
     });
+    // percent-split
+    el.querySelectorAll('.pct-inp').forEach(i=>{
       i.addEventListener('input',()=>{
         i.classList.toggle('ans',i.value.trim()!=='');
         const qid=i.dataset.qid;
