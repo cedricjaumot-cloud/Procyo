@@ -167,6 +167,10 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .pct-total{font-size:13px;color:var(--g500);padding:6px 10px;border-radius:8px;background:var(--g100);display:inline-block}
 .pct-total.ok{background:#d1fae5;color:#065f46}
 .pct-total.err{background:#fee2e2;color:#991b1b}
+.slider-wrap{padding:4px 0 2px}
+.q-slider{width:100%;accent-color:var(--blue);cursor:pointer;height:6px;margin-bottom:8px}
+.slider-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--g500)}
+.slider-val{font-size:22px;font-weight:700;color:var(--blue);min-width:36px;text-align:center}
 .q-input{width:100%;padding:9px 13px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;resize:vertical;color:var(--g800)}
 .q-input:focus{border-color:var(--blue)}
 .q-input.ans{border-color:var(--green);background:var(--green-pale)}
@@ -446,8 +450,7 @@ const MODULES = [
   ]},
   {id:'module2',title:'Contractualisation',desc:'Informations nécessaires à la préparation du contrat et à l\'identification des référents.',icon:'📋',sections:[
     {id:'M2A',name:'Configuration & licences',questions:[
-      {id:'M2Q1',type:'text',label:'Combien d\'adresses email à activer dans l\'Assistant mail (Inboxia) ?',required:true,hint:'Détermine le nombre de comptes utilisateurs facturés.'},
-      {id:'M2Q2',type:'text',label:'Nombre d\'ETP qui utiliseront PROCYO ?',required:true,hint:'Confirme le palier tarifaire défini en M1.'},
+      {id:'M2Q1',type:'slider',label:'Combien d\'adresses email à activer dans l\'Assistant mail (Inboxia) ?',required:true,min:1,max:20,default:3},
       {id:'M2Q3',type:'checkbox',label:'Quels assistants complémentaires souhaitez-vous activer ?',required:false,options:['Assistant conformité (Regulia) — KYC / AML / IDD','Assistant portefeuille (Portfolia) — analyse et tableaux de bord','Assistant commercial (Relancia) — opportunités et campagnes','Aucun pour l\'instant — uniquement l\'Assistant mail']},
     ]},
     {id:'M2B',name:'Identification juridique',questions:[
@@ -463,7 +466,7 @@ const MODULES = [
       {id:'M2Q11',type:'textarea',label:'Référent administratif du dossier',required:true,placeholder:'Nom, fonction, email, téléphone',hint:'Cette personne recevra les communications administratives.'},
       {id:'M2Q12',type:'textarea',label:'Référent technique pour l\'onboarding',required:true,placeholder:'Nom, fonction, email, téléphone',hint:'Cette personne pilotera le paramétrage en M3.'},
       {id:'M2Q13',type:'textarea',label:'Référent compliance / DPO si distinct',required:false,placeholder:'Nom, fonction, email, téléphone (facultatif)'},
-      {id:'M2Q14',type:'textarea',label:'Modalités contractuelles particulières ?',required:false,placeholder:'Dérogations négociées en démo (durée, conditions de résiliation, etc.)'},
+      {id:'M2Q14',type:'textarea',label:'Modalités contractuelles particulières ?',required:false},
       {id:'M2Q15',type:'radio',label:'Mode de facturation souhaité',required:false,options:['Mensuel','Trimestriel','Annuel']},
     ]},
   ]},
@@ -683,7 +686,9 @@ function getProgress(mid){
   mod.sections.forEach(s=>s.questions.forEach(q=>{
     tot++;
     const v=localCache[q.id];
-    if(q.type==='percent-split'){
+    if(q.type==='slider'){
+      ans++; // always has a value (default)
+    } else if(q.type==='percent-split'){
       // answered if at least one row filled and total == 100
       if(v&&typeof v==='object'){
         const total=q.rows.reduce((s,r)=>s+(parseInt(v[r])||0),0);
@@ -922,6 +927,17 @@ function buildQuestion(q,saved){
     });
     inp+=`</div><div class="pct-total${total===100?' ok':total>0?' err':''}">Total : <strong id="ptot-${q.id}">${total}</strong> / 100 %</div>`;
   }
+  else if(q.type==='slider'){
+    const val=saved!==undefined&&saved!==''?parseInt(saved):q.default;
+    inp=`<div class="slider-wrap">
+      <input type="range" class="q-slider" data-qid="${q.id}" min="${q.min}" max="${q.max}" value="${val}">
+      <div class="slider-row">
+        <span class="slider-min">${q.min}</span>
+        <span class="slider-val" id="sv-${q.id}">${val}</span>
+        <span class="slider-max">${q.max}</span>
+      </div>
+    </div>`;
+  }
   el.innerHTML=lbl+inp+`<div class="saved-ind" id="si-${q.id}">✓ Synchronisé</div>`;
   setTimeout(()=>{
     el.querySelectorAll('.q-input:not(.other-txt):not(.pct-inp)').forEach(i=>{
@@ -945,8 +961,14 @@ function buildQuestion(q,saved){
         }
       });
     });
-    // percent-split
-    el.querySelectorAll('.pct-inp').forEach(i=>{
+    // slider
+    el.querySelectorAll('.q-slider').forEach(s=>{
+      s.addEventListener('input',()=>{
+        document.getElementById('sv-'+s.dataset.qid).textContent=s.value;
+        debounceSave(s.dataset.qid,s.value);
+      });
+      s.addEventListener('change',()=>persistAnswer(s.dataset.qid,s.value));
+    });
       i.addEventListener('input',()=>{
         i.classList.toggle('ans',i.value.trim()!=='');
         const qid=i.dataset.qid;
