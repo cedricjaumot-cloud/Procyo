@@ -218,9 +218,13 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 
 /* STICKY */
 .sticky-bar{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--g200);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 -4px 12px rgba(0,0,0,.05);z-index:100}
-.save-st{font-size:13px;color:var(--g400)}.save-st.ok{color:var(--green)}
-.btn-save{padding:10px 24px;background:var(--blue);color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);transition:background .15s}
+.save-st{font-size:13px;color:var(--g400)}.save-st.ok{color:var(--green)}.save-st.err{color:#dc2626}
+.btn-save{padding:10px 24px;background:var(--blue);color:white;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);transition:background .15s;display:inline-flex;align-items:center;gap:8px;min-width:130px;justify-content:center}
 .btn-save:hover{background:var(--navy)}
+.btn-save:disabled{opacity:.7;cursor:not-allowed}
+.btn-save .spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.btn-save.saving .spin{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ADMIN */
 #screen-admin{display:none;min-height:calc(100vh - 60px)}
@@ -382,7 +386,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       <div style="height:80px"></div>
       <div class="sticky-bar" id="sticky-bar">
         <span class="save-st" id="save-st">Synchronisé sur tous vos appareils</span>
-        <button class="btn-save" onclick="saveAll()">Sauvegarder</button>
+        <button class="btn-save" id="btn-save" onclick="saveAll()"><span class="spin"></span><span class="btn-save-lbl">Sauvegarder</span></button>
       </div>
     </div>
   </div>
@@ -1045,8 +1049,24 @@ function debouncePct(el,qid){
 
 
 async function toggleChk(el){
-  const{qid}=el.dataset;
+  const{qid,val}=el.dataset;
   el.classList.toggle('chk');
+  // M2Q3 mutex : les 3 premiers s'excluent mutuellement avec "Aucun pour l'instant"
+  if(qid==='M2Q3'){
+    const container=el.closest('.checks');
+    const items=Array.from(container.querySelectorAll('.citem'));
+    const noneItem=items[items.length-1]; // dernier = "Aucun pour l'instant"
+    const isNone=el===noneItem;
+    if(el.classList.contains('chk')){
+      if(isNone){
+        // décoche les 3 premiers
+        items.slice(0,-1).forEach(i=>i.classList.remove('chk'));
+      } else {
+        // décoche "Aucun pour l'instant"
+        noneItem.classList.remove('chk');
+      }
+    }
+  }
   const vals=Array.from(el.closest('.checks').querySelectorAll('.citem.chk')).map(c=>c.dataset.val);
   await persistAnswer(qid,vals);
   updateQProgress(MODULES[currentMod]);
@@ -1066,14 +1086,32 @@ function debounceSave(qid,val){
 
 async function saveAll(){
   const st=document.getElementById('save-st');
-  st.textContent='Synchronisation…';
+  const btn=document.getElementById('btn-save');
+  const lbl=btn.querySelector('.btn-save-lbl');
+  // Start spinner
+  btn.classList.add('saving');
+  btn.disabled=true;
+  lbl.textContent='Sauvegarde…';
+  st.textContent='';st.className='save-st';
   try{
     await saveBatch();
     if(currentMod!==null)updateQProgress(MODULES[currentMod]);
     renderNotif(currentMod);
-    st.textContent='✓ Synchronisé';st.className='save-st ok';
-    setTimeout(()=>{st.textContent='Synchronisé sur tous vos appareils';st.className='save-st';},2500);
-  }catch(e){st.textContent='Erreur — réessayez';console.error(e);}
+    btn.classList.remove('saving');
+    btn.disabled=false;
+    lbl.textContent='✓ Sauvegardé';
+    st.textContent='Synchronisé sur tous vos appareils';st.className='save-st ok';
+    setTimeout(()=>{
+      lbl.textContent='Sauvegarder';
+      st.textContent='';st.className='save-st';
+    },2500);
+  }catch(e){
+    btn.classList.remove('saving');
+    btn.disabled=false;
+    lbl.textContent='Sauvegarder';
+    st.textContent='Erreur — réessayez';st.className='save-st err';
+    console.error(e);
+  }
 }
 
 function updateQProgress(mod){
