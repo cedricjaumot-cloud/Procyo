@@ -155,6 +155,18 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .q-lbl .qn{color:var(--g400);font-weight:400;margin-right:5px}
 .q-lbl .req{color:var(--red);margin-left:2px}
 .q-hint{font-size:12px;color:var(--g400);margin-bottom:8px;line-height:1.5;font-style:italic}
+.other-field{animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.pct-grid{display:grid;grid-template-columns:1fr 120px;gap:8px 12px;align-items:center;margin-bottom:10px}
+.pct-row-label{font-size:13px;color:var(--g700)}
+.pct-row-input{display:flex;align-items:center;gap:6px}
+.pct-inp{width:70px;padding:6px 10px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:var(--font);text-align:right;outline:none;transition:border .15s}
+.pct-inp:focus{border-color:var(--blue-mid)}
+.pct-inp.ans{border-color:var(--blue-mid);background:rgba(37,99,235,.04)}
+.pct-sym{font-size:13px;color:var(--g500)}
+.pct-total{font-size:13px;color:var(--g500);padding:6px 10px;border-radius:8px;background:var(--g100);display:inline-block}
+.pct-total.ok{background:#d1fae5;color:#065f46}
+.pct-total.err{background:#fee2e2;color:#991b1b}
 .q-input{width:100%;padding:9px 13px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;resize:vertical;color:var(--g800)}
 .q-input:focus{border-color:var(--blue)}
 .q-input.ans{border-color:var(--green);background:var(--green-pale)}
@@ -421,12 +433,12 @@ const MODULES = [
   {id:'module1',title:'Découverte',desc:'Questions de découverte pour préparer votre démo Procyo et calibrer la présentation à votre réalité.',icon:'🔍',sections:[
     {id:'M1',name:'Votre bureau & priorités',questions:[
       {id:'M1Q1',type:'radio',label:'Combien de personnes travaillent dans votre bureau ?',required:true,options:['1 à 3','4 à 10','11 à 30','31 à 50','Plus de 50'],hint:'Détermine le palier tarifaire présenté en démo.'},
-      {id:'M1Q2',type:'radio',label:'Quelle version de Brio utilisez-vous ?',required:true,options:['Brio First','Brio Confort','Brio Premium','Je ne suis pas certain·e','Nous utilisons un autre logiciel que Brio'],hint:'Réponse approximative acceptée ; la version exacte sera confirmée en M3.'},
-      {id:'M1Q3',type:'textarea',label:'Quelle activité pratiquez-vous et dans quelle proportion approximative ?',required:true,placeholder:'IARD particulier : __ %\nIARD entreprise : __ %\nAssurance-vie et placements : __ %\nCrédits (prêts hypothécaires et PAT) : __ %\nAutres : __ %'},
+      {id:'M1Q2',type:'radio-other',label:'Quelle version de Brio utilisez-vous ?',required:true,options:['Brio First','Brio Confort','Brio Premium','Je ne suis pas certain·e','Autre'],otherLabel:'Précisez votre logiciel…'},
+      {id:'M1Q3',type:'percent-split',label:'Quelle activité pratiquez-vous et dans quelle proportion approximative ?',required:true,rows:['IARD particulier','IARD entreprise','Assurance-vie et placements','Crédits (prêts hypothécaires et PAT)','Autres']},
       {id:'M1Q4',type:'radio',label:'Quelle est votre plateforme email principale ?',required:true,options:['Microsoft 365','Google Workspace','Exchange','Autre / je ne sais pas'],hint:'Prérequis Inboxia. Détermine si la démo peut viser un live ou rester générique.'},
       {id:'M1Q5',type:'radio',label:'Combien d\'emails clients entrants par adresse traitez-vous par jour ?',required:true,options:['Moins de 20','20 à 50','50 à 100','Plus de 100'],hint:'Calibre l\'argumentaire ROI Inboxia pour la démo.'},
-      {id:'M1Q6',type:'checkbox',label:'Parmi ces sujets, lesquels sont prioritaires pour vous ?',required:true,options:['Traiter plus vite les emails entrants (Assistant mail)','Sécuriser la conformité réglementaire — KYC, AML, IDD (Assistant conformité)','Mieux comprendre et piloter mon portefeuille (Assistant portefeuille)','Détecter des opportunités commerciales — cross-sell, relance (Assistant commercial)','Autre — précisez'],hint:'Oriente la démo vers les assistants correspondant aux priorités exprimées.'},
-      {id:'M1Q7',type:'radio',label:'Qui prendra la décision finale ?',required:true,options:['Moi seul·e','Moi + un·e associé·e','Comité de direction / CA','Autre — précisez'],hint:'Adapter le discours selon les décideurs présents.'},
+      {id:'M1Q6',type:'checkbox-other',label:'Parmi ces sujets, lesquels sont prioritaires pour vous ?',required:true,options:['Traiter plus vite les emails entrants (Assistant mail)','Sécuriser la conformité réglementaire — KYC, AML, IDD (Assistant conformité)','Mieux comprendre et piloter mon portefeuille (Assistant portefeuille)','Détecter des opportunités commerciales — cross-sell, relance (Assistant commercial)'],otherLabel:'Précisez…'},
+      {id:'M1Q7',type:'radio-other',label:'Qui prendra la décision finale ?',required:true,options:['Moi seul·e','Moi + un·e associé·e','Comité de direction / CA'],otherLabel:'Précisez…'},
       {id:'M1Q8',type:'radio',label:'Avez-vous déjà été en contact avec PROCYO ou un partenaire ?',required:false,options:['Oui — précisez','Non, premier contact'],hint:'Évite les redondances, trace les apporteurs.'},
       {id:'M1Q9',type:'radio',label:'Sur une échelle de 1 à 5, à quel point êtes-vous à l\'aise avec les outils d\'IA aujourd\'hui ?',required:false,options:['1 — jamais utilisé','2','3','4','5 — utilisateur quotidien'],hint:'Adapte le niveau technique de la démo.'},
       {id:'M1Q10',type:'textarea',label:'Y a-t-il un point précis que vous aimeriez voir abordé pendant la démo ?',required:false,placeholder:'Champ libre, facultatif…'},
@@ -671,7 +683,21 @@ function getProgress(mid){
   mod.sections.forEach(s=>s.questions.forEach(q=>{
     tot++;
     const v=localCache[q.id];
-    if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&v.length===0))ans++;
+    if(q.type==='percent-split'){
+      // answered if at least one row filled and total == 100
+      if(v&&typeof v==='object'){
+        const total=q.rows.reduce((s,r)=>s+(parseInt(v[r])||0),0);
+        if(total===100)ans++;
+      }
+    } else if(q.type==='radio-other'){
+      if(v&&v!=='Autre::')ans++;
+    } else if(q.type==='checkbox-other'){
+      const arr=Array.isArray(v)?v:[];
+      const valid=arr.filter(x=>x!=='Autre::');
+      if(valid.length>0)ans++;
+    } else {
+      if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&v.length===0))ans++;
+    }
   }));
   return{ans,tot};
 }
@@ -857,34 +883,142 @@ function buildQuestion(q,saved){
   const el=document.createElement('div');
   el.className='q-item';el.id='qi-'+q.id;
   const req=q.required?'<span class="req">*</span>':'';
-  const hint=q.hint?`<div class="q-hint">💡 ${escH(q.hint)}</div>`:'';
-  const lbl=`<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}${req}</div>${hint}`;
+  const lbl=`<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}${req}</div>`;
   let inp='';
   if(q.type==='text') inp=`<input type="text" class="q-input${saved?' ans':''}" data-qid="${q.id}" value="${escA(saved||'')}" placeholder="${escA(q.placeholder||'Votre réponse…')}">`;
   else if(q.type==='textarea') inp=`<textarea class="q-input${saved?' ans':''}" data-qid="${q.id}" rows="3" placeholder="${escA(q.placeholder||'Votre réponse…')}">${escH(saved||'')}</textarea>`;
   else if(q.type==='radio') inp='<div class="radios">'+q.options.map(o=>`<div class="rbtn${saved===o?' sel':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="pickRadio(this)">${escH(o)}</div>`).join('')+'</div>';
+  else if(q.type==='radio-other'){
+    // saved can be plain option or "Autre::text"
+    const savedOther=typeof saved==='string'&&saved.startsWith('Autre::')?saved.slice(7):'';
+    const savedMain=typeof saved==='string'&&saved.startsWith('Autre::') ?'Autre':saved;
+    const optionsWithOther=[...q.options,'Autre'];
+    inp='<div class="radios">'+optionsWithOther.map(o=>`<div class="rbtn${savedMain===o?' sel':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="pickRadio(this)">${escH(o)}</div>`).join('')+'</div>';
+    inp+=`<div class="other-field" id="of-${q.id}" style="display:${savedMain==='Autre'?'block':'none'};margin-top:8px"><input type="text" class="q-input other-txt${savedOther?' ans':''}" data-qid="${q.id}" data-other="1" placeholder="${escA(q.otherLabel||'Précisez…')}" value="${escA(savedOther)}"></div>`;
+  }
   else if(q.type==='checkbox'){
     const chk=Array.isArray(saved)?saved:[];
     inp='<div class="checks">'+q.options.map(o=>`<div class="citem${chk.includes(o)?' chk':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="toggleChk(this)"><div class="cbox"><svg width="10" height="8" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1"/></svg></div>${escH(o)}</div>`).join('')+'</div>';
   }
+  else if(q.type==='checkbox-other'){
+    // saved is array; last item may be "Autre::text"
+    const savedArr=Array.isArray(saved)?saved:[];
+    const otherEntry=savedArr.find(v=>v.startsWith('Autre::'));
+    const savedOtherTxt=otherEntry?otherEntry.slice(7):'';
+    const hasOther=!!otherEntry;
+    const plainChk=savedArr.filter(v=>!v.startsWith('Autre::'));
+    inp='<div class="checks">'+q.options.map(o=>`<div class="citem${plainChk.includes(o)?' chk':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="toggleChk(this)"><div class="cbox"><svg width="10" height="8" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1"/></svg></div>${escH(o)}</div>`).join('');
+    inp+=`<div class="citem${hasOther?' chk':''}" data-qid="${q.id}" data-val="__other__" onclick="toggleChkOther(this)"><div class="cbox"><svg width="10" height="8" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1"/></svg></div>Autre</div></div>`;
+    inp+=`<div class="other-field" id="of-${q.id}" style="display:${hasOther?'block':'none'};margin-top:8px"><input type="text" class="q-input other-txt${savedOtherTxt?' ans':''}" data-qid="${q.id}" data-other="1" placeholder="${escA(q.otherLabel||'Précisez…')}" value="${escA(savedOtherTxt)}"></div>`;
+  }
+  else if(q.type==='percent-split'){
+    // saved is object {row:pct, ...}
+    const savedObj=saved&&typeof saved==='object'?saved:{};
+    const total=q.rows.reduce((s,r)=>s+(parseInt(savedObj[r])||0),0);
+    inp=`<div class="pct-grid">`;
+    q.rows.forEach(r=>{
+      const v=savedObj[r]!==undefined?savedObj[r]:'';
+      inp+=`<div class="pct-row-label">${escH(r)}</div><div class="pct-row-input"><input type="number" min="0" max="100" class="pct-inp${v!==''?' ans':''}" data-qid="${q.id}" data-row="${escA(r)}" value="${escA(String(v))}" placeholder="0"><span class="pct-sym">%</span></div>`;
+    });
+    inp+=`</div><div class="pct-total${total===100?' ok':total>0?' err':''}">Total : <strong id="ptot-${q.id}">${total}</strong> / 100 %</div>`;
+  }
   el.innerHTML=lbl+inp+`<div class="saved-ind" id="si-${q.id}">✓ Synchronisé</div>`;
   setTimeout(()=>{
-    el.querySelectorAll('.q-input').forEach(i=>{
+    el.querySelectorAll('.q-input:not(.other-txt):not(.pct-inp)').forEach(i=>{
       i.addEventListener('input',()=>{i.classList.toggle('ans',i.value.trim()!=='');debounceSave(i.dataset.qid,i.value);});
       i.addEventListener('blur',()=>{if(i.value.trim())persistAnswer(i.dataset.qid,i.value);});
     });
+    // radio-other / checkbox-other text field
+    el.querySelectorAll('.other-txt').forEach(i=>{
+      i.addEventListener('input',()=>{
+        i.classList.toggle('ans',i.value.trim()!=='');
+        const qid=i.dataset.qid;
+        const qDef=findQ(qid);
+        if(!qDef)return;
+        if(qDef.type==='radio-other'){
+          debounceSave(qid,'Autre::'+i.value);
+        } else {
+          // checkbox-other: rebuild array
+          const checks=Array.from(el.querySelectorAll('.citem.chk:not([data-val="__other__"])')).map(c=>c.dataset.val);
+          if(i.value.trim()) checks.push('Autre::'+i.value);
+          debounceSave(qid,checks);
+        }
+      });
+    });
+    // percent-split
+    el.querySelectorAll('.pct-inp').forEach(i=>{
+      i.addEventListener('input',()=>{
+        i.classList.toggle('ans',i.value.trim()!=='');
+        const qid=i.dataset.qid;
+        updatePctTotal(el,qid);
+        debouncePct(el,qid);
+      });
+    });
   },0);
   return el;
+}
+
+function findQ(qid){
+  for(const mod of MODULES)for(const sec of mod.sections)for(const q of sec.questions)if(q.id===qid)return q;
+  return null;
 }
 
 async function pickRadio(el){
   const{qid,val}=el.dataset;
   el.closest('.radios').querySelectorAll('.rbtn').forEach(b=>b.classList.remove('sel'));
   el.classList.add('sel');
+  // handle radio-other
+  const ofEl=document.getElementById('of-'+qid);
+  if(ofEl){
+    if(val==='Autre'){
+      ofEl.style.display='block';
+      // don't save yet — wait for text
+      return;
+    } else {
+      ofEl.style.display='none';
+    }
+  }
   await persistAnswer(qid,val);
   updateQProgress(MODULES[currentMod]);
   updateSecProg(qid);
 }
+
+async function toggleChkOther(el){
+  const{qid}=el.dataset;
+  el.classList.toggle('chk');
+  const ofEl=document.getElementById('of-'+qid);
+  if(ofEl) ofEl.style.display=el.classList.contains('chk')?'block':'none';
+  if(!el.classList.contains('chk')){
+    // removed — rebuild without other
+    const checks=Array.from(el.closest('.checks').querySelectorAll('.citem.chk:not([data-val="__other__"])')).map(c=>c.dataset.val);
+    await persistAnswer(qid,checks);
+    updateQProgress(MODULES[currentMod]);
+    updateSecProg(qid);
+  }
+}
+
+function updatePctTotal(el,qid){
+  const inputs=el.querySelectorAll('.pct-inp');
+  const total=Array.from(inputs).reduce((s,i)=>s+(parseInt(i.value)||0),0);
+  const totEl=document.getElementById('ptot-'+qid);
+  const totDiv=totEl?.parentElement;
+  if(totEl) totEl.textContent=total;
+  if(totDiv){
+    totDiv.className='pct-total'+(total===100?' ok':total>0?' err':'');
+  }
+}
+
+let pctTimer={};
+function debouncePct(el,qid){
+  clearTimeout(pctTimer[qid]);
+  pctTimer[qid]=setTimeout(()=>{
+    const obj={};
+    el.querySelectorAll('.pct-inp').forEach(i=>{obj[i.dataset.row]=i.value!==''?parseInt(i.value):''});
+    persistAnswer(qid,obj);
+  },1200);
+}
+
+
 
 async function toggleChk(el){
   const{qid}=el.dataset;
