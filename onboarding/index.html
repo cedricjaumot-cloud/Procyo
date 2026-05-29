@@ -268,13 +268,79 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .big-spin{width:36px;height:36px;border:3px solid var(--g200);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-@media(max-width:640px){
-  .auth-left{display:none}
-  .home-wrap,.q-wrap,.admin-wrap{padding:20px 16px 80px}
+/* ── TABLETTE (≤ 768px) ─────────────────────────────────────── */
+@media(max-width:768px){
+  /* Auth */
+  .auth-left{width:300px;padding:36px 28px}
+  .auth-pitch{display:none}
+  /* Topbar */
   .topbar{padding:0 16px}
-  .mod-card{grid-template-columns:44px 1fr}
+  .topbar-email{display:none}
+  /* Home */
+  .home-wrap{padding:28px 18px 90px}
+  .progress-card{flex-direction:column;align-items:flex-start;gap:14px}
+  .pc-stats{flex-wrap:wrap;gap:12px}
+  .mod-card{grid-template-columns:48px 1fr auto;gap:14px;padding:18px 20px}
+  /* Questions */
+  .q-wrap{padding:24px 18px 100px}
+  .pct-grid{grid-template-columns:1fr 90px}
+  /* Admin */
+  .admin-wrap{padding:24px 18px 80px}
+  .broker-modules{grid-template-columns:repeat(3,1fr)}
+  /* Sticky bar */
+  .sticky-bar{padding:10px 18px}
+}
+
+/* ── MOBILE (≤ 540px) ───────────────────────────────────────── */
+@media(max-width:540px){
+  /* Auth — masquer le panneau gauche */
+  .auth-left{display:none}
+  .auth-right{padding:32px 20px}
+  /* Topbar */
+  .topbar{padding:0 14px;height:54px}
+  .topbar-logo img{height:24px}
+  .topbar-email{display:none}
+  .topbar-btn{font-size:12px;padding:5px 10px}
+  /* Home */
+  .home-wrap{padding:20px 14px 90px}
+  .home-head h2{font-size:20px}
+  .progress-card{padding:16px;gap:10px}
+  .pc-stats{gap:10px}
+  .pc-stat{min-width:50px}
+  .mod-card{grid-template-columns:40px 1fr;gap:12px;padding:16px}
   .mod-prog{display:none}
+  .mod-icon{width:40px;height:40px;font-size:20px;border-radius:10px}
+  .mod-title{font-size:14px}
+  .mod-desc{font-size:12px;-webkit-line-clamp:1}
+  /* Questions */
+  .q-wrap{padding:16px 14px 100px}
+  .q-block{margin-bottom:16px}
+  .q-lbl{font-size:14px}
+  .rbtn{font-size:12px;padding:6px 12px}
+  .citem{font-size:12px;padding:7px 10px}
+  /* Grille % — 1 colonne + input à droite */
+  .pct-grid{grid-template-columns:1fr 80px;gap:6px 8px}
+  .pct-row-label{font-size:12px}
+  .pct-inp{width:58px;font-size:13px}
+  /* Slider */
+  .slider-val{font-size:20px}
+  /* Sections */
+  .sec-head{padding:13px 14px}
+  .sec-head-l{gap:8px}
+  .sec-title{font-size:13px}
+  .sec-letter{width:28px;height:28px;font-size:10px}
+  /* Sticky bar */
+  .sticky-bar{padding:10px 14px;flex-wrap:wrap;gap:8px}
+  .save-st{width:100%;text-align:center;order:2;font-size:12px}
+  .btn-save{width:100%;order:1;justify-content:center}
+  /* Admin */
+  .admin-wrap{padding:16px 14px 80px}
   .broker-modules{grid-template-columns:repeat(2,1fr)}
+  .modal{padding:20px 16px}
+  .modal-actions{flex-direction:column-reverse}
+  .modal-actions .btn-outline,.modal-actions .btn{width:100%}
+  /* Champ autres */
+  .other-field input{font-size:13px}
 }
 </style>
 </head>
