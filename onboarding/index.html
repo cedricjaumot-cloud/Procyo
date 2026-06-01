@@ -171,6 +171,12 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .q-slider{width:100%;accent-color:var(--blue);cursor:pointer;height:6px;margin-bottom:8px}
 .slider-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--g500)}
 .slider-val{font-size:22px;font-weight:700;color:var(--blue);min-width:36px;text-align:center}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.contact-field{display:flex;flex-direction:column;gap:4px}
+.contact-lbl{font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.04em}
+.contact-inp{padding:8px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;transition:border .15s;background:white}
+.contact-inp:focus{border-color:var(--blue-mid)}
+.contact-inp.ans{border-color:var(--blue-mid);background:rgba(37,99,235,.03)}
 .q-input{width:100%;padding:9px 13px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;resize:vertical;color:var(--g800)}
 .q-input:focus{border-color:var(--blue)}
 .q-input.ans{border-color:var(--green);background:var(--green-pale)}
@@ -324,6 +330,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
   .pct-inp{width:58px;font-size:13px}
   /* Slider */
   .slider-val{font-size:20px}
+  .contact-grid{grid-template-columns:1fr}
   /* Sections */
   .sec-head{padding:13px 14px}
   .sec-head-l{gap:8px}
@@ -533,9 +540,9 @@ const MODULES = [
       {id:'M2Q10',type:'text',label:'Date de prise d\'effet souhaitée',required:true},
     ]},
     {id:'M2C',name:'Référents',questions:[
-      {id:'M2Q11',type:'textarea',label:'Référent administratif du dossier',required:true,placeholder:'Nom, fonction, email, téléphone',hint:'Cette personne recevra les communications administratives.'},
-      {id:'M2Q12',type:'textarea',label:'Référent technique pour l\'onboarding',required:true,placeholder:'Nom, fonction, email, téléphone',hint:'Cette personne pilotera le paramétrage en M3.'},
-      {id:'M2Q13',type:'textarea',label:'Référent compliance / DPO si distinct',required:false,placeholder:'Nom, fonction, email, téléphone (facultatif)'},
+      {id:'M2Q11',type:'contact-fields',label:'Référent administratif du dossier',required:true},
+      {id:'M2Q12',type:'contact-fields',label:'Référent technique pour l\'onboarding',required:true},
+      {id:'M2Q13',type:'contact-fields',label:'Référent compliance / DPO si distinct',required:false},
       {id:'M2Q14',type:'textarea',label:'Modalités contractuelles particulières ?',required:false},
       {id:'M2Q15',type:'radio',label:'Mode de facturation souhaité',required:false,options:['Mensuel','Trimestriel','Annuel']},
     ]},
@@ -758,6 +765,9 @@ function getProgress(mid){
     const v=localCache[q.id];
     if(q.type==='slider'){
       ans++; // always has a value (default)
+    } else if(q.type==='contact-fields'){
+      // answered if au moins nom rempli
+      if(v&&typeof v==='object'&&v.nom&&v.nom.trim())ans++;
     } else if(q.type==='percent-split'){
       // answered if at least one row filled and total == 100
       if(v&&typeof v==='object'){
@@ -1008,6 +1018,25 @@ function buildQuestion(q,saved){
       </div>
     </div>`;
   }
+  else if(q.type==='contact-fields'){
+    // saved is object {nom, fonction, email, tel}
+    const sv=saved&&typeof saved==='object'?saved:{};
+    const fields=[
+      {key:'nom',    label:'Nom',      type:'text',  placeholder:'Prénom Nom'},
+      {key:'fonction',label:'Fonction',type:'text',  placeholder:'Ex. : Directeur administratif'},
+      {key:'email',  label:'Email',    type:'email', placeholder:'prenom.nom@cabinet.be'},
+      {key:'tel',    label:'Téléphone',type:'tel',   placeholder:'+32 …'},
+    ];
+    inp=`<div class="contact-grid">`;
+    fields.forEach(f=>{
+      const v=sv[f.key]||'';
+      inp+=`<div class="contact-field">
+        <label class="contact-lbl">${f.label}</label>
+        <input type="${f.type}" class="q-input contact-inp${v?' ans':''}" data-qid="${q.id}" data-field="${f.key}" value="${escA(v)}" placeholder="${escA(f.placeholder)}">
+      </div>`;
+    });
+    inp+=`</div>`;
+  }
   el.innerHTML=lbl+inp+`<div class="saved-ind" id="si-${q.id}">✓ Synchronisé</div>`;
   setTimeout(()=>{
     el.querySelectorAll('.q-input:not(.other-txt):not(.pct-inp)').forEach(i=>{
@@ -1038,6 +1067,14 @@ function buildQuestion(q,saved){
         debounceSave(s.dataset.qid,s.value);
       });
       s.addEventListener('change',()=>persistAnswer(s.dataset.qid,s.value));
+    });
+    // contact-fields
+    el.querySelectorAll('.contact-inp').forEach(i=>{
+      i.addEventListener('input',()=>{
+        i.classList.toggle('ans',i.value.trim()!=='');
+        debounceContact(el,i.dataset.qid);
+      });
+      i.addEventListener('blur',()=>debounceContact(el,i.dataset.qid));
     });
     // percent-split
     el.querySelectorAll('.pct-inp').forEach(i=>{
@@ -1110,6 +1147,16 @@ function debouncePct(el,qid){
     el.querySelectorAll('.pct-inp').forEach(i=>{obj[i.dataset.row]=i.value!==''?parseInt(i.value):''});
     persistAnswer(qid,obj);
   },1200);
+}
+
+let contactTimer={};
+function debounceContact(el,qid){
+  clearTimeout(contactTimer[qid]);
+  contactTimer[qid]=setTimeout(()=>{
+    const obj={};
+    el.querySelectorAll('.contact-inp').forEach(i=>{obj[i.dataset.field]=i.value.trim();});
+    persistAnswer(qid,obj);
+  },800);
 }
 
 
