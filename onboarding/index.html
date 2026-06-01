@@ -177,6 +177,30 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .contact-inp{padding:8px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;transition:border .15s;background:white}
 .contact-inp:focus{border-color:var(--blue-mid)}
 .contact-inp.ans{border-color:var(--blue-mid);background:rgba(37,99,235,.03)}
+/* ── Company Matrix ── */
+.cm-wrap{width:100%}
+.cm-search-wrap{margin-bottom:10px}
+.cm-search{width:100%;padding:8px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;transition:border .15s}
+.cm-search:focus{border-color:var(--blue-mid)}
+.cm-scroll{overflow-x:auto;border:1px solid var(--g200);border-radius:10px}
+.cm-table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px}
+.cm-th-co{text-align:left;padding:8px 12px;background:var(--g50);font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;position:sticky;left:0;z-index:2;border-bottom:1px solid var(--g200)}
+.cm-th-br{padding:8px 6px;background:var(--g50);font-size:10px;font-weight:600;color:var(--g500);text-align:center;white-space:nowrap;border-bottom:1px solid var(--g200);cursor:help}
+.cm-row:nth-child(even){background:var(--g50)}
+.cm-row:hover{background:var(--blue-pale)}
+.cm-co{padding:7px 12px;color:var(--g700);font-size:12px;white-space:nowrap;position:sticky;left:0;background:inherit;border-right:1px solid var(--g200);z-index:1}
+.cm-cell{text-align:center;padding:4px 6px}
+.cm-box{width:18px;height:18px;border:1.5px solid var(--g300);border-radius:4px;margin:0 auto;cursor:pointer;transition:all .12s}
+.cm-box:hover{border-color:var(--blue-mid);background:var(--blue-pale)}
+.cm-box.on{background:var(--blue);border-color:var(--blue)}
+.cm-box.on::after{content:'✓';display:block;color:white;font-size:11px;line-height:18px;text-align:center;font-weight:700}
+.cm-summary{margin-top:8px;font-size:12px;color:var(--g500);font-style:italic}
+.cm-add-wrap{display:flex;gap:8px;margin-top:10px}
+.cm-add-inp{flex:1;padding:7px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;transition:border .15s}
+.cm-add-inp:focus{border-color:var(--blue-mid)}
+.cm-add-btn{padding:7px 16px;background:var(--blue);color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:background .15s}
+.cm-add-btn:hover{background:var(--navy)}
+.cm-co-custom{font-style:italic;color:var(--blue)}
 .q-input{width:100%;padding:9px 13px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;resize:vertical;color:var(--g800)}
 .q-input:focus{border-color:var(--blue)}
 .q-input.ans{border-color:var(--green);background:var(--green-pale)}
@@ -556,10 +580,9 @@ const MODULES = [
       {id:'M3Q5',type:'text',label:'Formule de politesse préférée',required:false,placeholder:'Ex: Cordialement, Bien à vous…'},
     ]},
     {id:'M3B',name:'Bloc 2 — Compagnies partenaires',questions:[
-      {id:'M3Q6',type:'textarea',label:'Listez vos compagnies partenaires par typologie',required:true,placeholder:'Auto : …\nHabitation : …\nVie : …\nHospi : …\nProtection juridique : …'},
-      {id:'M3Q7',type:'textarea',label:'Autres compagnies partenaires ?',required:false,placeholder:'Nom de la compagnie, branches couvertes…'},
-      {id:'M3Q8',type:'textarea',label:'Compagnies avec délégation de gestion sinistres (vous gérez en interne)',required:false,placeholder:'Liste libre…'},
-      {id:'M3Q9',type:'radio',label:'Convention RDR (auto) appliquée',required:true,options:['Systématiquement','Cas par cas','Pas appliquée']},
+      {id:'M3Q6',type:'company-matrix',label:'Compagnies partenaires et branches',required:true,
+        companies:['AG Insurance','AXA Belgium','Allianz','Baloise','DKV','Foyer','NN Insurance','Vivium','Athora','La Patronale','Baloise Luxembourg','Wealins','OneLife','Vitis Life','Lombard','AXA Wealth','Cardif','Aviza','AfiEsca','Ethias','Federale Assurance','HDI','AIG','Zurich','Chubb','Hiscox','Legal Village','DAS','Euromex','ARAG','Axa Partners','Allianz Partners','Europ Assistance','Atradius','Coface','TVM','Aedes','Avise','Ibis Insurance','Vander Haeghen','Jean Verheyen','Elitis Insurance','April'],
+        branches:['Habitation','Auto','Hospi','PJ','Assistance','Entreprise','Vie','Prior','Délégation Sinistre']},
     ]},
     {id:'M3C',name:'Bloc 3 — Filtres et catégories sensibles',questions:[
       {id:'M3Q10',type:'checkbox',label:'Mails à ne JAMAIS traiter automatiquement',required:true,options:['Client','Assurance','Expert','Autorité de régulation','Notaire','Prestataire et fournisseur','Consultant externe','Mail interne','Réclamation','Publicité','Banque','Autre']},
@@ -768,6 +791,8 @@ function getProgress(mid){
     } else if(q.type==='contact-fields'){
       // answered if au moins nom rempli
       if(v&&typeof v==='object'&&v.nom&&v.nom.trim())ans++;
+    } else if(q.type==='company-matrix'){
+      if(v&&typeof v==='object'&&Object.values(v).some(arr=>Array.isArray(arr)&&arr.length>0))ans++;
     } else if(q.type==='percent-split'){
       // answered if at least one row filled and total == 100
       if(v&&typeof v==='object'){
@@ -1037,7 +1062,49 @@ function buildQuestion(q,saved){
     });
     inp+=`</div>`;
   }
-  el.innerHTML=lbl+inp+`<div class="saved-ind" id="si-${q.id}">✓ Synchronisé</div>`;
+  else if(q.type==='company-matrix'){
+    // saved = { 'AG Insurance': ['Auto','Vie'], ... }
+    const sv=saved&&typeof saved==='object'?saved:{};
+    const branchFull=q.branches; // 9 branches
+    const branchAbr=['Hab.','Auto','Hospi','PJ','Assist.','Entr.','Vie','Prior','Dél.Sin.'];
+    // header
+    inp=`<div class="cm-wrap">
+      <div class="cm-search-wrap"><input type="text" class="cm-search" placeholder="🔍 Filtrer une compagnie…" oninput="cmFilter(this)"></div>
+      <div class="cm-scroll">
+      <table class="cm-table" id="cm-${q.id}">
+        <thead><tr><th class="cm-th-co">Compagnie</th>`;
+    branchAbr.forEach((b,i)=>{ inp+=`<th class="cm-th-br" title="${escH(branchFull[i])}">${escH(b)}</th>`; });
+    inp+=`</tr></thead><tbody>`;
+    q.companies.forEach(co=>{
+      const checked=Array.isArray(sv[co])?sv[co]:[];
+      inp+=`<tr class="cm-row" data-co="${escA(co)}"><td class="cm-co">${escH(co)}</td>`;
+      branchFull.forEach(br=>{
+        const on=checked.includes(br);
+        inp+=`<td class="cm-cell"><div class="cm-box${on?' on':''}" data-qid="${q.id}" data-co="${escA(co)}" data-br="${escA(br)}" onclick="toggleCm(this)"></div></td>`;
+      });
+      inp+=`</tr>`;
+    });
+    // custom companies (saved under key '__custom__')
+    const customs=Array.isArray(sv['__custom__'])?sv['__custom__']:[];
+    customs.forEach((co,idx)=>{
+      const checked=Array.isArray(sv[co])?sv[co]:[];
+      inp+=`<tr class="cm-row cm-custom-row" data-co="${escA(co)}"><td class="cm-co cm-co-custom">${escH(co)}</td>`;
+      branchFull.forEach(br=>{
+        const on=checked.includes(br);
+        inp+=`<td class="cm-cell"><div class="cm-box${on?' on':''}" data-qid="${q.id}" data-co="${escA(co)}" data-br="${escA(br)}" onclick="toggleCm(this)"></div></td>`;
+      });
+      inp+=`</tr>`;
+    });
+    inp+=`</tbody></table></div>
+    <div class="cm-add-wrap">
+      <input type="text" class="cm-add-inp" id="cm-add-${q.id}" placeholder="Ajouter une compagnie…">
+      <button class="cm-add-btn" onclick="cmAddCompany('${q.id}')">+ Ajouter</button>
+    </div>
+    <div class="cm-summary" id="cms-${q.id}"></div>
+    </div>`;
+    // update summary after render
+    setTimeout(()=>cmUpdateSummary(q.id,sv),0);
+  }
   setTimeout(()=>{
     el.querySelectorAll('.q-input:not(.other-txt):not(.pct-inp)').forEach(i=>{
       i.addEventListener('input',()=>{i.classList.toggle('ans',i.value.trim()!=='');debounceSave(i.dataset.qid,i.value);});
@@ -1159,6 +1226,67 @@ function debounceContact(el,qid){
   },800);
 }
 
+// ── COMPANY MATRIX ──────────────────────────────────────────────
+let cmState={};  // {qid: {co:[br,...]}}
+
+async function toggleCm(el){
+  const{qid,co,br}=el.dataset;
+  el.classList.toggle('on');
+  // rebuild state from DOM
+  const table=document.getElementById('cm-'+qid);
+  const obj={};
+  table.querySelectorAll('.cm-row').forEach(row=>{
+    const coName=row.dataset.co;
+    const checked=Array.from(row.querySelectorAll('.cm-box.on')).map(b=>b.dataset.br);
+    if(checked.length)obj[coName]=checked;
+  });
+  cmState[qid]=obj;
+  cmUpdateSummary(qid,obj);
+  await persistAnswer(qid,obj);
+  updateQProgress(MODULES[currentMod]);
+  updateSecProg(qid);
+}
+
+function cmUpdateSummary(qid,obj){
+  const el=document.getElementById('cms-'+qid);
+  if(!el)return;
+  const active=Object.keys(obj||{}).filter(k=>(obj[k]||[]).length>0);
+  if(!active.length){el.textContent='';return;}
+  el.textContent=active.length+' compagnie'+(active.length>1?'s':'')+' sélectionnée'+(active.length>1?'s':'');
+}
+
+function cmFilter(inp){
+  const val=inp.value.toLowerCase().trim();
+  inp.closest('.cm-wrap').querySelectorAll('.cm-row').forEach(row=>{
+    row.style.display=!val||row.dataset.co.toLowerCase().includes(val)?'':'none';
+  });
+}
+
+async function cmAddCompany(qid){
+  const inp=document.getElementById('cm-add-'+qid);
+  const name=inp.value.trim();
+  if(!name)return;
+  inp.value='';
+  // add row to table
+  const q=findQ(qid);
+  const table=document.getElementById('cm-'+qid).querySelector('tbody');
+  const tr=document.createElement('tr');
+  tr.className='cm-row cm-custom-row';
+  tr.dataset.co=name;
+  let cells=`<td class="cm-co cm-co-custom">${escH(name)}</td>`;
+  q.branches.forEach(br=>{
+    cells+=`<td class="cm-cell"><div class="cm-box" data-qid="${qid}" data-co="${escA(name)}" data-br="${escA(br)}" onclick="toggleCm(this)"></div></td>`;
+  });
+  tr.innerHTML=cells;
+  table.appendChild(tr);
+  // save custom list
+  const obj=cmState[qid]||{};
+  const customs=Array.isArray(obj['__custom__'])?obj['__custom__']:[];
+  customs.push(name);
+  obj['__custom__']=customs;
+  cmState[qid]=obj;
+  await persistAnswer(qid,obj);
+}
 
 
 async function toggleChk(el){
