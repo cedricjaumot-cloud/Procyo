@@ -1098,15 +1098,16 @@ function buildQuestion(q,saved){
     inp+=`</tbody></table></div>
     <div class="cm-add-wrap">
       <input type="text" class="cm-add-inp" id="cm-add-${q.id}" placeholder="Ajouter une compagnie…">
-      <button class="cm-add-btn" onclick="cmAddCompany('${q.id}')">+ Ajouter</button>
+      <button class="cm-add-btn" onclick="cmAddCompany(&quot;${q.id}&quot;)">+ Ajouter</button>
     </div>
     <div class="cm-summary" id="cms-${q.id}"></div>
     </div>`;
     // update summary after render
     setTimeout(()=>cmUpdateSummary(q.id,sv),0);
   }
+  el.innerHTML=lbl+inp;
   setTimeout(()=>{
-    el.querySelectorAll('.q-input:not(.other-txt):not(.pct-inp)').forEach(i=>{
+    el.querySelectorAll('.q-input:not(.other-txt):not(.pct-inp):not(.contact-inp):not(.cm-search):not(.cm-add-inp)').forEach(i=>{
       i.addEventListener('input',()=>{i.classList.toggle('ans',i.value.trim()!=='');debounceSave(i.dataset.qid,i.value);});
       i.addEventListener('blur',()=>{if(i.value.trim())persistAnswer(i.dataset.qid,i.value);});
     });
