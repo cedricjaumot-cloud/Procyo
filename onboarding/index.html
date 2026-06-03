@@ -200,6 +200,9 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .bm-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
 .bm-text{font-size:13px;color:var(--g600);line-height:1.6;margin-bottom:12px}
 .bm-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.bm-or{font-size:12px;color:var(--g400);font-style:italic}
+.bm-custom-wrap{flex:1;min-width:200px}
+.hidden{display:none!important}
 .bm-ok{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1.5px solid var(--g200);border-radius:20px;font-size:12px;font-weight:500;color:var(--g500);cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none}
 .bm-ok:hover{border-color:var(--blue-mid);color:var(--blue)}
 .bm-ok.active{background:#d1fae5;border-color:#10b981;color:#065f46}
@@ -1015,8 +1018,7 @@ function toggleSec(id,hdr){
 function buildQuestion(q,saved){
   const el=document.createElement('div');
   el.className='q-item';el.id='qi-'+q.id;
-  const req=q.required?'<span class="req">*</span>':'';
-  const lbl=`<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}${req}</div>`;
+  const lbl=`<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}</div>`;
   let inp='';
   if(q.type==='text') inp=`<input type="text" class="q-input${saved?' ans':''}" data-qid="${q.id}" value="${escA(saved||'')}" placeholder="${escA(q.placeholder||'Votre réponse…')}">`;
   else if(q.type==='textarea') inp=`<textarea class="q-input${saved?' ans':''}" data-qid="${q.id}" rows="3" placeholder="${escA(q.placeholder||'Votre réponse…')}">${escH(saved||'')}</textarea>`;
@@ -1098,10 +1100,13 @@ function buildQuestion(q,saved){
           <div class="bm-ok${st.ok?' active':''}" data-qid="${q.id}" data-key="${b.key}" onclick="bmToggleOk(this)">
             <span class="bm-check">✓</span> OK — comportement par défaut
           </div>
-          <input type="text" class="bm-custom${st.custom?' has-val':''}" data-qid="${q.id}" data-key="${b.key}"
-            placeholder="Écrire mon comportement personnalisé…"
-            value="${escA(st.custom||'')}"
-            oninput="bmInput(this)">
+          <div class="bm-or${st.ok?' hidden':''}">ou</div>
+          <div class="bm-custom-wrap${st.ok?' hidden':''}">
+            <input type="text" class="bm-custom${st.custom?' has-val':''}" data-qid="${q.id}" data-key="${b.key}"
+              placeholder="Écrire mon comportement personnalisé…"
+              value="${escA(st.custom||'')}"
+              oninput="bmInput(this)">
+          </div>
         </div>
       </div>`;
     });
@@ -1316,6 +1321,15 @@ function bmSave(qid){
 }
 function bmToggleOk(el){
   el.classList.toggle('active');
+  const isOk=el.classList.contains('active');
+  const item=el.closest('.bm-item');
+  item.querySelector('.bm-or').classList.toggle('hidden',isOk);
+  item.querySelector('.bm-custom-wrap').classList.toggle('hidden',isOk);
+  // si on repasse en OK, on efface le champ perso
+  if(isOk){
+    const inp=item.querySelector('.bm-custom');
+    if(inp){inp.value='';inp.classList.remove('has-val');}
+  }
   bmSave(el.dataset.qid);
 }
 function bmInput(el){
