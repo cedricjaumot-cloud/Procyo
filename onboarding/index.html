@@ -193,6 +193,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .fu-del{background:none;border:none;color:var(--g400);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;line-height:1;transition:all .15s}
 .fu-del:hover{background:#fee2e2;color:#dc2626}
 .fu-count{margin-top:8px;font-size:12px;color:var(--g400)}
+.fu-nofiles{margin-top:12px;padding-top:10px;border-top:1px solid var(--g100)}
 .bm-intro{font-size:13px;color:var(--g600);line-height:1.6;margin-bottom:16px;padding:12px 16px;background:var(--g50);border-radius:8px;border-left:3px solid var(--blue-mid)}
 .bm-list{display:flex;flex-direction:column;gap:14px}
 .bm-item{border:1.5px solid var(--g200);border-radius:10px;padding:16px 18px;background:white;transition:border .2s}
@@ -580,7 +581,7 @@ const MODULES = [
       {id:'M1Q7',type:'radio-other',label:'Qui prendra la décision finale ?',required:true,options:['Moi seul·e','Moi + un·e associé·e','Comité de direction / CA'],otherLabel:'Précisez…'},
       {id:'M1Q8',type:'radio',label:'Avez-vous déjà été en contact avec PROCYO ou un partenaire ?',required:false,options:['Oui — précisez','Non, premier contact'],hint:'Évite les redondances, trace les apporteurs.'},
       {id:'M1Q9',type:'radio',label:'Sur une échelle de 1 à 5, à quel point êtes-vous à l\'aise avec les outils d\'IA aujourd\'hui ?',required:false,options:['1 — jamais utilisé','2','3','4','5 — utilisateur quotidien'],hint:'Adapte le niveau technique de la démo.'},
-      {id:'M1Q10',type:'textarea',label:'Y a-t-il un point précis que vous aimeriez voir abordé pendant la démo ?',required:false,placeholder:'Champ libre, facultatif…'},
+      {id:'M1Q10',type:'textarea',label:'Y a-t-il un point précis que vous aimeriez voir abordé pendant la démo ?',required:false,placeholder:'Si rien de particulier, écrire NA'},
     ]}
   ]},
   {id:'module2',title:'Contractualisation',desc:'Informations nécessaires à la préparation du contrat et à l\'identification des référents.',icon:'📋',sections:[
@@ -624,7 +625,7 @@ const MODULES = [
       {id:'M3Q13',type:'textarea',label:'Organigramme des boîtes mails secondaires',required:true,placeholder:'sinistres@ : gestionnaire X, règles…\ninfo@ : gestionnaire Y, règles…',hint:'Pour chaque boîte : intitulé, gestionnaire référent, règles de tri.'},
     ]},
     {id:'M3D',name:'Bloc 4 — Documentation interne',questions:[
-      {id:'M3Q14',type:'file-upload',label:'Templates et formulaires à transmettre à Procyo',required:false,accept:'.pdf,.doc,.docx',maxFiles:10,maxSizeMb:5},
+      {id:'M3Q14',type:'file-upload',label:'Templates et formulaires à transmettre à Procyo',required:false,accept:'.pdf,.doc,.docx',maxFiles:10,maxSizeMb:5,noFilesOption:'Pas de templates'},
     ]},
     {id:'M3E',name:'Bloc 5 — Actions BRIO',questions:[
       {id:'M3Q15',type:'behavior-matrix',label:'Validation des comportements',required:false,
@@ -813,8 +814,10 @@ function getProgress(mid){
       if(v&&typeof v==='object'&&Object.values(v).some(s=>s.ok||s.custom))ans++;
       else ans++; // optionnel — ne bloque pas la progression
     } else if(q.type==='file-upload'){
-      // optionnel — jamais bloquant pour la progression
-      ans++;
+      // répondu si fichiers chargés OU "pas de templates" coché
+      if(v&&v.__noFiles===true) ans++;
+      else if(Array.isArray(v)&&v.length>0) ans++;
+      else ans++; // optionnel — ne bloque pas
     } else if(q.type==='contact-fields'){
       // answered if au moins nom rempli
       if(v&&typeof v==='object'&&v.nom&&v.nom.trim())ans++;
@@ -1146,8 +1149,17 @@ function buildQuestion(q,saved){
       </div>`;
     });
     inp+=`</div>
-      <div class="fu-count" id="fuc-${q.id}">${files.length} fichier${files.length!==1?'s':''} chargé${files.length!==1?'s':''}</div>
-    </div>`;
+      <div class="fu-count" id="fuc-${q.id}">${files.length} fichier${files.length!==1?'s':''} chargé${files.length!==1?'s':''}</div>`;
+    if(q.noFilesOption){
+      const noFiles=saved&&saved.__noFiles===true;
+      inp+=`<div class="fu-nofiles" id="funo-${q.id}">
+        <div class="citem${noFiles?' chk':''}" data-qid="${q.id}" data-val="__noFiles__" onclick="fuToggleNoFiles(this)">
+          <div class="cbox"><svg width="10" height="8" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1"/></svg></div>
+          ${escH(q.noFilesOption)}
+        </div>
+      </div>`;
+    }
+    inp+=`</div>`;
   }
   else if(q.type==='company-matrix'){
     // saved = { 'AG Insurance': ['Auto','Vie'], ... }
@@ -1408,6 +1420,25 @@ function fuRefresh(qid,files){
   });
   const cnt=document.getElementById('fuc-'+qid);
   if(cnt)cnt.textContent=`${files.length} fichier${files.length!==1?'s':''} chargé${files.length!==1?'s':''}`;
+}
+
+async function fuToggleNoFiles(el){
+  const qid=el.dataset.qid;
+  el.classList.toggle('chk');
+  const noFiles=el.classList.contains('chk');
+  // si "pas de templates" coché, masquer la zone de dépôt et vider les fichiers
+  const zone=document.getElementById('fuz-'+qid);
+  const list=document.getElementById('ful-'+qid);
+  const cnt=document.getElementById('fuc-'+qid);
+  if(zone) zone.style.display=noFiles?'none':'';
+  if(list) list.style.display=noFiles?'none':'';
+  if(cnt)  cnt.style.display=noFiles?'none':'';
+  const files=noFiles?[]:(Array.isArray(localCache[qid])?localCache[qid]:[]);
+  const val=noFiles?{__noFiles:true}:files;
+  localCache[qid]=val;
+  await persistAnswer(qid,val);
+  updateQProgress(MODULES[currentMod]);
+  updateSecProg(qid);
 }
 
 async function fuRemove(qid,idx){
