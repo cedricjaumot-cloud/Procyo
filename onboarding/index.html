@@ -177,6 +177,22 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .contact-inp{padding:8px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;transition:border .15s;background:white}
 .contact-inp:focus{border-color:var(--blue-mid)}
 .contact-inp.ans{border-color:var(--blue-mid);background:rgba(37,99,235,.03)}
+.fu-wrap{width:100%}
+.fu-zone{border:2px dashed var(--g200);border-radius:12px;padding:28px 20px;text-align:center;transition:all .2s;cursor:pointer;background:var(--g50)}
+.fu-zone:hover,.fu-zone.over{border-color:var(--blue-mid);background:rgba(37,99,235,.04)}
+.fu-zone.over{transform:scale(1.01)}
+.fu-icon{font-size:32px;margin-bottom:8px}
+.fu-label{font-size:14px;font-weight:600;color:var(--g700);margin-bottom:4px}
+.fu-sub{font-size:12px;color:var(--g400);margin-bottom:14px}
+.fu-btn{display:inline-block;padding:7px 18px;background:var(--blue);color:white;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:background .15s}
+.fu-btn:hover{background:var(--navy)}
+.fu-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.fu-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:white;border:1px solid var(--g200);border-radius:8px;font-size:13px}
+.fu-fname{flex:1;color:var(--g700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fu-fsize{color:var(--g400);font-size:12px;white-space:nowrap}
+.fu-del{background:none;border:none;color:var(--g400);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;line-height:1;transition:all .15s}
+.fu-del:hover{background:#fee2e2;color:#dc2626}
+.fu-count{margin-top:8px;font-size:12px;color:var(--g400)}
 /* ── Company Matrix ── */
 .cm-wrap{width:100%}
 .cm-search-wrap{margin-bottom:10px}
@@ -590,7 +606,7 @@ const MODULES = [
       {id:'M3Q13',type:'textarea',label:'Organigramme des boîtes mails secondaires',required:true,placeholder:'sinistres@ : gestionnaire X, règles…\ninfo@ : gestionnaire Y, règles…',hint:'Pour chaque boîte : intitulé, gestionnaire référent, règles de tri.'},
     ]},
     {id:'M3D',name:'Bloc 4 — Documentation interne',questions:[
-      {id:'M3Q14',type:'textarea',label:'Templates et formulaires à transmettre à Procyo',required:false,placeholder:'Décrivez les documents ou indiquez comment vous les enverrez…',hint:'Ces documents servent de référence à l\'IA pour calibrer les règles sur votre réalité.'},
+      {id:'M3Q14',type:'file-upload',label:'Templates et formulaires à transmettre à Procyo',required:false,accept:'.pdf,.doc,.docx',maxFiles:10,maxSizeMb:5},
     ]},
     {id:'M3E',name:'Bloc 5 — Actions BRIO',questions:[
       {id:'M3Q15',type:'checkbox',label:'Quel est le but d\'une activité selon vous ?',required:true,options:['Lister les actions à traiter aujourd\'hui (to-do du jour)','Lister les actions à faire (backlog général)','Programmer un rappel à date fixe','Tracer une promesse faite au client','Suivre une demande en attente d\'une tierce partie','Répartir le travail entre gestionnaires','Documenter une étape d\'un dossier en cours','Servir de checklist de processus','Escalader un dossier sensible','Préparer un point de revue','Bloquer un dossier en attente d\'une décision interne','Marquer un dossier prioritaire','Autre — précisez']},
@@ -787,6 +803,9 @@ function getProgress(mid){
     const v=localCache[q.id];
     if(q.type==='slider'){
       ans++; // always has a value (default)
+    } else if(q.type==='file-upload'){
+      // optionnel — jamais bloquant pour la progression
+      ans++;
     } else if(q.type==='contact-fields'){
       // answered if au moins nom rempli
       if(v&&typeof v==='object'&&v.nom&&v.nom.trim())ans++;
@@ -1061,7 +1080,33 @@ function buildQuestion(q,saved){
     });
     inp+=`</div>`;
   }
-  else if(q.type==='company-matrix'){
+  else if(q.type==='file-upload'){
+    // saved = [{name, size, type, data(base64)}]
+    const files=Array.isArray(saved)?saved:[];
+    inp=`<div class="fu-wrap" id="fu-${q.id}">
+      <div class="fu-zone" id="fuz-${q.id}"
+        ondragover="fuDragOver(event)" ondragleave="fuDragLeave(event)" ondrop="fuDrop(event,'${q.id}')">
+        <div class="fu-icon">📄</div>
+        <div class="fu-label">Glissez vos documents ici</div>
+        <div class="fu-sub">PDF, DOC, DOCX — max ${q.maxSizeMb} Mo par fichier</div>
+        <label class="fu-btn">
+          Parcourir…
+          <input type="file" multiple accept="${q.accept}" style="display:none"
+            onchange="fuPick(event,'${q.id}')">
+        </label>
+      </div>
+      <div class="fu-list" id="ful-${q.id}">`;
+    files.forEach((f,i)=>{
+      inp+=`<div class="fu-item" id="fi-${q.id}-${i}">
+        <span class="fu-fname">${escH(f.name)}</span>
+        <span class="fu-fsize">${fuFmtSize(f.size)}</span>
+        <button class="fu-del" onclick="fuRemove('${q.id}',${i})">✕</button>
+      </div>`;
+    });
+    inp+=`</div>
+      <div class="fu-count" id="fuc-${q.id}">${files.length} fichier${files.length!==1?'s':''} chargé${files.length!==1?'s':''}</div>
+    </div>`;
+  }
     // saved = { 'AG Insurance': ['Auto','Vie'], ... }
     const sv=saved&&typeof saved==='object'?saved:{};
     const branchFull=q.branches; // 9 branches
@@ -1224,6 +1269,66 @@ function debounceContact(el,qid){
     el.querySelectorAll('.contact-inp').forEach(i=>{obj[i.dataset.field]=i.value.trim();});
     persistAnswer(qid,obj);
   },800);
+}
+
+// ── FILE UPLOAD ─────────────────────────────────────────────────
+function fuFmtSize(bytes){
+  if(!bytes)return'';
+  if(bytes<1024)return bytes+'o';
+  if(bytes<1024*1024)return Math.round(bytes/1024)+'Ko';
+  return(bytes/(1024*1024)).toFixed(1)+'Mo';
+}
+function fuDragOver(e){e.preventDefault();e.currentTarget.classList.add('over');}
+function fuDragLeave(e){e.currentTarget.classList.remove('over');}
+function fuDrop(e,qid){e.preventDefault();e.currentTarget.classList.remove('over');fuProcess(e.dataTransfer.files,qid);}
+function fuPick(e,qid){fuProcess(e.target.files,qid);e.target.value='';}
+
+async function fuProcess(fileList,qid){
+  const q=findQ(qid);
+  const existing=Array.isArray(localCache[qid])?[...localCache[qid]]:[];
+  const maxMb=q.maxSizeMb||5;
+  const allowed=(q.accept||'.pdf,.doc,.docx').split(',').map(x=>x.trim().toLowerCase());
+  const errors=[];
+  for(const f of Array.from(fileList)){
+    const ext='.'+f.name.split('.').pop().toLowerCase();
+    if(!allowed.includes(ext)){errors.push(`${f.name} : format non supporté`);continue;}
+    if(f.size>maxMb*1024*1024){errors.push(`${f.name} : dépasse ${maxMb} Mo`);continue;}
+    if(existing.length>=(q.maxFiles||10)){errors.push('Limite de fichiers atteinte');break;}
+    // read as base64
+    const b64=await new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=()=>res(r.result.split(',')[1]);
+      r.onerror=rej;
+      r.readAsDataURL(f);
+    });
+    existing.push({name:f.name,size:f.size,type:f.type,data:b64});
+  }
+  if(errors.length)alert(errors.join('\n'));
+  await persistAnswer(qid,existing);
+  localCache[qid]=existing;
+  fuRefresh(qid,existing);
+}
+
+function fuRefresh(qid,files){
+  const list=document.getElementById('ful-'+qid);
+  if(!list)return;
+  list.innerHTML='';
+  files.forEach((f,i)=>{
+    const d=document.createElement('div');
+    d.className='fu-item';d.id=`fi-${qid}-${i}`;
+    d.innerHTML=`<span class="fu-fname">${escH(f.name)}</span><span class="fu-fsize">${fuFmtSize(f.size)}</span><button class="fu-del" onclick="fuRemove('${qid}',${i})">✕</button>`;
+    list.appendChild(d);
+  });
+  const cnt=document.getElementById('fuc-'+qid);
+  if(cnt)cnt.textContent=`${files.length} fichier${files.length!==1?'s':''} chargé${files.length!==1?'s':''}`;
+}
+
+async function fuRemove(qid,idx){
+  const files=Array.isArray(localCache[qid])?[...localCache[qid]]:[];
+  files.splice(idx,1);
+  await persistAnswer(qid,files);
+  localCache[qid]=files;
+  fuRefresh(qid,files);
 }
 
 // ── COMPANY MATRIX ──────────────────────────────────────────────
