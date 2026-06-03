@@ -193,6 +193,21 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .fu-del{background:none;border:none;color:var(--g400);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;line-height:1;transition:all .15s}
 .fu-del:hover{background:#fee2e2;color:#dc2626}
 .fu-count{margin-top:8px;font-size:12px;color:var(--g400)}
+.bm-intro{font-size:13px;color:var(--g600);line-height:1.6;margin-bottom:16px;padding:12px 16px;background:var(--g50);border-radius:8px;border-left:3px solid var(--blue-mid)}
+.bm-list{display:flex;flex-direction:column;gap:14px}
+.bm-item{border:1.5px solid var(--g200);border-radius:10px;padding:16px 18px;background:white;transition:border .2s}
+.bm-item:has(.bm-ok.active){border-color:var(--blue-mid);background:rgba(37,99,235,.02)}
+.bm-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.bm-text{font-size:13px;color:var(--g600);line-height:1.6;margin-bottom:12px}
+.bm-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.bm-ok{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1.5px solid var(--g200);border-radius:20px;font-size:12px;font-weight:500;color:var(--g500);cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none}
+.bm-ok:hover{border-color:var(--blue-mid);color:var(--blue)}
+.bm-ok.active{background:#d1fae5;border-color:#10b981;color:#065f46}
+.bm-check{font-size:11px}
+.bm-custom{flex:1;min-width:200px;padding:7px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:12px;font-family:var(--font);color:var(--g700);outline:none;transition:border .15s;background:white}
+.bm-custom::placeholder{color:var(--g300);font-style:italic}
+.bm-custom:focus{border-color:var(--blue-mid)}
+.bm-custom.has-val{border-color:var(--blue-mid);background:rgba(37,99,235,.02)}
 /* ── Company Matrix ── */
 .cm-wrap{width:100%}
 .cm-search-wrap{margin-bottom:10px}
@@ -609,28 +624,14 @@ const MODULES = [
       {id:'M3Q14',type:'file-upload',label:'Templates et formulaires à transmettre à Procyo',required:false,accept:'.pdf,.doc,.docx',maxFiles:10,maxSizeMb:5},
     ]},
     {id:'M3E',name:'Bloc 5 — Actions BRIO',questions:[
-      {id:'M3Q15',type:'checkbox',label:'Quel est le but d\'une activité selon vous ?',required:true,options:['Lister les actions à traiter aujourd\'hui (to-do du jour)','Lister les actions à faire (backlog général)','Programmer un rappel à date fixe','Tracer une promesse faite au client','Suivre une demande en attente d\'une tierce partie','Répartir le travail entre gestionnaires','Documenter une étape d\'un dossier en cours','Servir de checklist de processus','Escalader un dossier sensible','Préparer un point de revue','Bloquer un dossier en attente d\'une décision interne','Marquer un dossier prioritaire','Autre — précisez']},
-      {id:'M3Q16',type:'checkbox',label:'Catégories de mail qui déclenchent une activité BRIO',required:true,options:['Déclaration sinistre','Demande modification contrat','Demande devis nouvelle souscription','Réclamation / plainte','Demande résiliation','Demande attestation / document','Mail nécessitant un rappel / suivi']},
-      {id:'M3Q17',type:'textarea',label:'Destinataire par défaut d\'une activité',required:true,hint:'Si adresse nominative → gestionnaire correspondant. Si générique → précisez la règle de répartition.'},
-      {id:'M3Q18',type:'radio',label:'Priorité par défaut',required:true,options:['Haute','Normale','Basse']},
-      {id:'M3Q19',type:'text',label:'Délai d\'échéance par défaut (en jours)',required:true},
-    ]},
-    {id:'M3F',name:'Bloc 6 — Classement documents BRIO',questions:[
-      {id:'M3Q20',type:'radio',label:'Entité par défaut pour le classement d\'un document reçu',required:true,options:['Party','Contract','Claimfolder','Risk object']},
-      {id:'M3Q21',type:'textarea',label:'Qualifiers BRIO pour vos types de documents courants',required:false,placeholder:'Constat : …\nCarte d\'identité : …\nAttestation : …\nDevis : …\nPV : …\nPhotos : …'},
-      {id:'M3Q22',type:'radio',label:'Constat reçu → ouverture sinistre automatique ?',required:true,options:['Oui','Non']},
-    ]},
-    {id:'M3G',name:'Bloc 7 — Frontières IA',questions:[
-      {id:'M3Q23',type:'radio',label:'L\'IA peut envoyer un brouillon directement au client SANS validation humaine ?',required:true,options:['Oui','Non']},
-      {id:'M3Q24',type:'checkbox',label:'L\'IA peut modifier automatiquement dans BRIO',required:true,options:['Email party','Téléphone party','Adresse postale party','IBAN','Date carte d\'identité','Plaque véhicule','Date d\'effet contrat']},
-      {id:'M3Q25',type:'radio',label:'L\'IA peut créer un sinistre dans BRIO automatiquement ?',required:true,options:['Oui','Non','Sous conditions']},
-      {id:'M3Q26',type:'text',label:'Montant maximum qu\'une indemnisation que l\'IA peut mentionner sans validation (€)',required:false},
-      {id:'M3Q27',type:'radio',label:'Mail contenant "avocat / huissier / tribunal" → l\'IA bloque systématiquement ?',required:true,options:['Oui','Non']},
-    ]},
-    {id:'M3H',name:'Bloc 8 — Données techniques BRIO',questions:[
-      {id:'M3Q28',type:'text',label:'Code office BRIO',required:true},
-      {id:'M3Q29',type:'text',label:'Sub-office BRIO (si applicable)',required:false},
-      {id:'M3Q30',type:'textarea',label:'Codes utilisateurs BRIO',required:true,placeholder:'Prénom NOM : code utilisateur\nPrénom NOM : code utilisateur\n…'},
+      {id:'M3Q15',type:'behavior-matrix',label:'Validation des comportements',required:false,
+        intro:'Voici le comportement par défaut de l\'IA sur les principales actions Brio. Ces règles s\'appliquent automatiquement et sont ajustables par les questions qui suivent.',
+        behaviors:[
+          {key:'production',title:'Production',text:'Lors d\'une production initiée par Procyo, l\'IA crée systématiquement un objet de risque (OR) en y rattachant les documents pertinents et en complétant les informations issues du mail. Si le preneur n\'existe pas dans Brio et qu\'aucun doute raisonnable n\'existe sur l\'identité (orthographe approchante, homonyme potentiel, etc.), l\'IA crée la fiche preneur.'},
+          {key:'sinistre',title:'Sinistre',text:'À la déclaration d\'un sinistre, l\'IA crée automatiquement le dossier sinistre, le rattache à l\'OR concerné, et y associe les documents et informations qu\'elle a pu détecter avec un niveau de certitude suffisant.'},
+          {key:'document',title:'Document',text:'Chaque document peut être renommé selon vos règles propres. Par défaut, l\'IA applique une nomenclature claire pour faciliter la recherche. Il peut arriver qu\'un document ne soit pas correctement détecté : classement initial ambigu (document de contrat déposé dans un sinistre), nomenclature peu lisible (« scan 1 », « contrat_v_finale » alors qu\'il ne l\'est pas), etc. Si la détection vous paraît évidente et qu\'elle échoue, transmettez-nous vos règles : nous les intégrons.'},
+          {key:'mail',title:'Mail',text:'Si le mail est en lien avec un sinistre, il est ajouté au sinistre concerné. Si le mail concerne une question sur un OR ou un contrat, il est rattaché à l\'OR. Si le mail ne rentre dans aucune catégorie ou pourrait relever de plusieurs catégories, il est rattaché au preneur.'},
+        ]},
     ]},
   ]},
   {id:'module4',title:'Optimisation continue',desc:'Après le go-live, l\'IA observe vos habitudes et vous propose des ajustements en un clic.',icon:'🔬',isObservation:true,sections:[{id:'M4',name:'Observations',questions:[]}]},
@@ -803,6 +804,10 @@ function getProgress(mid){
     const v=localCache[q.id];
     if(q.type==='slider'){
       ans++; // always has a value (default)
+    } else if(q.type==='behavior-matrix'){
+      // compté comme répondu dès qu'au moins un comportement est validé ou personnalisé
+      if(v&&typeof v==='object'&&Object.values(v).some(s=>s.ok||s.custom))ans++;
+      else ans++; // optionnel — ne bloque pas la progression
     } else if(q.type==='file-upload'){
       // optionnel — jamais bloquant pour la progression
       ans++;
@@ -1080,6 +1085,28 @@ function buildQuestion(q,saved){
     });
     inp+=`</div>`;
   }
+  else if(q.type==='behavior-matrix'){
+    // saved = { production:{ok:true,custom:''}, sinistre:{...}, ... }
+    const sv=saved&&typeof saved==='object'?saved:{};
+    inp=`<div class="bm-intro">${escH(q.intro)}</div><div class="bm-list">`;
+    q.behaviors.forEach(b=>{
+      const st=sv[b.key]||{ok:false,custom:''};
+      inp+=`<div class="bm-item" id="bmi-${q.id}-${b.key}">
+        <div class="bm-title">${escH(b.title)}</div>
+        <div class="bm-text">${escH(b.text)}</div>
+        <div class="bm-actions">
+          <div class="bm-ok${st.ok?' active':''}" data-qid="${q.id}" data-key="${b.key}" onclick="bmToggleOk(this)">
+            <span class="bm-check">✓</span> OK — comportement par défaut
+          </div>
+          <input type="text" class="bm-custom${st.custom?' has-val':''}" data-qid="${q.id}" data-key="${b.key}"
+            placeholder="Écrire mon comportement personnalisé…"
+            value="${escA(st.custom||'')}"
+            oninput="bmInput(this)">
+        </div>
+      </div>`;
+    });
+    inp+=`</div>`;
+  }
   else if(q.type==='file-upload'){
     // saved = [{name, size, type, data(base64)}]
     const files=Array.isArray(saved)?saved:[];
@@ -1273,6 +1300,29 @@ function debounceContact(el,qid){
 }
 
 // ── FILE UPLOAD ─────────────────────────────────────────────────
+// ── BEHAVIOR MATRIX ─────────────────────────────────────────────
+let bmTimer={};
+function bmSave(qid){
+  clearTimeout(bmTimer[qid]);
+  bmTimer[qid]=setTimeout(()=>{
+    const obj={};
+    document.querySelectorAll(`[data-qid="${qid}"].bm-ok`).forEach(el=>{
+      const key=el.dataset.key;
+      const custom=document.querySelector(`.bm-custom[data-qid="${qid}"][data-key="${key}"]`)?.value||'';
+      obj[key]={ok:el.classList.contains('active'),custom};
+    });
+    persistAnswer(qid,obj);
+  },600);
+}
+function bmToggleOk(el){
+  el.classList.toggle('active');
+  bmSave(el.dataset.qid);
+}
+function bmInput(el){
+  el.classList.toggle('has-val',el.value.trim()!=='');
+  bmSave(el.dataset.qid);
+}
+
 function fuFmtSize(bytes){
   if(!bytes)return'';
   if(bytes<1024)return bytes+'o';
