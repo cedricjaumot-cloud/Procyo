@@ -298,7 +298,11 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .admin-sub{font-size:14px;color:var(--g500);margin-bottom:28px}
 .broker-card{background:white;border-radius:var(--r-lg);border:1px solid var(--g200);padding:20px 24px;margin-bottom:14px}
 .broker-card h3{font-size:16px;font-weight:600;margin-bottom:2px}
-.broker-meta{font-size:12px;color:var(--g400);margin-bottom:16px;font-family:monospace}
+.broker-meta{font-size:12px;color:var(--g400);margin-bottom:12px;font-family:monospace}
+.broker-sales-wrap{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 12px;background:var(--g50);border-radius:8px}
+.broker-sales-lbl{font-size:12px;font-weight:600;color:var(--g500);white-space:nowrap}
+.broker-sales-inp{flex:1;padding:5px 10px;border:1.5px solid var(--g200);border-radius:6px;font-size:13px;font-family:var(--font);outline:none;transition:border .15s}
+.broker-sales-inp:focus{border-color:var(--blue-mid)}
 .broker-modules{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .bmod{background:var(--g50);border-radius:var(--r);padding:10px 12px;border:1px solid var(--g200)}
 .bmod-title{font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
@@ -1578,11 +1582,54 @@ async function saveAll(){
   }
 }
 
+// ── NOTIFICATIONS BREVO ─────────────────────────────────────────
+const NOTIF_FIXED = {
+  M1: [],
+  M2: [{email:'gianni.luyckx@procyo.be',name:'Gianni'},{email:'support@procyo.be',name:'Anne'}],
+  M3: [{email:'maxime.dejean@procyo.be',name:'Maxime'}],
+};
+
+async function sendModuleNotification(modId){
+  // Check not already sent
+  const alreadySent=currentUser[modId+'_notif_sent'];
+  if(alreadySent)return;
+  // Build recipients
+  const to=[];
+  const salesEmail=currentUser.sales_email;
+  if(salesEmail)to.push({email:salesEmail,name:'Sales'});
+  (NOTIF_FIXED[modId]||[]).forEach(r=>to.push(r));
+  if(to.length===0)return;
+  const modNum=modId.replace('M','').replace(/[A-Z].*/,'');
+  const company=currentUser.company_name||currentUser.email;
+  const subject=`Module ${modNum} complété — ${company}`;
+  const html=`<p>Bonjour,</p>
+<p>Le <strong>Module ${modNum}</strong> de <strong>${company}</strong> vient d'être complété dans la webapp Procyo.</p>
+<p>Vous pouvez consulter les réponses et débloquer la suite depuis l'interface admin.</p>
+<br><p>— Procyo Onboarding</p>`;
+  try{
+    await fetch(SB_URL+'/functions/v1/send-notification',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},
+      body:JSON.stringify({to,subject,html,senderName:'Procyo',senderEmail:'noreply@procyo.be'}),
+    });
+    // Mark as sent in DB so we don't resend
+    await sbUpdate('brokers','id=eq.'+currentUser.id,{[modId+'_notif_sent']:true});
+    currentUser[modId+'_notif_sent']=true;
+  }catch(e){console.warn('Notif failed:',e);}
+}
+
 function updateQProgress(mod){
   const{ans,tot}=getProgress(mod.id);
   const pct=tot>0?Math.round(ans/tot*100):0;
   document.getElementById('q-prog-lbl').textContent=ans+' / '+tot+' questions';
   document.getElementById('q-prog-fill').style.width=pct+'%';
+  // Detect completion
+  if(ans>=tot&&tot>0){
+    const status=currentUser[mod.id+'_status']||'locked';
+    if(status==='active'){
+      sendModuleNotification(mod.id);
+    }
+  }
 }
 
 function updateSecProg(qid){
@@ -1654,6 +1701,12 @@ async function showAdmin(){
       card.innerHTML=`
         <h3>${escH(b.company_name||b.email)}</h3>
         <div class="broker-meta">${b.email} — inscrit le ${new Date(b.created_at).toLocaleDateString('fr-BE')}</div>
+        <div class="broker-sales-wrap">
+          <label class="broker-sales-lbl">Sales en charge</label>
+          <input type="email" class="broker-sales-inp" placeholder="sales@procyo.be"
+            value="${escA(b.sales_email||'')}"
+            onchange="adminSetSales('${b.id}',this.value)">
+        </div>
         <div class="broker-modules">${modHTML}</div>
         <div class="broker-actions">
           ${unlockBtns}
@@ -1669,6 +1722,10 @@ async function adminUnlock(brokerId,mid,btn){
   await sbUpdate('brokers','id=eq.'+brokerId,{[mid+'_status']:'active'});
   btn.textContent='✓ Débloqué';btn.style.color='var(--green)';
   setTimeout(()=>showAdmin(),1000);
+}
+
+async function adminSetSales(brokerId,email){
+  await sbUpdate('brokers','id=eq.'+brokerId,{sales_email:email.trim()});
 }
 
 // ══════════════════════════════════════════════════════════════
