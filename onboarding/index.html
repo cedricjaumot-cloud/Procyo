@@ -216,10 +216,10 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .cm-search-wrap{margin-bottom:10px}
 .cm-search{width:100%;padding:8px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;transition:border .15s}
 .cm-search:focus{border-color:var(--blue-mid)}
-.cm-scroll{overflow-x:auto;border:1px solid var(--g200);border-radius:10px}
+.cm-scroll{overflow-x:auto;overflow-y:auto;max-height:420px;border:1px solid var(--g200);border-radius:10px}
 .cm-table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px}
-.cm-th-co{text-align:left;padding:8px 12px;background:var(--g50);font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;position:sticky;left:0;z-index:2;border-bottom:1px solid var(--g200)}
-.cm-th-br{padding:8px 6px;background:var(--g50);font-size:10px;font-weight:600;color:var(--g500);text-align:center;white-space:nowrap;border-bottom:1px solid var(--g200);cursor:help}
+.cm-th-co{text-align:left;padding:8px 12px;background:var(--g50);font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;left:0;z-index:4;border-bottom:1px solid var(--g200)}
+.cm-th-br{padding:8px 6px;background:var(--g50);font-size:10px;font-weight:600;color:var(--g500);text-align:center;white-space:nowrap;border-bottom:1px solid var(--g200);cursor:help;position:sticky;top:0;z-index:3}
 .cm-row:nth-child(even){background:var(--g50)}
 .cm-row:hover{background:var(--blue-pale)}
 .cm-co{padding:7px 12px;color:var(--g700);font-size:12px;white-space:nowrap;position:sticky;left:0;background:inherit;border-right:1px solid var(--g200);z-index:1}
@@ -610,12 +610,11 @@ const MODULES = [
       {id:'M3Q1',type:'textarea',label:'Signature standard à apposer en fin de chaque mail',required:true,placeholder:'Texte exact, ligne par ligne…',hint:'Sera utilisé par défaut pour tous les brouillons générés.'},
       {id:'M3Q2',type:'radio',label:'Forme par défaut',required:true,options:['Vouvoiement','Tutoiement','Miroir (s\'aligne sur la forme employée par l\'interlocuteur)']},
       {id:'M3Q3',type:'radio',label:'Ton souhaité',required:true,options:['Sobre','Chaleureux','Technique','Formel','Familier','Miroir (s\'aligne sur le ton de l\'interlocuteur)']},
-      {id:'M3Q4',type:'radio',label:'Langue de réponse par défaut',required:true,options:['FR','NL','EN','Langue du mail entrant']},
       {id:'M3Q5',type:'text',label:'Formule de politesse préférée',required:false,placeholder:'Ex: Cordialement, Bien à vous…'},
     ]},
     {id:'M3B',name:'Bloc 2 — Compagnies partenaires',questions:[
       {id:'M3Q6',type:'company-matrix',label:'Compagnies partenaires et branches',required:true,
-        companies:['AG Insurance','AXA Belgium','Allianz','Baloise','DKV','Foyer','NN Insurance','Vivium','Athora','La Patronale','Baloise Luxembourg','Wealins','OneLife','Vitis Life','Lombard','AXA Wealth','Cardif','Aviza','AfiEsca','Ethias','Federale Assurance','HDI','AIG','Zurich','Chubb','Hiscox','Legal Village','DAS','Euromex','ARAG','Axa Partners','Allianz Partners','Europ Assistance','Atradius','Coface','TVM','Aedes','Avise','Ibis Insurance','Vander Haeghen','Jean Verheyen','Elitis Insurance','April'],
+        companies:['AG Insurance','AXA Belgium','Allianz','Baloise','DKV','Foyer','NN Insurance','Vivium','Athora','La Patronale','Baloise Luxembourg','Wealins','OneLife','Vitis Life','Lombard','AXA Wealth','Cardif','Aviza','AfiEsca','Ethias','Federale Assurance','HDI','AIG','Zurich','Chubb','Hiscox','Legal Village','ARAG','Providis','DAS','Euromex','Axa Partners','Allianz Partners','Europ Assistance','Atradius','Coface','TVM','Aedes','Avise','Ibis Insurance','Vander Haeghen','Jean Verheyen','Elitis Insurance','April'],
         branches:['Habitation','Auto','Hospi','PJ','Assistance','Entreprise','Vie','Prior','Délégation Sinistre']},
     ]},
     {id:'M3C',name:'Bloc 3 — Filtres et catégories sensibles',questions:[
