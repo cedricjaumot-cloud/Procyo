@@ -1719,7 +1719,11 @@ async function showAdmin(){
 
 async function adminUnlock(brokerId,mid,btn){
   btn.disabled=true;btn.textContent='…';
-  await sbUpdate('brokers','id=eq.'+brokerId,{[mid+'_status']:'active'});
+  await sbUpdate('brokers','id=eq.'+brokerId,{
+    [mid+'_status']:'active',
+    [mid+'_unlocked_at']:new Date().toISOString(),
+    [mid+'_reminder_count']:0,
+  });
   btn.textContent='✓ Débloqué';btn.style.color='var(--green)';
   setTimeout(()=>showAdmin(),1000);
 }
