@@ -1720,20 +1720,12 @@ async function showAdmin(){
 
 async function adminUnlock(brokerId,mid,btn){
   btn.disabled=true;btn.textContent='…';
-  // Mise à jour du statut — colonnes principales uniquement
-  const update={[mid+'_status']:'active'};
-  // Tentative d'enregistrement de la date de déblocage (optionnel)
-  try{
-    const midL=mid.toLowerCase();
-    await sbUpdate('brokers','id=eq.'+brokerId,{
-      ...update,
-      [midL+'_unlocked_at']:new Date().toISOString(),
-      [midL+'_reminder_count']:0,
-    });
-  }catch(e){
-    // Si les colonnes n'existent pas encore, on met juste le statut
-    await sbUpdate('brokers','id=eq.'+brokerId,update);
-  }
+  const midL=mid.toLowerCase();
+  await sbUpdate('brokers','id=eq.'+brokerId,{
+    [mid+'_status']:'active',
+    [midL+'_unlocked_at']:new Date().toISOString(),
+    [midL+'_reminder_count']:0,
+  });
   btn.textContent='✓ Débloqué';btn.style.color='var(--green)';
   setTimeout(()=>showAdmin(),1000);
 }
