@@ -313,6 +313,35 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .bmod-prog-fill.full{background:var(--green)}
 .bmod-count{font-size:11px;color:var(--g400)}
 .broker-actions{display:flex;gap:8px;flex-wrap:wrap}
+.dossier-btn{padding:7px 14px;background:var(--navy);color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:background .15s}
+.dossier-btn:hover{background:var(--blue)}
+/* Dossier screen */
+.dossier-wrap{max-width:820px;margin:0 auto;padding:32px 28px 80px}
+.dossier-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.btn-print{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:var(--blue);color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:background .15s}
+.btn-print:hover{background:var(--navy)}
+.dos-header{display:flex;align-items:flex-start;gap:20px;padding:20px 24px;background:var(--navy);color:white;border-radius:12px;margin-bottom:28px}
+.dos-logo{font-size:22px;font-weight:800;letter-spacing:.08em;color:white;padding-top:2px}
+.dos-title{font-size:20px;font-weight:700;color:white;margin-bottom:4px}
+.dos-meta{font-size:12px;color:rgba(255,255,255,.65);margin-bottom:2px}
+.dos-module{margin-bottom:28px;border:1px solid var(--g200);border-radius:12px;overflow:hidden}
+.dos-mod-title{background:var(--g50);padding:12px 20px;font-size:14px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--g200);text-transform:uppercase;letter-spacing:.04em}
+.dos-section{padding:16px 20px;border-bottom:1px solid var(--g100)}
+.dos-section:last-child{border-bottom:none}
+.dos-sec-title{font-size:12px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.dos-q{margin-bottom:10px;display:grid;grid-template-columns:220px 1fr;gap:8px 16px;align-items:start}
+.dos-q:last-child{margin-bottom:0}
+.dos-q-label{font-size:13px;color:var(--g500);line-height:1.5}
+.dos-q-val{font-size:13px;color:var(--g800);font-weight:500;line-height:1.6}
+/* Print */
+@media print{
+  .no-print,.topbar,.sticky-bar{display:none!important}
+  #screen-dossier{display:block!important}
+  .dossier-wrap{padding:0;max-width:100%}
+  .dos-header{background:#1e3a5f!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .dos-module{break-inside:avoid;page-break-inside:avoid}
+  .dos-q{break-inside:avoid}
+}
 .unlock-btn{font-size:12px;padding:6px 14px;border:1px solid var(--blue-mid);color:var(--blue);background:none;border-radius:6px;cursor:pointer;font-family:var(--font);transition:all .15s;font-weight:500}
 .unlock-btn:hover{background:var(--blue);color:white}
 .add-obs-btn{font-size:12px;padding:6px 14px;border:1px solid #DDD6FE;color:var(--purple);background:none;border-radius:6px;cursor:pointer;font-family:var(--font);transition:all .15s;font-weight:500}
@@ -537,6 +566,23 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       <h2 class="admin-title">Administration — Courtiers inscrits</h2>
       <p class="admin-sub">Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.</p>
       <div id="admin-list"></div>
+    </div>
+  </div>
+
+  <!-- ÉCRAN DOSSIER COURTIER -->
+  <div id="screen-dossier" style="display:none">
+    <div class="dossier-wrap" id="dossier-content">
+      <div class="dossier-topbar no-print">
+        <button class="back-btn" onclick="closeDossier()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+          Retour à la liste
+        </button>
+        <button class="btn-print" onclick="window.print()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+          Imprimer / Exporter PDF
+        </button>
+      </div>
+      <div id="dossier-body"></div>
     </div>
   </div>
 </div>
@@ -1712,10 +1758,108 @@ async function showAdmin(){
         <div class="broker-actions">
           ${unlockBtns}
           <button class="add-obs-btn" onclick="openObsModal('${b.id}')">➕ Observation M4</button>
+          <button class="dossier-btn" onclick="showDossier('${b.id}')">📋 Voir le dossier</button>
         </div>`;
       list.appendChild(card);
     }
   }finally{setLoading(false);}
+}
+
+function closeDossier(){
+  document.getElementById('screen-dossier').style.display='none';
+  document.getElementById('screen-admin').style.display='block';
+}
+
+async function showDossier(brokerId){
+  hideAll();
+  document.getElementById('screen-dossier').style.display='block';
+  const body=document.getElementById('dossier-body');
+  body.innerHTML='<p style="color:var(--g400);padding:40px;text-align:center">Chargement du dossier…</p>';
+
+  // Load broker + answers
+  const brokers=await sbGet('brokers','id=eq.'+brokerId+'&select=*');
+  const b=brokers[0];
+  if(!b){body.innerHTML='Introuvable';return;}
+  const answers=await sbGet('answers','broker_id=eq.'+brokerId+'&select=*');
+  const ansMap={};
+  (answers||[]).forEach(a=>ansMap[a.question_id]=a.value);
+
+  // Build dossier HTML
+  let html=`<div class="dos-header">
+    <div class="dos-logo">PROCYO</div>
+    <div>
+      <div class="dos-title">${escH(b.company_name||b.email)}</div>
+      <div class="dos-meta">${escH(b.email)} — Dossier généré le ${new Date().toLocaleDateString('fr-BE')}</div>
+      ${b.sales_email?`<div class="dos-meta">Sales : ${escH(b.sales_email)}</div>`:''}
+    </div>
+  </div>`;
+
+  // For each module
+  MODULES.filter(m=>!m.isObservation).forEach((mod,mi)=>{
+    const status=b[mod.id+'_status']||'locked';
+    if(status==='locked')return; // skip locked modules
+    html+=`<div class="dos-module">
+      <div class="dos-mod-title">Module ${mi+1} — ${mod.title}</div>`;
+    mod.sections.forEach(sec=>{
+      html+=`<div class="dos-section"><div class="dos-sec-title">${escH(sec.name)}</div>`;
+      sec.questions.forEach(q=>{
+        const raw=ansMap[q.id];
+        if(!raw)return; // skip unanswered
+        const val=typeof raw==='string'?raw:(typeof raw==='object'?raw:String(raw));
+        const display=formatDossierValue(q,val);
+        if(!display)return;
+        html+=`<div class="dos-q">
+          <div class="dos-q-label">${escH(q.label)}</div>
+          <div class="dos-q-val">${display}</div>
+        </div>`;
+      });
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  });
+
+  body.innerHTML=html;
+}
+
+function formatDossierValue(q,val){
+  try{
+    const parsed=typeof val==='string'?JSON.parse(val):val;
+    // Array (checkbox)
+    if(Array.isArray(parsed)){
+      return parsed.map(v=>typeof v==='string'&&v.startsWith('Autre::')?'Autre : '+v.slice(7):escH(String(v))).join('<br>');
+    }
+    // Object (contact-fields, percent-split, behavior-matrix, company-matrix)
+    if(parsed&&typeof parsed==='object'){
+      if(q.type==='contact-fields'){
+        return [parsed.nom,parsed.fonction,parsed.email,parsed.tel].filter(Boolean).map(escH).join(' — ');
+      }
+      if(q.type==='percent-split'){
+        return Object.entries(parsed).filter(([,v])=>v!=='').map(([k,v])=>`${escH(k)} : ${v}%`).join('<br>');
+      }
+      if(q.type==='behavior-matrix'){
+        return Object.entries(parsed).map(([k,v])=>{
+          const b2=q.behaviors?.find(b=>b.key===k);
+          const title=b2?b2.title:k;
+          if(v.ok)return `<strong>${escH(title)}</strong> : OK — comportement par défaut`;
+          if(v.custom)return `<strong>${escH(title)}</strong> : ${escH(v.custom)}`;
+          return null;
+        }).filter(Boolean).join('<br>');
+      }
+      if(q.type==='company-matrix'){
+        return Object.entries(parsed).filter(([k,v])=>k!=='__custom__'&&Array.isArray(v)&&v.length>0)
+          .map(([k,v])=>`<strong>${escH(k)}</strong> : ${v.map(escH).join(', ')}`).join('<br>');
+      }
+      if(parsed.__noFiles)return 'Pas de templates';
+      return JSON.stringify(parsed);
+    }
+    // Slider
+    if(q.type==='slider')return escH(String(parsed))+' adresse(s)';
+    // radio-other
+    if(typeof parsed==='string'&&parsed.startsWith('Autre::'))return 'Autre : '+escH(parsed.slice(7));
+    return escH(String(parsed));
+  }catch(e){
+    return escH(String(val));
+  }
 }
 
 async function adminUnlock(brokerId,mid,btn){
