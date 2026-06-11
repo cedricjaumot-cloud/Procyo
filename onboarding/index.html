@@ -1926,17 +1926,20 @@ function formatDossierValue(q,val){
     return escH(String(val));
   }
 }
-
 async function adminUnlock(brokerId,mid,btn){
+
   btn.disabled=true;btn.textContent='…';
   const midL=mid.toLowerCase();
-  await sbUpdate('brokers','id=eq.'+brokerId,{
-    [mid+'_status']:'active',
-    [midL+'_unlocked_at']:new Date().toISOString(),
-    [midL+'_reminder_count']:0,
-  });
-  btn.textContent='✓ Débloqué';btn.style.color='var(--green)';
-  setTimeout(()=>showAdmin(),1000);
+  try{
+    await sbUpdate('brokers','id=eq.'+brokerId,{[mid+'_status']:'active'});
+    try{ await sbUpdate('brokers','id=eq.'+brokerId,{[midL+'_unlocked_at']:new Date().toISOString(),[midL+'_reminder_count']:0}); }catch(e2){console.warn('Extra cols:',e2);}
+    btn.textContent='✓ Débloqué';btn.style.color='var(--green)';
+    setTimeout(()=>showAdmin(),1000);
+  }catch(e){
+    btn.disabled=false;btn.textContent='🔓 Débloquer';
+    alert('Erreur déblocage : '+e.message);
+    console.error('adminUnlock:',e);
+  }
 }
 
 async function adminSetSales(brokerId,email){
