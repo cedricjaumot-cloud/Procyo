@@ -293,6 +293,10 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 
 /* ADMIN */
 #screen-admin{display:none;min-height:calc(100vh - 60px)}
+.admin-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--g200)}
+.admin-tab{padding:10px 20px;font-size:14px;font-weight:500;color:var(--g400);cursor:pointer;border:none;border-bottom:2.5px solid transparent;margin-bottom:-2px;background:none;font-family:var(--font);transition:all .15s}
+.admin-tab.on{color:var(--navy);border-bottom-color:var(--blue)}
+.admin-tab:hover:not(.on){color:var(--g600)}
 .admin-wrap{max-width:960px;margin:0 auto;padding:36px 28px 80px}
 .admin-title{font-size:22px;font-weight:600;color:var(--navy);margin-bottom:8px}
 .admin-sub{font-size:14px;color:var(--g500);margin-bottom:28px}
@@ -563,9 +567,27 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration — Courtiers inscrits <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V1.2</span></h2>
-      <p class="admin-sub">Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.</p>
-      <div id="admin-list"></div>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V1.3</span></h2>
+      <div class="admin-tabs">
+        <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
+        <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')">Export réponses</button>
+      </div>
+      <div id="admin-tab-courtiers">
+        <p class="admin-sub">Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.</p>
+        <div id="admin-list"></div>
+      </div>
+      <div id="admin-tab-export" style="display:none">
+        <p class="admin-sub">Tableau croisé — une ligne par question, une colonne par courtier.</p>
+        <div id="pivot-status" style="font-size:13px;color:var(--g500);padding:10px 14px;background:var(--g100);border-radius:8px;margin-bottom:16px;border-left:3px solid var(--blue)">Cliquez sur "Charger" pour générer le tableau.</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="pivot-load-btn" onclick="loadPivot()">&#8635; Charger les données</button>
+          <button class="btn btn-primary" id="pivot-xlsx-btn" onclick="exportPivotXLSX()" disabled style="opacity:.4">&#8595; Télécharger .xlsx</button>
+          <button class="btn" id="pivot-csv-btn" onclick="exportPivotCSV()" disabled style="opacity:.4">&#8595; Télécharger .csv</button>
+        </div>
+        <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--g200)">
+          <table id="pivot-table" style="border-collapse:collapse;background:white;font-size:12px;width:100%"></table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1927,6 +1949,148 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('reg-pwd2').addEventListener('keypress',e=>{if(e.key==='Enter')doRegister();});
   checkSession();
 });
+
+// ── ADMIN TABS ──────────────────────────────────────────────
+function switchAdminTab(tab){
+  document.getElementById('admin-tab-courtiers').style.display = tab==='courtiers'?'':'none';
+  document.getElementById('admin-tab-export').style.display    = tab==='export'?'':'none';
+  document.getElementById('atab-courtiers').className = 'admin-tab'+(tab==='courtiers'?' on':'');
+  document.getElementById('atab-export').className    = 'admin-tab'+(tab==='export'?' on':'');
+}
+
+// ── EXPORT PIVOT ─────────────────────────────────────────────
+var _pivot = null;
+
+function _pval(v){
+  if(v===null||v===undefined) return '';
+  if(typeof v==='string'){
+    try{
+      var p=JSON.parse(v);
+      if(Array.isArray(p)) return p.join(', ');
+      if(p&&typeof p==='object') return Object.entries(p).map(function(kv){return kv[0]+': '+kv[1];}).join(' | ');
+      return String(p).replace(/^"|"$/g,'');
+    }catch(e){ return v.replace(/^"|"$/g,''); }
+  }
+  if(Array.isArray(v)) return v.join(', ');
+  return String(v);
+}
+
+async function _pfetch(table){
+  var all=[],from=0;
+  while(true){
+    var r=await fetch(SB_URL+'/rest/v1/'+table+'?select=*&limit=1000&offset='+from,{
+      headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
+    });
+    var d=await r.json();
+    if(!d||!d.length) break;
+    all=all.concat(d);
+    if(d.length<1000) break;
+    from+=1000;
+  }
+  return all;
+}
+
+async function loadPivot(){
+  var btn=document.getElementById('pivot-load-btn');
+  btn.disabled=true; btn.textContent='Chargement...';
+  document.getElementById('pivot-status').textContent='Chargement des courtiers...';
+  try{
+    var brokers=await _pfetch('brokers');
+    var bNames={};
+    brokers.forEach(function(b){ bNames[b.id]=b.company_name||b.name||b.email||b.id.slice(0,8); });
+
+    document.getElementById('pivot-status').textContent='Chargement des reponses...';
+    var answers=await _pfetch('answers');
+
+    var qSet={}, bSet={}, map={};
+    answers.forEach(function(a){
+      qSet[a.question_id]=1;
+      bSet[a.broker_id]=1;
+      if(!map[a.question_id]) map[a.question_id]={};
+      map[a.question_id][a.broker_id]=_pval(a.answer_value);
+    });
+
+    var questions=Object.keys(qSet).sort(function(a,b){
+      var pa=a.match(/[0-9]+/g)||[0], pb=b.match(/[0-9]+/g)||[0];
+      for(var i=0;i<Math.max(pa.length,pb.length);i++){
+        var d=(parseInt(pa[i])||0)-(parseInt(pb[i])||0);
+        if(d!==0) return d;
+      }
+      return 0;
+    });
+    var bids=Object.keys(bSet).sort(function(a,b){
+      return (bNames[a]||a).localeCompare(bNames[b]||b);
+    });
+
+    _pivot={questions:questions,bids:bids,map:map,bNames:bNames};
+
+    // Build table
+    var h='<thead><tr><th style="background:#1e3a5f;color:white;padding:8px 12px;text-align:left;font-size:11px;white-space:nowrap">Question</th>';
+    bids.forEach(function(bid){
+      h+='<th style="background:#1e3a5f;color:white;padding:8px 12px;text-align:left;font-size:11px;white-space:nowrap">'+(bNames[bid]||bid.slice(0,8))+'</th>';
+    });
+    h+='</tr></thead><tbody>';
+    questions.forEach(function(q,i){
+      var bg=i%2===0?'white':'#f5f7ff';
+      h+='<tr><td style="padding:6px 12px;border-bottom:1px solid #eee;font-weight:600;color:#1e3a5f;background:'+bg+';white-space:nowrap;font-size:12px">'+q+'</td>';
+      bids.forEach(function(bid){
+        var val=(map[q]&&map[q][bid])?map[q][bid]:'';
+        h+='<td style="padding:6px 12px;border-bottom:1px solid #eee;background:'+bg+';max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:'+(val?'#1a1a2e':'#ccc')+'" title="'+String(val).replace(/"/g,"&quot;")+'">'+(val||'–')+'</td>';
+      });
+      h+='</tr>';
+    });
+    h+='</tbody>';
+    document.getElementById('pivot-table').innerHTML=h;
+
+    document.getElementById('pivot-status').textContent='✓ '+answers.length+' réponses · '+bids.length+' courtiers · '+questions.length+' questions';
+    var xb=document.getElementById('pivot-xlsx-btn'); xb.disabled=false; xb.style.opacity='1';
+    var cb=document.getElementById('pivot-csv-btn');  cb.disabled=false; cb.style.opacity='1';
+  }catch(e){
+    document.getElementById('pivot-status').textContent='Erreur : '+e.message;
+    console.error(e);
+  }finally{
+    btn.disabled=false; btn.textContent='↻ Charger les données';
+  }
+}
+
+function _pivotRows(){
+  var header=[' '];
+  _pivot.bids.forEach(function(b){ header.push(_pivot.bNames[b]||b.slice(0,8)); });
+  var rows=[header];
+  _pivot.questions.forEach(function(q){
+    var row=[q];
+    _pivot.bids.forEach(function(b){ row.push((_pivot.map[q]&&_pivot.map[q][b])?_pivot.map[q][b]:''); });
+    rows.push(row);
+  });
+  return rows;
+}
+
+function exportPivotXLSX(){
+  if(!_pivot||typeof XLSX==='undefined') return;
+  var ws=XLSX.utils.aoa_to_sheet(_pivotRows());
+  ws['!cols']=[{wch:12}];
+  _pivot.bids.forEach(function(){ ws['!cols'].push({wch:30}); });
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Reponses Procyo');
+  XLSX.writeFile(wb,'Procyo_Reponses_Pivot.xlsx');
+}
+
+function exportPivotCSV(){
+  if(!_pivot) return;
+  var rows=_pivotRows();
+  var lines=[];
+  rows.forEach(function(r){
+    var cells=r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; });
+    lines.push(cells.join(';'));
+  });
+  var blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='Procyo_Reponses_Pivot.csv';
+  a.click();
+}
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>
