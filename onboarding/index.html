@@ -1795,7 +1795,7 @@ async function updateQProgress(mod){
     if(status==='active'){
       // Enregistrer la date de complétion (toujours, indépendamment de l'envoi mail)
       const modIdL=mod.id.toLowerCase();
-      const completedKey='module'+mod.id.replace('M','')+'_completed_at';
+      const completedKey=modIdL.replace('m','module')+'_completed_at';
       if(!currentUser[completedKey]){
         const completedAt=new Date().toISOString();
         await sbUpdate('brokers','id=eq.'+currentUser.id,{[completedKey]:completedAt});
