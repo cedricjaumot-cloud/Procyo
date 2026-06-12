@@ -1792,6 +1792,7 @@ async function updateQProgress(mod){
   // Detect completion
   if(ans>=tot&&tot>0){
     const status=currentUser[mod.id+'_status']||'locked';
+    console.log('Completion check:', mod.id, 'status=', status, 'ans=', ans, 'tot=', tot);
     if(status==='active'){
       // Enregistrer la date de complétion (toujours, indépendamment de l'envoi mail)
       const modIdL=mod.id.toLowerCase();
