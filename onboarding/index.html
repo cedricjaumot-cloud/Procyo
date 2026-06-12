@@ -23,6 +23,17 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 
 /* AUTH */
 #screen-auth{min-height:100vh;display:flex}
+#screen-activate{min-height:100vh;display:none;align-items:center;justify-content:center;background:var(--g50)}
+.activate-box{background:white;border-radius:var(--r-lg);padding:48px;max-width:480px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center}
+.activate-box .lf{font-size:28px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.activate-box p{color:var(--g500);font-size:14px;margin-bottom:32px}
+.activate-form{text-align:left}
+.activate-form .field{margin-bottom:16px}
+.activate-form label{font-size:13px;font-weight:500;color:var(--g600);display:block;margin-bottom:6px}
+.activate-form input{width:100%;padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:var(--font);outline:none;transition:border .15s}
+.activate-form input:focus{border-color:var(--blue)}
+.activate-msg-error{color:var(--red);font-size:13px;margin-bottom:12px;min-height:18px}
+.activate-msg-ok{color:var(--green);font-size:13px;margin-bottom:12px;min-height:18px}
 .auth-left{width:400px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;justify-content:space-between;padding:48px 40px;position:relative;overflow:hidden}
 .auth-left::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(29,106,229,.12);pointer-events:none}
 .auth-left::after{content:'';position:absolute;bottom:-60px;left:-60px;width:220px;height:220px;border-radius:50%;background:rgba(232,160,32,.07);pointer-events:none}
@@ -450,6 +461,22 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 <body>
 
 <!-- AUTH -->
+<!-- ACTIVATION PAR TOKEN -->
+<div id="screen-activate">
+  <div class="activate-box">
+    <div class="lf">PROCYO</div>
+    <p>Bienvenue ! Choisissez votre mot de passe pour accéder à votre espace courtier.</p>
+    <div class="activate-form">
+      <div class="activate-msg-error" id="act-err"></div>
+      <div class="activate-msg-ok" id="act-ok"></div>
+      <div class="field"><label>Votre email</label><input type="email" id="act-email" readonly style="background:var(--g50);color:var(--g500)"></div>
+      <div class="field"><label>Choisissez un mot de passe</label><input type="password" id="act-pwd1" placeholder="Minimum 8 caractères"></div>
+      <div class="field"><label>Confirmez le mot de passe</label><input type="password" id="act-pwd2" placeholder="Répétez le mot de passe"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="doActivate()">Activer mon compte</button>
+    </div>
+  </div>
+</div>
+
 <div id="screen-auth">
   <div class="auth-left">
     <div class="auth-logo">
@@ -567,7 +594,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V1.3</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.0</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')">Export réponses</button>
@@ -814,6 +841,71 @@ async function doLogout(){
 }
 
 function showMsg(el,msg){el.textContent=msg;el.style.display='block';}
+
+// ACTIVATION PAR TOKEN
+async function checkToken(){
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if(!token) return false;
+
+  // Chercher le broker avec ce token
+  const r = await fetch(SB_URL+'/rest/v1/brokers?invite_token=eq.'+encodeURIComponent(token)+'&invite_token_used=eq.false&select=id,email,company_name,invite_token_used', {
+    headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
+  });
+  const data = await r.json();
+  if(!data||!data.length){
+    // Token invalide ou déjà utilisé
+    return false;
+  }
+  const broker = data[0];
+  // Afficher l'écran d'activation
+  document.getElementById('act-email').value = broker.email;
+  document.getElementById('screen-activate').style.display = 'flex';
+  // Stocker l'ID broker pour doActivate
+  window._activateBrokerId = broker.id;
+  window._activateToken = token;
+  return true;
+}
+
+async function doActivate(){
+  const email = document.getElementById('act-email').value;
+  const pwd1 = document.getElementById('act-pwd1').value;
+  const pwd2 = document.getElementById('act-pwd2').value;
+  const errEl = document.getElementById('act-err');
+  const okEl = document.getElementById('act-ok');
+  errEl.textContent=''; okEl.textContent='';
+
+  if(pwd1.length < 8){ errEl.textContent='Le mot de passe doit faire au moins 8 caractères.'; return; }
+  if(pwd1 !== pwd2){ errEl.textContent='Les mots de passe ne correspondent pas.'; return; }
+
+  // Hasher le mot de passe (même logique que doRegister)
+  const hash = await hashPwd(pwd1);
+
+  // Mettre à jour le broker
+  const r = await fetch(SB_URL+'/rest/v1/brokers?id=eq.'+window._activateBrokerId, {
+    method:'PATCH',
+    headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({password_hash:hash, invite_token_used:true})
+  });
+
+  if(r.ok){
+    okEl.textContent='Compte activé ! Connexion en cours…';
+    // Connecter automatiquement
+    setTimeout(async ()=>{
+      const broker = await sbGet('brokers','email=eq.'+encodeURIComponent(email)+'&password_hash=eq.'+encodeURIComponent(hash));
+      if(broker&&broker.length){
+        currentUser=broker[0];
+        localStorage.setItem('procyo_uid',currentUser.id);
+        document.getElementById('screen-activate').style.display='none';
+        // Nettoyer l'URL
+        window.history.replaceState({},'',window.location.pathname);
+        enterApp();
+      }
+    }, 1500);
+  } else {
+    errEl.textContent="Erreur lors de l'activation. Veuillez réessayer.";
+  }
+}
 
 async function checkSession(){
   try{
@@ -1944,10 +2036,12 @@ function setLoading(show,msg='Chargement…'){
 // ══════════════════════════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded',async ()=>{
   document.getElementById('login-pwd').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin();});
   document.getElementById('reg-pwd2').addEventListener('keypress',e=>{if(e.key==='Enter')doRegister();});
-  checkSession();
+  // Vérifier d'abord si un token d'invitation est présent dans l'URL
+  const hasToken = await checkToken();
+  if(!hasToken) checkSession();
 });
 
 // ── ADMIN TABS ──────────────────────────────────────────────
