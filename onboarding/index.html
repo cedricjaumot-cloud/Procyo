@@ -6,7 +6,6 @@
 <title>Procyo — Espace Courtier</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-
 :root {
   --navy:#0B1F3A;--blue:#1D6AE5;--blue-h:#1558c4;
   --blue-pale:#EEF4FF;--blue-mid:#C7D9FA;
@@ -292,36 +291,12 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .btn-save.saving .spin{display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ADMIN TABS */
-.admin-tabs{display:flex;gap:0;margin-bottom:28px;border-bottom:2px solid var(--g200)}
-.admin-tab{padding:10px 20px;font-size:14px;font-weight:500;color:var(--g400);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font)}
+/* ADMIN */
+#screen-admin{display:none;min-height:calc(100vh - 60px)}
+.admin-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--g200)}
+.admin-tab{padding:10px 20px;font-size:14px;font-weight:500;color:var(--g400);cursor:pointer;border:none;border-bottom:2.5px solid transparent;margin-bottom:-2px;background:none;font-family:var(--font);transition:all .15s}
 .admin-tab.on{color:var(--navy);border-bottom-color:var(--blue)}
 .admin-tab:hover:not(.on){color:var(--g600)}
-/* EXPORT PIVOT */
-.pivot-metrics{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-.pivot-metric{background:var(--blue-pale);border-radius:var(--r);padding:12px 18px;min-width:120px}
-.pivot-metric .pm-val{font-size:26px;font-weight:700;color:var(--blue)}
-.pivot-metric .pm-lbl{font-size:11px;color:var(--g500);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
-.pivot-status{font-size:13px;color:var(--g500);padding:10px 14px;background:var(--g100);border-radius:8px;margin-bottom:16px;border-left:3px solid var(--blue)}
-.pivot-actions{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.pivot-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;border:none;transition:all .15s}
-.pivot-btn-primary{background:var(--blue);color:white}
-.pivot-btn-primary:hover{background:var(--blue-h)}
-.pivot-btn-primary:disabled{opacity:.45;cursor:not-allowed}
-.pivot-btn-secondary{background:white;color:var(--g600);border:1px solid var(--g200)}
-.pivot-btn-secondary:hover{background:var(--g50)}
-.pivot-btn-secondary:disabled{opacity:.45;cursor:not-allowed}
-.pivot-table-wrap{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--g200)}
-.pivot-table{border-collapse:collapse;background:white;font-size:12px;width:100%}
-.pivot-table th{background:var(--navy);color:white;padding:8px 12px;text-align:left;white-space:nowrap;font-weight:500;font-size:11px}
-.pivot-table th:first-child{position:sticky;left:0;z-index:3;min-width:80px}
-.pivot-table td{padding:6px 12px;border-bottom:1px solid var(--g100);font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pivot-table td:first-child{font-weight:600;color:var(--navy);background:var(--blue-pale);position:sticky;left:0;z-index:1;border-right:1px solid var(--g200);white-space:nowrap}
-.pivot-table tr:nth-child(even) td{background:var(--g50)}
-.pivot-table tr:nth-child(even) td:first-child{background:var(--blue-pale)}
-.pivot-table tr:hover td{background:var(--blue-pale)!important}
-.pivot-empty{color:var(--g300);font-style:italic}
-
 .admin-wrap{max-width:960px;margin:0 auto;padding:36px 28px 80px}
 .admin-title{font-size:22px;font-weight:600;color:var(--navy);margin-bottom:8px}
 .admin-sub{font-size:14px;color:var(--g500);margin-bottom:28px}
@@ -586,7 +561,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
   </div>
 
   <!-- ADMIN -->
-  <div id="screen-admin" style="display:none">
+  <div id="screen-admin">
     <div class="admin-wrap">
       <button class="back-btn" onclick="showHome()">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
@@ -594,41 +569,23 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       </button>
       <h2 class="admin-title">Administration</h2>
       <div class="admin-tabs">
-        <button class="admin-tab on" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
-        <button class="admin-tab" onclick="switchAdminTab('export')">Export réponses</button>
+        <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
+        <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')">Export réponses</button>
       </div>
-
-      <!-- Onglet Courtiers -->
       <div id="admin-tab-courtiers">
         <p class="admin-sub">Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.</p>
         <div id="admin-list"></div>
       </div>
-
-      <!-- Onglet Export -->
       <div id="admin-tab-export" style="display:none">
-        <p class="admin-sub">Tableau croisé des réponses — une ligne par question, une colonne par courtier.</p>
-        <div id="pivot-status" class="pivot-status">Cliquez sur "Charger les données" pour générer le tableau.</div>
-        <div id="pivot-metrics" class="pivot-metrics" style="display:none">
-          <div class="pivot-metric"><div class="pm-val" id="pm-answers">—</div><div class="pm-lbl">Réponses</div></div>
-          <div class="pivot-metric"><div class="pm-val" id="pm-brokers">—</div><div class="pm-lbl">Courtiers</div></div>
-          <div class="pivot-metric"><div class="pm-val" id="pm-questions">—</div><div class="pm-lbl">Questions</div></div>
+        <p class="admin-sub">Tableau croisé — une ligne par question, une colonne par courtier.</p>
+        <div id="pivot-status" style="font-size:13px;color:var(--g500);padding:10px 14px;background:var(--g100);border-radius:8px;margin-bottom:16px;border-left:3px solid var(--blue)">Cliquez sur &quot;Charger&quot; pour générer le tableau.</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="pivot-load-btn" onclick="loadPivot()">⟳ Charger les données</button>
+          <button class="btn btn-primary" id="pivot-xlsx-btn" onclick="exportPivotXLSX()" disabled style="opacity:.4">⬇ Télécharger .xlsx</button>
+          <button class="btn" id="pivot-csv-btn" onclick="exportPivotCSV()" disabled style="opacity:.4">⬇ Télécharger .csv</button>
         </div>
-        <div class="pivot-actions">
-          <button class="pivot-btn pivot-btn-primary" id="pivot-load-btn" onclick="loadPivot()">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"/></svg>
-            Charger les données
-          </button>
-          <button class="pivot-btn pivot-btn-primary" id="pivot-xlsx-btn" onclick="exportPivotXLSX()" disabled>
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Télécharger .xlsx
-          </button>
-          <button class="pivot-btn pivot-btn-secondary" id="pivot-csv-btn" onclick="exportPivotCSV()" disabled>
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Télécharger .csv
-          </button>
-        </div>
-        <div class="pivot-table-wrap">
-          <table class="pivot-table" id="pivot-table"></table>
+        <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--g200)">
+          <table id="pivot-table" style="border-collapse:collapse;background:white;font-size:12px;width:100%"></table>
         </div>
       </div>
     </div>
@@ -1926,20 +1883,17 @@ function formatDossierValue(q,val){
     return escH(String(val));
   }
 }
-async function adminUnlock(brokerId,mid,btn){
 
+async function adminUnlock(brokerId,mid,btn){
   btn.disabled=true;btn.textContent='…';
   const midL=mid.toLowerCase();
-  try{
-    await sbUpdate('brokers','id=eq.'+brokerId,{[mid+'_status']:'active'});
-    try{ await sbUpdate('brokers','id=eq.'+brokerId,{[midL+'_unlocked_at']:new Date().toISOString(),[midL+'_reminder_count']:0}); }catch(e2){console.warn('Extra cols:',e2);}
-    btn.textContent='✓ Débloqué';btn.style.color='var(--green)';
-    setTimeout(()=>showAdmin(),1000);
-  }catch(e){
-    btn.disabled=false;btn.textContent='🔓 Débloquer';
-    alert('Erreur déblocage : '+e.message);
-    console.error('adminUnlock:',e);
-  }
+  await sbUpdate('brokers','id=eq.'+brokerId,{
+    [mid+'_status']:'active',
+    [midL+'_unlocked_at']:new Date().toISOString(),
+    [midL+'_reminder_count']:0,
+  });
+  btn.textContent='✓ Débloqué';btn.style.color='var(--green)';
+  setTimeout(()=>showAdmin(),1000);
 }
 
 async function adminSetSales(brokerId,email){
@@ -1971,155 +1925,8 @@ async function submitObservation(){
 }
 
 // ══════════════════════════════════════════════════════════════
-// ADMIN TABS
+// UTILS
 // ══════════════════════════════════════════════════════════════
-function switchAdminTab(tab){
-  document.getElementById('admin-tab-courtiers').style.display = tab==='courtiers' ? '' : 'none';
-  document.getElementById('admin-tab-export').style.display = tab==='export' ? '' : 'none';
-  document.querySelectorAll('.admin-tab').forEach((el,i)=>{
-    el.classList.toggle('on', (tab==='courtiers'&&i===0)||(tab==='export'&&i===1));
-  });
-}
-
-// ══════════════════════════════════════════════════════════════
-// EXPORT PIVOT
-// ══════════════════════════════════════════════════════════════
-let _pivotData = null;
-
-function setPivotStatus(msg, ok){
-  const el = document.getElementById('pivot-status');
-  el.textContent = msg;
-  el.style.borderLeftColor = ok===true ? 'var(--green)' : ok===false ? 'var(--red)' : 'var(--blue)';
-}
-
-function parsePivotValue(v){
-  if(v===null||v===undefined) return '';
-  if(typeof v==='string'){
-    try{
-      const p=JSON.parse(v);
-      if(Array.isArray(p)) return p.join(', ');
-      if(p&&typeof p==='object') return Object.entries(p).map(([k,val])=>`${k}: ${val}`).join(' | ');
-      return String(p).replace(/^"|"$/g,'');
-    }catch{ return v.replace(/^"|"$/g,''); }
-  }
-  if(Array.isArray(v)) return v.join(', ');
-  if(typeof v==='object') return JSON.stringify(v);
-  return String(v);
-}
-
-async function fetchPivotAll(table){
-  let all=[],from=0,limit=1000;
-  while(true){
-    const r=await fetch(SB_URL+'/rest/v1/'+table+'?select=*&limit='+limit+'&offset='+from,{
-      headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
-    });
-    if(!r.ok) throw new Error('Erreur '+r.status+' sur '+table);
-    const d=await r.json();
-    if(!d.length) break;
-    all=all.concat(d);
-    if(d.length<limit) break;
-    from+=limit;
-  }
-  return all;
-}
-
-async function loadPivot(){
-  const btn=document.getElementById('pivot-load-btn');
-  btn.disabled=true; btn.textContent='Chargement…';
-  try{
-    setPivotStatus('Chargement des courtiers…');
-    const brokers=await fetchPivotAll('brokers');
-    const brokerNames={};
-    brokers.forEach(b=>{ brokerNames[b.id]=b.company_name||b.name||b.email||b.id.slice(0,8); });
-
-    setPivotStatus('Chargement des réponses…');
-    const answers=await fetchPivotAll('answers');
-
-    setPivotStatus('Construction du tableau…');
-    const qSet=new Set(), bSet=new Set(), map={};
-    answers.forEach(a=>{
-      qSet.add(a.question_id);
-      bSet.add(a.broker_id);
-      if(!map[a.question_id]) map[a.question_id]={};
-      map[a.question_id][a.broker_id]=parsePivotValue(a.answer_value);
-    });
-
-    const questions=[...qSet].sort((a,b)=>{
-      const pa=a.match(/\d+/g)?.map(Number)||[0];
-      const pb=b.match(/\d+/g)?.map(Number)||[0];
-      for(let i=0;i<Math.max(pa.length,pb.length);i++){
-        const d=(pa[i]||0)-(pb[i]||0); if(d!==0) return d;
-      }
-      return 0;
-    });
-    const brokerIds=[...bSet].sort((a,b)=>(brokerNames[a]||a).localeCompare(brokerNames[b]||b));
-
-    _pivotData={questions,brokerIds,map,brokerNames};
-
-    document.getElementById('pm-answers').textContent=answers.length;
-    document.getElementById('pm-brokers').textContent=brokerIds.length;
-    document.getElementById('pm-questions').textContent=questions.length;
-    document.getElementById('pivot-metrics').style.display='flex';
-
-    buildPivotTable();
-    setPivotStatus('✓ '+answers.length+' réponses · '+brokerIds.length+' courtiers · '+questions.length+' questions', true);
-    document.getElementById('pivot-xlsx-btn').disabled=false;
-    document.getElementById('pivot-csv-btn').disabled=false;
-  }catch(e){
-    setPivotStatus('Erreur : '+e.message, false);
-  }finally{
-    btn.disabled=false;
-    btn.innerHTML='<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"/></svg> Rafraîchir';
-  }
-}
-
-function buildPivotTable(){
-  const {questions,brokerIds,map,brokerNames}=_pivotData;
-  const tbl=document.getElementById('pivot-table');
-  let html='<thead><tr><th>Question</th>';
-  brokerIds.forEach(bid=>{ html+=`<th title="${bid}">${escH(brokerNames[bid]||bid.slice(0,8))}</th>`; });
-  html+='</tr></thead><tbody>';
-  questions.forEach(q=>{
-    html+=`<tr><td>${escH(q)}</td>`;
-    brokerIds.forEach(bid=>{
-      const val=(map[q]&&map[q][bid])?map[q][bid]:'';
-      html+=val?`<td title="${escA(val)}">${escH(val)}</td>`:`<td class="pivot-empty">–</td>`;
-    });
-    html+='</tr>';
-  });
-  html+='</tbody>';
-  tbl.innerHTML=html;
-}
-
-function getPivotRows(){
-  const {questions,brokerIds,map,brokerNames}=_pivotData;
-  const header=['Question',...brokerIds.map(bid=>brokerNames[bid]||bid.slice(0,8))];
-  const rows=questions.map(q=>[q,...brokerIds.map(bid=>(map[q]&&map[q][bid])?map[q][bid]:'')]);
-  return [header,...rows];
-}
-
-function exportPivotXLSX(){
-  if(!_pivotData||typeof XLSX==='undefined') return;
-  const rows=getPivotRows();
-  const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:12},..._pivotData.brokerIds.map(()=>({wch:32}))];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Réponses Procyo');
-  XLSX.writeFile(wb,'Procyo_Reponses_Pivot.xlsx');
-}
-
-function exportPivotCSV(){
-  if(!_pivotData) return;
-  const rows=getPivotRows();
-  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';')).join('\r\n');
-  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='Procyo_Reponses_Pivot.csv';
-  a.click();
-}
-
-
 function hideAll(){['screen-home','screen-questions','screen-admin'].forEach(id=>document.getElementById(id).style.display='none');}
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function escA(s){return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
@@ -2137,6 +1944,136 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('reg-pwd2').addEventListener('keypress',e=>{if(e.key==='Enter')doRegister();});
   checkSession();
 });
+
+// ── ADMIN TABS ──────────────────────────────────────────────
+function switchAdminTab(tab){
+  document.getElementById('admin-tab-courtiers').style.display = tab==='courtiers'?'':'none';
+  document.getElementById('admin-tab-export').style.display    = tab==='export'?'':'none';
+  document.getElementById('atab-courtiers').className = 'admin-tab'+(tab==='courtiers'?' on':'');
+  document.getElementById('atab-export').className    = 'admin-tab'+(tab==='export'?' on':'');
+}
+
+// ── EXPORT PIVOT ─────────────────────────────────────────────
+var _pivot = null;
+
+function _pval(v){
+  if(v===null||v===undefined) return '';
+  if(typeof v==='string'){
+    try{
+      var p=JSON.parse(v);
+      if(Array.isArray(p)) return p.join(', ');
+      if(p&&typeof p==='object') return Object.entries(p).map(function(e){return e[0]+': '+e[1];}).join(' | ');
+      return String(p).replace(/^"|"$/g,'');
+    }catch(e){ return v.replace(/^"|"$/g,''); }
+  }
+  if(Array.isArray(v)) return v.join(', ');
+  return String(v);
+}
+
+async function _pfetch(table){
+  var all=[],from=0;
+  while(true){
+    var r=await fetch(SB_URL+'/rest/v1/'+table+'?select=*&limit=1000&offset='+from,{
+      headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
+    });
+    var d=await r.json();
+    if(!d.length) break;
+    all=all.concat(d);
+    if(d.length<1000) break;
+    from+=1000;
+  }
+  return all;
+}
+
+function _pivotStatus(msg){
+  document.getElementById('pivot-status').textContent=msg;
+}
+
+async function loadPivot(){
+  var btn=document.getElementById('pivot-load-btn');
+  btn.disabled=true; btn.textContent='Chargement…';
+  try{
+    _pivotStatus('Chargement des courtiers…');
+    var brokers=await _pfetch('brokers');
+    var bNames={};
+    brokers.forEach(function(b){ bNames[b.id]=b.company_name||b.name||b.email||b.id.slice(0,8); });
+
+    _pivotStatus('Chargement des réponses…');
+    var answers=await _pfetch('answers');
+
+    var qSet={},bSet={},map={};
+    answers.forEach(function(a){
+      qSet[a.question_id]=1; bSet[a.broker_id]=1;
+      if(!map[a.question_id]) map[a.question_id]={};
+      map[a.question_id][a.broker_id]=_pval(a.answer_value);
+    });
+
+    var questions=Object.keys(qSet).sort(function(a,b){
+      var pa=a.match(/\d+/g)||[0], pb=b.match(/\d+/g)||[0];
+      for(var i=0;i<Math.max(pa.length,pb.length);i++){
+        var d=(parseInt(pa[i])||0)-(parseInt(pb[i])||0);
+        if(d!==0) return d;
+      }
+      return 0;
+    });
+    var bids=Object.keys(bSet).sort(function(a,b){ return (bNames[a]||a).localeCompare(bNames[b]||b); });
+
+    _pivot={questions:questions,bids:bids,map:map,bNames:bNames};
+
+    var tbl=document.getElementById('pivot-table');
+    var h='<thead><tr><th style="background:#1e3a5f;color:white;padding:8px 12px;text-align:left;white-space:nowrap;font-size:11px;position:sticky;top:0">Question</th>';
+    bids.forEach(function(bid){ h+='<th style="background:#1e3a5f;color:white;padding:8px 12px;text-align:left;white-space:nowrap;font-size:11px;position:sticky;top:0">'+(bNames[bid]||bid.slice(0,8))+'</th>'; });
+    h+='</tr></thead><tbody>';
+    questions.forEach(function(q,i){
+      var bg=i%2===0?'white':'#f8faff';
+      h+='<tr><td style="padding:6px 12px;border-bottom:1px solid #f0f0f0;font-weight:600;color:#1e3a5f;background:'+bg+';white-space:nowrap">'+q+'</td>';
+      bids.forEach(function(bid){
+        var val=map[q]&&map[q][bid]?map[q][bid]:'';
+        h+='<td style="padding:6px 12px;border-bottom:1px solid #f0f0f0;background:'+bg+';max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:'+(val?'#1a1a2e':'#ccc')+';" title="'+val.replace(/"/g,'&quot;')+'">'+(val||'–')+'</td>';
+      });
+      h+='</tr>';
+    });
+    h+='</tbody>';
+    tbl.innerHTML=h;
+
+    _pivotStatus('✓ '+answers.length+' réponses · '+bids.length+' courtiers · '+questions.length+' questions');
+    var xb=document.getElementById('pivot-xlsx-btn'); xb.disabled=false; xb.style.opacity='1';
+    var cb=document.getElementById('pivot-csv-btn');  cb.disabled=false; cb.style.opacity='1';
+  }catch(e){
+    _pivotStatus('Erreur : '+e.message);
+    console.error(e);
+  }finally{
+    btn.disabled=false; btn.textContent='⟳ Charger les données';
+  }
+}
+
+function _pivotRows(){
+  var rows=[[' '].concat(_pivot.bids.map(function(b){return _pivot.bNames[b]||b.slice(0,8);}))];
+  _pivot.questions.forEach(function(q){
+    rows.push([q].concat(_pivot.bids.map(function(b){ return (_pivot.map[q]&&_pivot.map[q][b])?_pivot.map[q][b]:''; })));
+  });
+  return rows;
+}
+
+function exportPivotXLSX(){
+  if(!_pivot||typeof XLSX==='undefined') return;
+  var ws=XLSX.utils.aoa_to_sheet(_pivotRows());
+  ws['!cols']=[{wch:12}].concat(_pivot.bids.map(function(){return {wch:30};}));
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Réponses Procyo');
+  XLSX.writeFile(wb,'Procyo_Reponses_Pivot.xlsx');
+}
+
+function exportPivotCSV(){
+  if(!_pivot) return;
+  var rows=_pivotRows(), lines=[];
+  rows.forEach(function(r){
+    lines.push(r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(';'));
+  });
+  var blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='Procyo_Reponses_Pivot.csv'; a.click();
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
