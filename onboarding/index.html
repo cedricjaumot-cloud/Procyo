@@ -493,7 +493,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-step"><div class="step-dot">4</div><div class="step-text"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.3</span></div>
+    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.4</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -594,7 +594,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.3</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.4</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')">Export réponses</button>
@@ -1071,10 +1071,26 @@ function openModule(idx){
     renderObservations();
   } else {
     document.getElementById('q-prog-card').style.display='block';
-    document.getElementById('sticky-bar').style.display='flex';
     renderSections(mod);
     updateQProgress(mod);
     renderNotif(idx);
+    // Lecture seule si module complété
+    const isCompleted = !!currentUser[mod.id+'_completed_at'];
+    const stickyBar = document.getElementById('sticky-bar');
+    stickyBar.style.display = isCompleted ? 'none' : 'flex';
+    if(isCompleted){
+      setTimeout(function(){
+        document.querySelectorAll('#screen-questions input, #screen-questions select, #screen-questions textarea').forEach(function(el){
+          el.disabled = true;
+          el.style.opacity = '0.7';
+          el.style.cursor = 'not-allowed';
+        });
+        document.querySelectorAll('#screen-questions .opt-btn, #screen-questions .chip').forEach(function(el){
+          el.style.pointerEvents = 'none';
+          el.style.opacity = '0.7';
+        });
+      }, 100);
+    }
   }
 }
 
