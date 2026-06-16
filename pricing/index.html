@@ -536,8 +536,7 @@ function genererPDF(){
   doc.setFont("helvetica","normal");doc.setTextColor(150,180,175);doc.setFontSize(7.5);
   doc.text("www.procyo.be  -  contact@procyo.be  -  Document confidentiel",105,294,{align:"center"});
 
-  doc.save("Offre_Procyo_"+client.replace(/[^a-zA-Z0-9]/g,"_")+"_"+c.sp.label+".pdf");
-}
+
 
 document.getElementById("nb-etp").addEventListener("input",function(){S.nbEtp=Math.max(1,parseInt(this.value)||1);render();});
 document.getElementById("nb-addr").addEventListener("input",function(){S.nbAddr=Math.max(1,parseInt(this.value)||1);render();});
@@ -933,7 +932,19 @@ function genererPDF(){
   doc.setFont("helvetica","normal");doc.setTextColor(150,180,175);doc.setFontSize(7.5);
   doc.text("www.procyo.be  -  contact@procyo.be  -  Document confidentiel",105,294,{align:"center"});
 
-  doc.save("Offre_Procyo_"+client.replace(/[^a-zA-Z0-9]/g,"_")+"_"+c.sp.label+".pdf");
+
+// Envoie aussi vers Odoo Sign
+var odooId = document.getElementById('codoo').value;
+if(odooId) {
+  var pdfBase64 = doc.output('datauristring').split(',')[1];
+  fetch('/web/hook/TON_URL_WEBHOOK', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      odoo_id: parseInt(odooId),
+      pdf_base64: pdfBase64
+    })
+  }).then(function(r){ console.log('Envoyé à Odoo:', r.status); });
 }
 
 document.getElementById("nb-etp").addEventListener("input",function(){S.nbEtp=Math.max(1,parseInt(this.value)||1);render();});
