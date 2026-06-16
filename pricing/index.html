@@ -934,17 +934,17 @@ function genererPDF(){
 
 // Envoie vers Odoo Sign
   var odooId = document.getElementById('codoo').value;
-  if(odooId) {
-    var pdfBase64 = doc.output('datauristring').split(',')[1];
-    fetch('https://procyo2.odoo.com/web/hook/2d16019c-fb74-4e13-98bb-1cd45063f0d1', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        odoo_id: parseInt(odooId),
-        pdf_base64: pdfBase64
-      })
-    }).then(function(r){ console.log('Envoyé à Odoo:', r.status); });
-  }
+if(odooId) {
+  var pdfBase64 = doc.output('datauristring').split(',')[1];
+  fetch('https://rzeequxjvsoqvbetxmev.supabase.co/functions/v1/send-pdf-odoo', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      odoo_id: parseInt(odooId),
+      pdf_base64: pdfBase64
+    })
+  }).then(function(r){ console.log('Envoyé à Odoo:', r.status); });
+}
 }
 
 document.getElementById("nb-etp").addEventListener("input",function(){S.nbEtp=Math.max(1,parseInt(this.value)||1);render();});
