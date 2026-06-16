@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<!-- saved from url=(0063)file:///C:/Users/Antoine/Downloads/procyo_workflow_codir_1.html -->
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Procyo - Workflow Commercial · Comité de Direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:       #0f0f0e;
+    --ink2:      #3a3935;
+    --ink3:      #7a7870;
+    --paper:     #faf9f6;
+    --paper2:    #f2f0eb;
+    --paper3:    #e8e5de;
+    --comm:      #1a1a2e;
+    --comm-mid:  #393580;
+    --comm-acc:  #8f87f5;
+    --comm-lite: #ededfd;
+    --ai:        #0b2218;
+    --ai-mid:    #1a6645;
+    --ai-acc:    #3ecf8e;
+    --ai-lite:   #e4f7ef;
+    --gold:      #c8a96e;
+    --line:      rgba(15,15,14,0.10);
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── PAGE LAYOUT ── */
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 48px 80px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 28px;
+    margin-bottom: 52px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .logo-block { }
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    letter-spacing: -1px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .logo em { font-style: italic; color: var(--ink3); }
+  .logo-sub {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--ink3);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+  .header-meta {
+    text-align: right;
+    font-size: 11px;
+    color: var(--ink3);
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+  }
+  .header-meta strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 12px;
+    color: var(--ink2);
+    font-weight: 400;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .legend-dot.comm { background: var(--comm-acc); }
+  .legend-dot.ai   { background: var(--ai-acc); }
+
+  /* ── SECTION WRAPPER ── */
+  .section { margin-bottom: 52px; }
+
+  .section-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .section-badge {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 30px;
+    white-space: nowrap;
+  }
+  .badge-comm { background: var(--comm); color: var(--comm-acc); }
+  .badge-ai   { background: var(--ai);   color: var(--ai-acc); }
+
+  .section-rule { height: 1px; background: var(--line); }
+  .section-team {
+    font-size: 11px;
+    color: var(--ink3);
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  .section-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 16px;
+    margin-top: -8px;
+    padding-left: 2px;
+  }
+
+  /* ── PHASE GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ── PHASE CARD ── */
+  .pcard {
+    background: #fff;
+    border: 1px solid var(--paper3);
+    border-radius: 16px;
+    padding: 24px 22px 20px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .pcard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.07);
+    border-color: var(--paper3);
+  }
+  .pcard.open {
+    border-color: var(--paper3);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+
+  .pcard-accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+  .accent-comm { background: linear-gradient(90deg, var(--comm-mid), var(--comm-acc)); }
+  .accent-ai   { background: linear-gradient(90deg, var(--ai-mid),   var(--ai-acc)); }
+
+  .pcard-num {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .pcard-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .pcard-desc {
+    font-size: 12.5px;
+    color: var(--ink3);
+    line-height: 1.6;
+    margin-bottom: 14px;
+    font-weight: 300;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+  .tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+  .tag-c { background: var(--comm-lite); color: var(--comm-mid); }
+  .tag-a { background: var(--ai-lite);   color: var(--ai-mid); }
+  .tag-n { background: var(--paper2);    color: var(--ink2); }
+
+  .pcard-cta {
+    font-size: 11px;
+    color: var(--ink3);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 400;
+  }
+  .cta-arrow { transition: transform 0.2s; display: inline-block; }
+  .pcard.open .cta-arrow { transform: rotate(90deg); }
+
+  /* ── DRAWER ── */
+  .drawer {
+    display: none;
+    margin-top: 0;
+  }
+  .drawer.open { display: block; }
+  .drawer-inner {
+    background: var(--paper2);
+    border: 1px solid var(--paper3);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-top: 12px;
+    font-size: 12.5px;
+    color: var(--ink2);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .drawer-inner h4 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 8px;
+    margin-top: 18px;
+  }
+  .drawer-inner h4:first-child,
+  .drawer-tag + h4 { margin-top: 0; }
+  .drawer-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    background: var(--paper3);
+    padding: 4px 12px;
+    border-radius: 30px;
+    margin-bottom: 14px;
+  }
+  .drawer-inner ul {
+    margin-left: 18px;
+    margin-top: 4px;
+  }
+  .drawer-inner li { margin-bottom: 5px; }
+  .drawer-inner strong { font-weight: 500; color: var(--ink); }
+
+  .kv-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 6px 16px;
+    margin-top: 8px;
+  }
+  .kv-k {
+    font-size: 11px;
+    color: var(--ink3);
+    font-weight: 400;
+    padding-top: 1px;
+  }
+  .kv-v { font-size: 12px; color: var(--ink2); }
+
+  .flag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .flag-urg { background: #fde8e8; color: #8b1a1a; }
+  .flag-ok  { background: #e6f4ea; color: #1a5c2a; }
+
+  /* ── SEPARATOR ── */
+  .sep {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 52px 0;
+    animation: fadeUp 0.5s ease both;
+  }
+  .sep-line { flex: 1; height: 1px; background: var(--line); }
+  .sep-diamond {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    margin-top: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--ink3);
+    letter-spacing: 0.05em;
+    animation: fadeUp 0.5s ease both;
+  }
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--ink2);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .pcard:nth-child(1) { animation-delay: 0.05s; }
+  .pcard:nth-child(2) { animation-delay: 0.12s; }
+  .pcard:nth-child(3) { animation-delay: 0.19s; }
+
+  @media print {
+    body { background: #fff; }
+    .pcard { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+    .pcard:hover { transform: none; }
+    .drawer { display: block !important; }
+    .drawer-inner { background: #f9f9f9; }
+    .pcard-cta { display: none; }
+  }
+</style>
+</head>
+<body>
+<!-- ÉCRAN MOT DE PASSE -->
+<div id="pwd-screen" style="position:fixed;inset:0;background:#1A2744;display:flex;align-items:center;justify-content:center;z-index:9999">
+  <div style="background:white;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <img src="data:image/avif;base64,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" alt="Procyo" style="height:48px;margin-bottom:16px;object-fit:contain">
+    <div style="font-size:14px;color:#8B9794;margin-bottom:8px">Workflow Commercial & Opérationnel</div>
+    <div style="font-size:11px;color:#8B9794;margin-bottom:32px;opacity:.7">Accès réservé à l'équipe Procyo</div>
+    <input type="password" id="pwd-input" placeholder="Mot de passe" autocomplete="off"
+      style="width:100%;padding:12px 16px;border:2px solid #DDE5E3;border-radius:10px;font-size:15px;font-family:'Plus Jakarta Sans','Outfit',sans-serif;outline:none;text-align:center;letter-spacing:.05em;transition:border .15s"
+      onfocus="this.style.borderColor='#00BFA5'" onblur="this.style.borderColor='#DDE5E3'">
+    <button onclick="checkPwd()"
+      style="width:100%;margin-top:16px;padding:13px;border:none;border-radius:10px;background:#00BFA5;color:#1A2744;font-size:15px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans','Outfit',sans-serif;transition:background .15s"
+      onmouseover="this.style.background='#4CE6B9'" onmouseout="this.style.background='#00BFA5'">
+      Accéder →
+    </button>
+    <div id="pwd-err" style="color:#E85D04;font-size:13px;margin-top:12px;min-height:20px"></div>
+  </div>
+</div>
+<div id="app" style="display:none">
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo-block">
+      <div class="logo">Procyo <em>-</em> Workflow client</div>
+      <div class="logo-sub">De la prospection à l'autonomie · 8 phases · 2 équipes</div>
+    </div>
+    <div class="header-meta">
+      <strong>Comité de Direction</strong>
+      Juin 2026 · Usage interne<br>
+      Document confidentiel
+    </div>
+  </header>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item">
+      <span class="legend-dot comm"></span>
+      Équipe « commerciale »
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot ai"></span>
+      Équipe « IA Factory »
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SECTION A - PROSPECTION
+  ════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-badge badge-comm">Prospection</span>
+      <div class="section-rule"></div>
+      <span class="section-team">Antoine · Cédric · Éric · Maxime</span>
+    </div>
+    <div class="section-name">Phases 1 - 2</div>
+
+    <div class="grid-2">
+
+      <div class="pcard" onclick="tog(&#39;d1&#39;,this)">
+        <div class="pcard-accent accent-comm"></div>
+        <div class="pcard-num">Phase 1</div>
+        <div class="pcard-title">Génération de leads</div>
+        <div class="pcard-desc">Identification et qualification des premiers contacts avant toute prise de rendez-vous. Cinq canaux actifs alimentent le pipeline en continu.</div>
+        <div class="tags">
+          <span class="tag tag-c">Événements</span>
+          <span class="tag tag-c">LinkedIn</span>
+          <span class="tag tag-c">Recommandations</span>
+          <span class="tag tag-c">Website</span>
+          <span class="tag tag-n">CRM Odoo</span>
+        </div>
+        <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+      </div>
+
+      <div class="pcard" onclick="tog(&#39;d2&#39;,this)">
+        <div class="pcard-accent accent-comm"></div>
+        <div class="pcard-num">Phase 2</div>
+        <div class="pcard-title">Prise de contact</div>
+        <div class="pcard-desc">Le courtier réserve son créneau via Calendly, reçoit un meeting request, puis accède au Launchpad pour compléter le Module Découverte - moins de 5 minutes.</div>
+        <div class="tags">
+          <span class="tag tag-c">Calendly</span>
+          <span class="tag tag-c">Module Découverte · ~5 min</span>
+          <span class="tag tag-n">Relance auto 48h</span>
+        </div>
+        <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+      </div>
+
+    </div>
+
+    <div class="drawer" id="d1">
+      <div class="drawer-inner">
+        <span class="drawer-tag">Phase 1 · Génération de leads</span>
+        <h4>Cinq canaux de génération</h4>
+        <ul>
+          <li><strong>Événements &amp; salons</strong> - rencontres directes avec gérants et associés de bureaux de courtage belges lors des salons professionnels du secteur.</li>
+          <li><strong>LinkedIn</strong> - prospection ciblée sur les décideurs : associés, gérants, office managers. Séquences de messages personnalisées selon la province et la taille du bureau.</li>
+          <li><strong>Recommandations</strong> - chaque client satisfait est un vecteur naturel vers son réseau de confrères. Le programme de parrainage est en cours de formalisation.</li>
+          <li><strong>Website Procyo</strong> - formulaire d'entrée sur le site, pré-tagué par source dans Odoo pour tracking complet du parcours d'acquisition.</li>
+          <li><strong>Campagnes SEA</strong> - trafic payant ciblé sur les mots-clés du secteur courtage belge.</li>
+        </ul>
+        <h4>Ce qui se passe dans le CRM Odoo</h4>
+        Dès qu'un formulaire est soumis (toute source confondue), Odoo crée automatiquement un contact et une opportunité dans le pipeline commercial. Un commercial est affecté automatiquement selon la province du bureau - sans intervention manuelle.
+        <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Identification source</span><span class="kv-v">Le système doit prévoir une identification des différentes sources dans le CRM Odoo</span>
+          <span class="kv-k">Statut Odoo</span><span class="kv-v">Fixer un RDV Démo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer" id="d2">
+      <div class="drawer-inner">
+        <span class="drawer-tag">Phase 2 · Prise de contact</span>
+        <h4>Prise de rendez-vous</h4>
+        Le courtier reçoit un mail pour la prise de rendez-vous via Calendly. <span class="flag flag-urg">Quid présentiel vs Teams ?</span> Présenter le template du mail envoyé.
+        <h4>Confirmation du rendez-vous</h4>
+        Une fois le rendez-vous fixé par le courtier, un meeting request est envoyé dans son calendrier ainsi que dans celui du commercial.
+        <h4>Accès au Launchpad &amp; Module Découverte</h4>
+        Le courtier reçoit ensuite un mail lui donnant accès à un espace sécurisé « Launchpad » (profil prédéfini, seul un mot de passe reste à créer) afin de compléter le Module Découverte : 10 questions, moins de 5 minutes. Les données sont enregistrées dans la base Supabase, puis répercutées sur le contact dans Odoo.
+        <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Statut Odoo</span><span class="kv-v">RDV démo planifié</span>
+          <span class="kv-k">Relance automatique</span><span class="kv-v">Mail envoyé si le Module Découverte n'est pas complété après 48h - objet : « Préparons votre démonstration »</span>
+          <span class="kv-k">Notification interne</span><span class="kv-v">Commercial alerté dès complétion → prépare la démo sur base des réponses</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════
+       SECTION B - ACQUISITION
+  ════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-badge badge-comm">Acquisition client</span>
+      <div class="section-rule"></div>
+      <span class="section-team">Antoine · Cédric · Éric · Maxime</span>
+    </div>
+    <div class="section-name">Phases 3 - 4 - 5</div>
+
+    <div class="grid-3">
+
+      <div class="pcard" onclick="tog(&#39;d3&#39;,this)">
+        <div class="pcard-accent accent-comm"></div>
+        <div class="pcard-num">Phase 3</div>
+        <div class="pcard-title">Démonstration</div>
+        <div class="pcard-desc">Présentation live de l'outil, en présentiel ou en visioconférence, sur la base d'un deck standard entièrement adapté oralement.</div>
+        <div class="tags">
+          <span class="tag tag-c">PPT standard</span>
+          <span class="tag tag-c">~1h15</span>
+          <span class="tag tag-n">Teams ou présentiel</span>
+        </div>
+        <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+      </div>
+
+      <div class="pcard" onclick="tog(&#39;d4&#39;,this)">
+        <div class="pcard-accent accent-comm"></div>
+        <div class="pcard-num">Phase 4</div>
+        <div class="pcard-title">Offre commerciale</div>
+        <div class="pcard-desc">Tarification réalisée en clôture du rendez-vous démo via le Launchpad. L'offre est envoyée au courtier avec un CTA de validation, qui débloque le Module Contractualisation.</div>
+        <div class="tags">
+          <span class="tag tag-c">Tarification Launchpad</span>
+          <span class="tag tag-c">CTA validation offre</span>
+          <span class="tag tag-n">Module Contractualisation</span>
+        </div>
+        <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+      </div>
+
+      <div class="pcard" onclick="tog(&#39;d5&#39;,this)">
+        <div class="pcard-accent accent-comm"></div>
+        <div class="pcard-num">Phase 5</div>
+        <div class="pcard-title">Contrat &amp; signature</div>
+        <div class="pcard-desc">Gianni reçoit la notification et dispose de 48h pour réaliser le draft du contrat via le module Signature d'Odoo et le faire suivre au courtier pour signature électronique.</div>
+        <div class="tags">
+          <span class="tag tag-c">Draft contrat · 48h · Gianni</span>
+          <span class="tag tag-c">e-signature Odoo</span>
+          <span class="tag tag-n">Module Paramétrage</span>
+        </div>
+        <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+      </div>
+
+    </div>
+
+    <div class="drawer" id="d3">
+      <div class="drawer-inner">
+        <span class="drawer-tag">Phase 3 · Démonstration</span>
+        <h4>Un deck, un discours sur mesure</h4>
+        Le PPT est identique pour tous les courtiers - ce qui change, c'est le discours oral du commercial, entièrement calibré sur les réponses du Module Découverte. Si le bureau est en Microsoft 365, avec 50+ mails entrants par jour et comme priorité la gestion des sinistres, la démo met en scène exactement ce scénario en live.
+        <h4>Structure de la session (~1h15)</h4>
+        <ul>
+          <li><strong>Contexte du courtage belge</strong> - enjeux réglementaires, pression sur la productivité, attentes clients.</li>
+          <li><strong>Problèmes concrets résolus</strong> - démonstration des gains de temps mesurables sur les tâches à faible valeur ajoutée.</li>
+          <li><strong>Démonstration live</strong> - scénario réel adapté au profil du courtier (sinistre, devis, attestation).</li>
+          <li><strong>IA métier</strong> - présentation des assistants Procyo IA, Assistant Conformité, Assistant Commercial, Assistant Portefeuille.</li>
+          <li><strong>Tarification</strong> - palier correspondant à la taille du bureau, avec et sans modules complémentaires.</li>
+          <li><strong>Prochaines étapes</strong> - accès au Module Contractualisation et timeline de mise en service.</li>
+        </ul>
+        <h4>Question de clôture</h4>
+        À la fin de la démonstration, on pose simplement la question : « Combien d'adresses mails ? »
+        <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Démo concluante</span><span class="kv-v">Tarification réalisée via le Launchpad, offre envoyée au courtier avec CTA de validation</span>
+          <span class="kv-k">Statut Odoo</span><span class="kv-v">Offre Envoyée</span>
+          <span class="kv-k">Démo non concluante</span><span class="kv-v">Motif tracé, relance possible à 30 jours · statut Odoo <span class="flag flag-urg">à définir</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer" id="d4">
+      <div class="drawer-inner">
+        <span class="drawer-tag">Phase 4 · Offre commerciale</span>
+        <h4>Tarification en clôture du rendez-vous démo</h4>
+        Tarif ajusté selon la taille du bureau et les modules activés. La tarification est établie directement à l'issue du rendez-vous démo à l'aide du Launchpad.
+        <h4>Envoi de l'offre au courtier</h4>
+        L'offre est transmise au courtier via Odoo. Le mail contient un CTA permettant au courtier de valider l'offre ou d'en demander une autre.
+        <h4>Validation de l'offre → Module Contractualisation</h4>
+        Lorsque le courtier répond positivement à l'offre via le CTA, cela débloque le Module Contractualisation dans le Launchpad. Un mail est alors envoyé au courtier. Le module comporte 13 questions, environ 10 minutes.
+        <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Relance automatique</span><span class="kv-v">Mail envoyé si le Module Contractualisation n'est pas complété après 24h · objet : « Votre contrat est en préparation »</span>
+          <span class="kv-k">Notification interne</span><span class="kv-v">Commercial et Gianni alertés dès complétion → préparation contrat par Gianni</span>
+          <span class="kv-k">Statut Odoo</span><span class="kv-v">Offre Envoyée</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer" id="d5">
+      <div class="drawer-inner">
+        <span class="drawer-tag">Phase 5 · Contrat &amp; signature</span>
+        <h4>Déclenchement de l'étape</h4>
+        Cette étape ne démarre que lorsque Gianni et le commercial sont notifiés de la fin du Module Contractualisation dans le Launchpad.
+        <h4>Draft du contrat - Gianni, 48h</h4>
+        Gianni dispose de 48h pour réaliser le draft du contrat, via le module Signature d'Odoo, et le faire suivre au courtier pour signature. À terme, le contrat pourrait se compléter automatiquement à partir des informations reprises sur le contact.
+        <h4>Signature électronique</h4>
+        Signature 100% digitale, sans impression, via le module Signature d'Odoo. Contrat généré automatiquement depuis les Conditions Particulières issues du Module Contractualisation. Niveau de signature à valider :
+        <ul>
+          <li><strong>Basique (SES)</strong> - signature électronique simple.</li>
+          <li><strong>Avancée (AES)</strong> - via SMS, coût de 0,15 € par signature.</li>
+          <li><strong>Qualifiée (QES)</strong> - via itsme, coût de 2 € par signature.</li>
+        </ul>
+        <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Statut Odoo (début)</span><span class="kv-v">Emission Contrat - arrive automatiquement quand le Module Contractualisation est complété</span>
+          <span class="kv-k">Relance J+3</span><span class="kv-v">Relance automatique si le contrat n'est pas signé après 3 jours</span>
+          <span class="kv-k">À la signature</span><span class="kv-v">Mail « Bienvenue chez Procyo » envoyé automatiquement - vu de manière plus complète en Phase 6</span>
+          <span class="kv-k">Notification interne</span><span class="kv-v">Le commercial est notifié dès que le contrat est signé</span>
+          <span class="kv-k">Statut Odoo (fin)</span><span class="kv-v">Contrat Signé - arrive automatiquement via la signature digitale</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEPARATOR -->
+  <div class="sep">
+    <div class="sep-line"></div>
+    <div class="sep-diamond"></div>
+    <div class="sep-line"></div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SECTION C - ONBOARDING
+  ════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-badge badge-ai">Onboarding &amp; suivi</span>
+      <div class="section-rule"></div>
+      <span class="section-team">Maxime · IA Factory</span>
+    </div>
+    <div class="section-name">Phases 6 - 7 - 8</div>
+
+    <div class="grid-3">
+
+      <div class="pcard" onclick="tog(&#39;d6&#39;,this)">
+        <div class="pcard-accent accent-ai"></div>
+        <div class="pcard-num">Phase 6</div>
+        <div class="pcard-title">Bienvenue &amp; Set-Up</div>
+        <div class="pcard-desc">Deux mails automatiques suite au passage en statut Contrat Signé : J+1 pour la demande de clé API, J+2 pour démarrer le Module Paramétrage. La demande de clé déclenche le RDV présentiel et la création de l'accès Dashboard.</div>
+        <div class="tags">
+          <span class="tag tag-a">J+1 · Demande clé API</span>
+          <span class="tag tag-a">J+2 · Module Paramétrage</span>
+          <span class="tag tag-n">RDV présentiel ≈ J+10</span>
+        </div>
+        <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+      </div>
+
+      <div class="pcard" onclick="tog(&#39;d7&#39;,this)">
+        <div class="pcard-accent accent-ai"></div>
+        <div class="pcard-num">Phase 7</div>
+        <div class="pcard-title">Préparation IA Factory &amp; Go-Live</div>
+        <div class="pcard-desc">Dès réception de la clé Brio, l'IA Factory charge les tables et personnalise les prompts. Add-in Outlook installé. Formation de l'équipe, puis Go-Live à J+2 en Teams.</div>
+        <div class="tags">
+          <span class="tag tag-a">Script Brio standard</span>
+          <span class="tag tag-a">Add-in Outlook</span>
+          <span class="tag tag-n">Go-Live J+2</span>
+        </div>
+        <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+      </div>
+
+      <div class="pcard" onclick="tog(&#39;d8&#39;,this)">
+        <div class="pcard-accent accent-ai"></div>
+        <div class="pcard-num">Phase 8</div>
+        <div class="pcard-title">Entrainement</div>
+        <div class="pcard-desc">Suivi de proximité pendant 3 mois après le Go-Live, avec une cadence d'appels décroissante. L'assistant apprend ensuite seul des usages du bureau.</div>
+        <div class="tags">
+          <span class="tag tag-a">10j ouvrables · quotidien</span>
+          <span class="tag tag-a">3 sem. · hebdo</span>
+          <span class="tag tag-n">8 sem. · bi-mensuel</span>
+        </div>
+        <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+      </div>
+
+    </div>
+
+    <div class="drawer" id="d6">
+      <div class="drawer-inner">
+        <span class="drawer-tag">Phase 6 · Bienvenue &amp; Set-Up</span>
+        <h4>Mail J+1 - Demande de clé API</h4>
+        Le lendemain de la signature (J+1), automatisation suite au passage en statut Contrat Signé : un mail est envoyé au courtier pour lui indiquer la procédure de demande de clé API via Portima. <span class="flag flag-urg">template à présenter</span>
+        <h4>Mail J+2 - Module Paramétrage</h4>
+        Le surlendemain (J+2), un second mail automatique invite le courtier à démarrer le Module Paramétrage dans le Launchpad. <span class="flag flag-urg">template à présenter</span> Ce module peut également être complété lors d'un RDV Teams au besoin.
+        <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Relance automatique</span><span class="kv-v">Rappel toutes les 48h si le Module Paramétrage n'est pas complété</span>
+          <span class="kv-k">Notification interne</span><span class="kv-v">Une fois complété, information envoyée à onboarding@procyo2.odoo.com (via APP Assistance) et au Commercial</span>
+        </div>
+        <h4>Demande de clé Brio effectuée</h4>
+        Lorsque le courtier effectue sa demande de clé Brio, <strong>onboarding@procyo2.odoo.com</strong> (via APP Assistance) reçoit l'information. Ceci déclenche deux nouveaux mails :
+        <ul>
+          <li>un mail avec Calendly pour fixer un RDV en présentiel au bureau du courtier pour la présentation globale (à ≈ J+10) <span class="flag flag-urg">prévoir template</span> ;</li>
+          <li>un mail vers le commercial afin qu'il crée l'accès au Dashboard via la zone ADMIN (automatisation à prévoir dans le futur) <span class="flag flag-urg">prévoir template</span>.</li>
+        </ul>
+        <h4>Création de l'accès Dashboard</h4>
+        À la création de l'accès au Dashboard, deux mails partent automatiquement vers le courtier :
+        <ul>
+          <li>un mail pour l'accès à la plateforme Procyo <span class="flag flag-urg">prévoir template</span> ;</li>
+          <li>un mail dédié à la connexion Microsoft Graph <span class="flag flag-urg">prévoir template</span>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="drawer" id="d7">
+      <div class="drawer-inner">
+        <span class="drawer-tag">Phase 7 · Préparation IA Factory &amp; Go-Live</span>
+        <h4>Réception de la clé Brio</h4>
+        Lorsque le courtier renvoie la clé Brio, celle-ci arrive sur <strong>onboarding@procyo2.odoo.com</strong> (via APP Assistance). <span class="flag flag-urg">Mail du courtier ou de Brio directement ? À définir.</span> On passe alors en Phase 7.
+        <h4>Présentation à l'équipe</h4>
+        Selon toute logique, c'est durant cette période que se déroule la présentation à l'équipe du courtier, planifiée lors de la Phase 6 (RDV présentiel ≈ J+10).
+        <h4>Mail Add-in Outlook</h4>
+        À la réception de la clé Brio chez Procyo, un mail automatique est envoyé au courtier pour le téléchargement et l'installation de l'add-in Outlook (Chatbox Procyo IA). <span class="flag flag-urg">template à prévoir</span>
+        <h4>Préparation IA Factory</h4>
+        L'IA Factory exécute un script Brio standard pour charger les tables : sinistres, objets de risques, contrats, clients, codes produits, etc., et prépare la personnalisation des prompts et des actions Brio pour le courtier.
+        <h4>Go-Live (J+2 et au moins J+4 de la remise de la clé Brio)</h4>
+        À la fin de la formation de l'équipe, le Go-Live est fixé à J+2, et au moins à J+4 de la remise de la clé Brio, en Teams (courtier, commercial, IA Factory).
+        <h4>Au programme</h4>
+        <ul>
+          <li>parcourir le Dashboard ;</li>
+          <li>lancer les premiers cas en live ;</li>
+          <li>personnaliser plus si besoin ;</li>
+          <li>montrer le catalogue de prompts et son fonctionnement.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="drawer" id="d8">
+      <div class="drawer-inner">
+        <span class="drawer-tag">Phase 8 · Entrainement</span>
+        <h4>Suivi de proximité - 3 mois après le Go-Live</h4>
+        <ul>
+          <li><strong>10 premiers jours ouvrables</strong> - call tous les jours.</li>
+          <li><strong>3 semaines suivantes</strong> - call une fois par semaine.</li>
+          <li><strong>8 semaines suivantes</strong> - call tous les 15 jours.</li>
+        </ul>
+        Ce rythme reste souple et à adapter au cas par cas, selon les aptitudes et la complexité du bureau de courtage.
+        <h4>Apprentissage autonome</h4>
+        Au terme du suivi de proximité, l'assistant apprend ensuite seul des usages réels du bureau, sans nouveau questionnaire.
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">Procyo</div>
+    <div>Workflow commercial · Juin 2026 · Usage interne Direction</div>
+    <div>8 phases · 2 équipes · Confidentiel</div>
+  </footer>
+
+</div>
+
+<script>
+  function tog(id, card) {
+    const drawer = document.getElementById(id);
+    const isOpen = drawer.classList.contains('open');
+    document.querySelectorAll('.drawer.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.pcard.open').forEach(c => c.classList.remove('open'));
+    if (!isOpen) {
+      drawer.classList.add('open');
+      card.classList.add('open');
+      setTimeout(() => drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+    }
+  }
+</script>
+
+
+</div>
+
+<script>
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function checkPwd() {
+  const val = document.getElementById('pwd-input').value;
+  const h = await sha256(val);
+  const target = await sha256('Pr0cy0Tar!f');
+  if(h === target) {
+    sessionStorage.setItem('procyo_workflow','1');
+    document.getElementById('pwd-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+  } else {
+    document.getElementById('pwd-err').textContent = 'Mot de passe incorrect.';
+    document.getElementById('pwd-input').value='';
+    document.getElementById('pwd-input').focus();
+  }
+}
+document.getElementById('pwd-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPwd();});
+if(sessionStorage.getItem('procyo_workflow')==='1') {
+  document.getElementById('pwd-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+}
+</script>
+
+</body></html>
