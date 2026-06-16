@@ -8,31 +8,23 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* PASSWORD SCREEN */
-#pwd-screen{
-  position:fixed;inset:0;background:#1A2744;display:flex;align-items:center;justify-content:center;z-index:9999;
-}
-.pwd-box{
-  background:white;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);
-}
+#pwd-screen{position:fixed;inset:0;background:#1A2744;display:flex;align-items:center;justify-content:center;z-index:9999}
+.pwd-box{background:white;border-radius:16px;padding:48px 40px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .pwd-logo{font-size:28px;font-weight:700;color:#1A2744;margin-bottom:6px;letter-spacing:-.5px}
 .pwd-sub{font-size:14px;color:#8B9794;margin-bottom:32px}
-.pwd-field{
-  width:100%;padding:12px 16px;border:2px solid #DDE5E3;border-radius:10px;
-  font-size:15px;font-family:'DM Sans',sans-serif;outline:none;transition:border .15s;
-  text-align:center;letter-spacing:.05em;
-}
+.pwd-field{width:100%;padding:12px 16px;border:2px solid #DDE5E3;border-radius:10px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;transition:border .15s;text-align:center;letter-spacing:.05em}
 .pwd-field:focus{border-color:#00BFA5}
-.pwd-btn{
-  width:100%;margin-top:16px;padding:13px;border:none;border-radius:10px;
-  background:#00BFA5;color:#1A2744;font-size:15px;font-weight:700;
-  cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;
-}
+.pwd-btn{width:100%;margin-top:16px;padding:13px;border:none;border-radius:10px;background:#00BFA5;color:#1A2744;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
 .pwd-btn:hover{background:#4CE6B9}
 .pwd-err{color:#E85D04;font-size:13px;margin-top:12px;min-height:20px}
 .pwd-footer{font-size:11px;color:#8B9794;margin-top:24px}
-
-/* SIMULATOR */
 #app{display:none}
+/* BROKER DROPDOWN */
+.broker-item{padding:8px 12px;cursor:pointer;font-size:13px;color:#1A2744;border-bottom:1px solid #DDE5E3}
+.broker-item:hover{background:#E8FBF5}
+.broker-item:last-child{border-bottom:none}
+.broker-name{font-weight:600}
+.broker-email{font-size:11px;color:#8B9794}
 
 :root{
   --navy:#1A2744;--teal:#00BFA5;--teal2:#4CE6B9;--teal-bg:#E8FBF5;--teal-border:#9FE1CB;
@@ -133,11 +125,10 @@ header img.logo{height:34px}
 <div id="pwd-screen">
   <div class="pwd-box">
     <div class="pwd-logo">PROCYO</div>
-    <div class="pwd-sub">Simulateur de tarification</div>
+    <div class="pwd-sub">Simulateur de tarification<br><small style="font-size:11px;opacity:.6">Accès réservé à l'équipe Procyo</small></div>
     <input type="password" class="pwd-field" id="pwd-input" placeholder="Mot de passe" autocomplete="off">
-    <button class="pwd-btn" onclick="checkPwd()">Accéder</button>
+    <button class="pwd-btn" onclick="checkPwd()">Accéder →</button>
     <div class="pwd-err" id="pwd-err"></div>
-    <div class="pwd-footer">Accès réservé à l'équipe Procyo</div>
   </div>
 </div>
 
@@ -178,8 +169,15 @@ header img.logo{height:34px}
   <div>
     <div class="slabel">Client</div>
     <div class="card">
-      <div class="frow"><label>Nom du bureau</label><input type="text" id="cnom" placeholder="Nom du bureau"/></div>
-      <div class="frow"><label>Contact</label><input type="text" id="ccont" placeholder="Prénom Nom"/></div>
+      <div class="frow" style="position:relative">
+  <label>Nom du bureau</label>
+  <div style="position:relative;width:150px">
+    <input type="text" id="cnom" placeholder="Rechercher..." autocomplete="off" oninput="searchBroker(this.value)" onfocus="searchBroker(this.value)"/>
+    <div id="broker-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid #00BFA5;border-radius:6px;z-index:999;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.15)"></div>
+  </div>
+</div>
+      <div class="frow"><label>Contact</label><input type="text" id="ccont" placeholder="Prénom Nom" readonly style="background:#F7F9F8;color:#8B9794"/></div>
+<div class="frow" style="display:none"><label>Odoo ID</label><input type="text" id="codoo" readonly/></div>
     </div>
   </div>
 
@@ -562,40 +560,125 @@ render();
 </div>
 
 <script>
-// Password protection
-const HASH = '7a3b9f2e1d4c8a6b5e0f3d2c9b7a4e1f8d6c3b0a5e2f9d7c4b1a8e5f3d2c0b9';
+// ── CONFIG ──────────────────────────────────────────────────
+const SB_URL = 'https://rzeequxjvsoqvbetxmev.supabase.co';
+const SB_KEY = 'sb_publishable_Vb-s-OrOKfHjYDxDBmb2MA_ReHEBEQ5';
+const ODOO_WH = 'https://procyo2.odoo.com/web/hook/b2afcdca-64ff-411b-b3fe-8b420b2c13ab';
 
+// ── PASSWORD ────────────────────────────────────────────────
 async function sha256(msg) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-
 async function checkPwd() {
   const val = document.getElementById('pwd-input').value;
   const h = await sha256(val);
   const target = await sha256('Pr0cy0Tar!f');
   if(h === target) {
-    sessionStorage.setItem('procyo_pricing_ok','1');
+    sessionStorage.setItem('procyo_pricing','1');
     document.getElementById('pwd-screen').style.display='none';
     document.getElementById('app').style.display='block';
+    loadBrokers();
   } else {
     document.getElementById('pwd-err').textContent = 'Mot de passe incorrect.';
-    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').value='';
     document.getElementById('pwd-input').focus();
   }
 }
-
-document.getElementById('pwd-input').addEventListener('keypress', e => {
-  if(e.key==='Enter') checkPwd();
-});
-
-// Check session
-if(sessionStorage.getItem('procyo_pricing_ok')==='1') {
+document.getElementById('pwd-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPwd();});
+if(sessionStorage.getItem('procyo_pricing')==='1') {
   document.getElementById('pwd-screen').style.display='none';
   document.getElementById('app').style.display='block';
 }
 
-// Simulator JS
+// ── BROKER SEARCH ───────────────────────────────────────────
+let allBrokers = [];
+async function loadBrokers() {
+  try {
+    const r = await fetch(SB_URL+'/rest/v1/brokers?select=id,email,company_name,odoo_id&order=company_name.asc', {
+      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY}
+    });
+    allBrokers = await r.json();
+  } catch(e) { console.warn('Brokers load error:', e); }
+}
+function searchBroker(q) {
+  const dd = document.getElementById('broker-dropdown');
+  if(!q || q.length < 1) { dd.style.display='none'; return; }
+  const matches = allBrokers.filter(b =>
+    (b.company_name||'').toLowerCase().includes(q.toLowerCase()) ||
+    (b.email||'').toLowerCase().includes(q.toLowerCase())
+  ).slice(0,8);
+  if(!matches.length) { dd.style.display='none'; return; }
+  dd.innerHTML = matches.map(b => `
+    <div class="broker-item" onclick="selectBroker('${escapeStr(b.company_name||'')}','${escapeStr(b.email||'')}','${b.odoo_id||''}')">
+      <div class="broker-name">${b.company_name||'—'}</div>
+      <div class="broker-email">${b.email}</div>
+    </div>
+  `).join('');
+  dd.style.display='block';
+}
+function escapeStr(s) { return s.replace(/'/g,"\'").replace(/"/g,'&quot;'); }
+function selectBroker(name, email, odooId) {
+  document.getElementById('cnom').value = name;
+  document.getElementById('ccont').value = email;
+  document.getElementById('codoo').value = odooId;
+  document.getElementById('broker-dropdown').style.display='none';
+  render();
+}
+document.addEventListener('click', function(e) {
+  if(!e.target.closest('#broker-dropdown') && e.target.id !== 'cnom') {
+    const dd = document.getElementById('broker-dropdown');
+    if(dd) dd.style.display='none';
+  }
+});
+
+// ── SEND TO ODOO ─────────────────────────────────────────────
+async function sendToOdoo() {
+  const odooId = document.getElementById('codoo')?.value;
+  const client = document.getElementById('cnom')?.value;
+  const statusEl = document.getElementById('odoo-status');
+  
+  if(!odooId) {
+    statusEl.style.color='#E85D04';
+    statusEl.textContent = 'Veuillez sélectionner un courtier avant d\'envoyer.';
+    return;
+  }
+  
+  statusEl.style.color='#8B9794';
+  statusEl.textContent = 'Envoi en cours...';
+  
+  try {
+    const resp = await fetch(ODOO_WH, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        _model: 'crm.lead',
+        _id: parseInt(odooId),
+        odoo_id: parseInt(odooId),
+        action: 'pricing_sent',
+        client_name: client
+      })
+    });
+    
+    if(resp.ok) {
+      statusEl.style.color='#00BFA5';
+      statusEl.textContent = '✓ Envoyé dans Odoo avec succès';
+    } else {
+      statusEl.style.color='#E85D04';
+      statusEl.textContent = 'Erreur Odoo ('+resp.status+')';
+    }
+  } catch(e) {
+    statusEl.style.color='#E85D04';
+    statusEl.textContent = 'Erreur réseau : '+e.message;
+  }
+  
+  setTimeout(()=>{statusEl.textContent='';}, 5000);
+}
+
+// Load brokers if already authenticated
+if(sessionStorage.getItem('procyo_pricing')==='1') loadBrokers();
+
+// ── SIMULATOR JS ──────────────────────────────────────────────
 
 var TVA = 1.21;
 var VATRATE = 0.21;
