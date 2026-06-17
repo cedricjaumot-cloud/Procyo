@@ -730,8 +730,10 @@ document.getElementById("prevbtn").addEventListener("click",function(){
   document.getElementById('dlbtn').style.opacity='1';
   document.getElementById('dlbtn').style.cursor='pointer';
 });
-document.getElementById("dlbtn").addEventListener("click",genererPDF);
-render();
+document.getElementById("dlbtn").addEventListener("click", function () {
+  genererPDF();
+  alert("Le document a été envoyé pour signature ✔");
+});
 
 </script>
 </body>
