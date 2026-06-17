@@ -681,6 +681,10 @@ function genererPDF(){
     return;
   }
   document.getElementById('broker-warning').style.display='none';
+  var modsArr=[];
+  if(S.modules.regulia)  modsArr.push("Assistant Conformité");
+  if(S.modules.relancia) modsArr.push("Assistant Commercial");
+  if(S.modules.portfolia) modsArr.push("Assistant Portefeuille");
   var pdfBase64 = doc.output('datauristring').split(',')[1];
   fetch('https://rzeequxjvsoqvbetxmev.supabase.co/functions/v1/send-pdf-odoo', {
     method: 'POST',
