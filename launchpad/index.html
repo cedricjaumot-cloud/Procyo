@@ -223,6 +223,9 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .bm-custom::placeholder{color:var(--g300);font-style:italic}
 .bm-custom:focus{border-color:var(--blue-mid)}
 .bm-custom.has-val{border-color:var(--blue-mid);background:rgba(37,99,235,.02)}
+/* ── Bouton C'est moi ── */
+.btn-cest-moi{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1.5px solid var(--blue-mid);border-radius:20px;font-size:12px;font-weight:500;color:var(--blue);background:var(--blue-pale);cursor:pointer;font-family:var(--font);transition:all .15s;margin-bottom:10px}
+.btn-cest-moi:hover{background:var(--blue);color:white}
 /* ── Company Matrix ── */
 .cm-wrap{width:100%}
 .cm-search-wrap{margin-bottom:10px}
@@ -518,7 +521,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-step"><div class="step-dot">4</div><div class="step-text"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.64</span></div>
+    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.66</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -621,7 +624,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.64</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.66</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')">Export réponses</button>
@@ -776,7 +779,7 @@ const MODULES = [
     {id:'M2C',name:'Référents',questions:[
       {id:'M2Q11',type:'contact-fields',label:'Référent administratif du dossier',required:true},
       {id:'M2Q12',type:'contact-fields',label:'Référent technique pour l\'onboarding',required:true},
-      {id:'M2Q13',type:'contact-fields',label:'Référent compliance / DPO si distinct',required:false},
+      {id:'M2Q13',type:'contact-fields',label:'Référent compliance / DPO',required:true},
       {id:'M2Q14',type:'textarea',label:'Modalités contractuelles particulières ?',required:false},
       {id:'M2Q15',type:'radio',label:'Mode de facturation souhaité',required:false,options:['Mensuel','Trimestriel','Annuel']},
     ]},
@@ -1008,12 +1011,21 @@ function enterApp(){
 async function loadAnswersCache(){
   const rows=await sbGet('answers','broker_id=eq.'+currentUser.id+'&select=question_id,answer_value');
   localCache={};
-  (rows||[]).forEach(r=>{localCache[r.question_id]=r.answer_value;});
+  (rows||[]).forEach(r=>{
+    // answer_value peut être un JSON string (objets/arrays) ou une valeur scalaire
+    let val=r.answer_value;
+    if(typeof val==='string'){
+      try{ val=JSON.parse(val); }catch(e){ /* scalaire, on garde tel quel */ }
+    }
+    localCache[r.question_id]=val;
+  });
 }
 
 async function saveAnswer(qid,val){
-  localCache[qid]=val;
-  await sbUpsert('answers',{broker_id:currentUser.id,question_id:qid,answer_value:val,updated_at:new Date().toISOString()},'broker_id,question_id');
+  // Supabase stocke answer_value en TEXT — sérialiser objets et arrays en JSON string
+  const stored = (val !== null && val !== undefined && typeof val === 'object') ? JSON.stringify(val) : val;
+  localCache[qid]=val; // garde l'objet en mémoire pour l'UI
+  await sbUpsert('answers',{broker_id:currentUser.id,question_id:qid,answer_value:stored,updated_at:new Date().toISOString()},'broker_id,question_id');
 }
 
 async function saveBatch(){
@@ -1050,11 +1062,9 @@ function getProgress(mid){
     if(q.type==='slider'){
       ans++; // always has a value (default)
     } else if(q.type==='behavior-matrix'){
-      // compté comme répondu dès qu'au moins un comportement est validé ou personnalisé
       if(v&&typeof v==='object'&&Object.values(v).some(s=>s.ok||s.custom))ans++;
       else ans++; // optionnel — ne bloque pas la progression
     } else if(q.type==='file-upload'){
-      // répondu si fichiers chargés OU "pas de templates" coché
       if(v&&v.__noFiles===true) ans++;
       else if(Array.isArray(v)&&v.length>0) ans++;
       else ans++; // optionnel — ne bloque pas
@@ -1345,7 +1355,8 @@ function buildQuestion(q,saved){
       {key:'email',  label:'Email',    type:'email', placeholder:'prenom.nom@cabinet.be'},
       {key:'tel',    label:'Téléphone',type:'tel',   placeholder:'+32 …'},
     ];
-    inp=`<div class="contact-grid">`;
+    inp=`<button type="button" class="btn-cest-moi" onclick="fillCestMoi('${q.id}')">👤 C'est moi</button>`;
+    inp+=`<div class="contact-grid">`;
     fields.forEach(f=>{
       const v=sv[f.key]||'';
       inp+=`<div class="contact-field">
@@ -1592,6 +1603,24 @@ function debounceContact(el,qid){
     el.querySelectorAll('.contact-inp').forEach(i=>{obj[i.dataset.field]=i.value.trim();});
     persistAnswer(qid,obj);
   },800);
+}
+
+function fillCestMoi(qid){
+  // Pré-remplir nom + email depuis currentUser
+  const nom = currentUser.company_name || currentUser.email.split('@')[0];
+  const email = currentUser.email;
+  const qi = document.getElementById('qi-'+qid);
+  if(!qi) return;
+  const nomInp   = qi.querySelector('.contact-inp[data-field="nom"]');
+  const emailInp = qi.querySelector('.contact-inp[data-field="email"]');
+  if(nomInp){   nomInp.value=nom;   nomInp.classList.add('ans'); }
+  if(emailInp){ emailInp.value=email; emailInp.classList.add('ans'); }
+  // Construire l'objet complet et sauvegarder
+  const obj={};
+  qi.querySelectorAll('.contact-inp').forEach(i=>{obj[i.dataset.field]=i.value.trim();});
+  persistAnswer(qid,obj);
+  updateQProgress(MODULES[currentMod]);
+  updateSecProg(qid);
 }
 
 // ── FILE UPLOAD ─────────────────────────────────────────────────
