@@ -651,28 +651,24 @@ function construirePDF(){
   doc.setFont("helvetica","bold");doc.setFontSize(8);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
   doc.text("Procyo SRL",X+2,y);
   doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(MID[0],MID[1],MID[2]);
-  doc.text("BCE / TVA : BE 1023.609.920  \u00b7  Groeningenveldstraat 1, 1755 Pajottegem",X+2,y+4);y+=12;
-  var _cw=(W-8)/2;
+  doc.text("BCE / TVA : BE 1023.609.920  \u00b7  Groeningenveldstraat 1, 1755 Pajottegem",X+2,y+4);y+=16;
   doc.setFont("helvetica","bold");doc.setFontSize(8);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
-  doc.text("Pour Procyo SRL",X+2,y);
-  doc.text("Bon pour accord \u2014 Le client",X+_cw+8,y);
+  doc.text("Bon pour accord \u2014 Le client",X+2,y);y+=8;
   doc.setFont("helvetica","normal");doc.setFontSize(7);doc.setTextColor(MID[0],MID[1],MID[2]);
-  doc.text("Nom, date & signature",X+2,y+4);
-  doc.text("Nom, date & signature",X+_cw+8,y+4);
+  doc.text("Nom :",X+2,y);
   doc.setDrawColor(BRD[0],BRD[1],BRD[2]);
-  doc.line(X+2,y+15,X+_cw-2,y+15);
-  doc.line(X+_cw+8,y+15,X+W-2,y+15);
-  y+=20;
-
+  doc.line(X+18,y,X+W-2,y);y+=8;
+  doc.text("Date :",X+2,y);
+  doc.line(X+18,y,X+W-2,y);y+=8;
+  doc.text("Signature :",X+2,y);
+  doc.line(X+26,y,X+W-2,y);y+=20;
   doc.setFontSize(7.5);doc.setFont("helvetica","italic");doc.setTextColor(MID[0],MID[1],MID[2]);
-  doc.text("Prix affichés HTVA, TVA (21 %) et TVAC. La TVA n'est pas récupérable par les courtiers belges.",105,y+3,{align:"center"});
-
+  doc.text("Prix affich\u00e9s HTVA, TVA (21 %) et TVAC. La TVA n'est pas r\u00e9cup\u00e9rable par les courtiers belges.",105,y+3,{align:"center"});
   doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(0,282,210,15,"F");
   doc.setTextColor(TEAL2[0],TEAL2[1],TEAL2[2]);doc.setFont("helvetica","italic");doc.setFontSize(8.5);
-  doc.text("L'IA qui comprend votre métier de courtier, pas l'inverse",105,288.5,{align:"center"});
+  doc.text("L'IA qui comprend votre m\u00e9tier de courtier, pas l'inverse",105,288.5,{align:"center"});
   doc.setFont("helvetica","normal");doc.setTextColor(150,180,175);doc.setFontSize(7.5);
   doc.text("www.procyo.be  -  contact@procyo.be  -  Document confidentiel",105,294,{align:"center"});
-
   return doc;
 }
 
