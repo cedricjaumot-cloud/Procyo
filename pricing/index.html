@@ -354,6 +354,7 @@ function selectBroker(name, email, odooId) {
   document.getElementById('ccont').value = email;
   document.getElementById('codoo').value = odooId;
   document.getElementById('broker-dropdown').style.display='none';
+  resetSignBtn();
   render();
 }
 document.addEventListener('click', function(e) {
@@ -458,6 +459,11 @@ function calcul(){
   return {abo:abo, sp:sp, mensuelHT:mensuelHT, setupHT:setupHT, setupNet:setupHT-remise, remise:remise, nbMod:nbMod, creditsTotal:creditsTotal, mailsTotal:mailsTotal};
 }
 
+function resetSignBtn(){
+  document.getElementById('dlbtn').disabled=true;
+  document.getElementById('dlbtn').style.opacity='0.4';
+  document.getElementById('dlbtn').style.cursor='not-allowed';
+}
 function trow(l,v){return "<div class=\"trow\"><span class=\"tl\">"+l+"</span><span class=\"tv\">"+v+"</span></div>";}
 
 function render(){
@@ -500,6 +506,7 @@ function render(){
   h+="<div class=\"tsub\">HTVA "+money(c.setupNet)+"</div>";
   if(S.engagement==="3months") h+="<div class=\"eng-n\">3 mois \u00b7 résiliable en fin de période</div>";
   document.getElementById("tot-wrap").innerHTML=h;
+  resetSignBtn();
 }
 
 function construirePDF(){
