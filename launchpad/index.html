@@ -381,6 +381,31 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .big-spin{width:36px;height:36px;border:3px solid var(--g200);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* RESET PASSWORD SCREEN */
+#screen-reset{min-height:100vh;display:none;align-items:center;justify-content:center;background:var(--g50)}
+.reset-box{background:white;border-radius:var(--r-lg);padding:48px;max-width:480px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center}
+.reset-box .lf{font-size:28px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.reset-box p{color:var(--g500);font-size:14px;margin-bottom:32px}
+.reset-form{text-align:left}
+.reset-form .field{margin-bottom:16px}
+.reset-form label{font-size:13px;font-weight:500;color:var(--g600);display:block;margin-bottom:6px}
+.reset-form input{width:100%;padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:var(--font);outline:none;transition:border .15s}
+.reset-form input:focus{border-color:var(--blue)}
+.reset-msg-error{color:var(--red);font-size:13px;margin-bottom:12px;min-height:18px}
+.reset-msg-ok{color:var(--green);font-size:13px;margin-bottom:12px;min-height:18px}
+.reset-back-link{display:block;margin-top:16px;font-size:13px;color:var(--blue);text-align:center;cursor:pointer;background:none;border:none;font-family:var(--font);width:100%}
+.reset-back-link:hover{color:var(--navy)}
+
+/* FORGOT PASSWORD LINK */
+.forgot-link{display:block;margin-top:10px;font-size:12px;color:var(--g400);text-align:center;cursor:pointer;background:none;border:none;font-family:var(--font);width:100%;transition:color .15s}
+.forgot-link:hover{color:var(--blue)}
+
+/* CHANGE PASSWORD MODAL */
+#modal-change-pwd .modal-btn.confirm{background:var(--blue);color:white}
+#modal-change-pwd .modal-btn.confirm:hover{background:var(--blue-h)}
+.chpwd-err{color:var(--red);font-size:13px;margin-bottom:10px;display:none}
+.chpwd-ok{color:var(--green);font-size:13px;margin-bottom:10px;display:none}
+
 /* ── TABLETTE (≤ 768px) ─────────────────────────────────────── */
 @media(max-width:768px){
   /* Auth */
@@ -493,7 +518,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-step"><div class="step-dot">4</div><div class="step-text"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.5</span></div>
+    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.61</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -508,7 +533,8 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="field"><label>Adresse email</label><input type="email" id="login-email" placeholder="vous@cabinet.be" autocomplete="email"></div>
         <div class="field"><label>Mot de passe</label><input type="password" id="login-pwd" placeholder="••••••••" autocomplete="current-password"></div>
         <button class="btn btn-primary" onclick="doLogin()">Se connecter</button>
-        <p style="margin-top:16px;font-size:13px;color:var(--g400);text-align:center">Pas encore de compte ? <a href="#" onclick="switchTab('register');return false" style="color:var(--blue)">Créer un accès</a></p>
+        <p style="margin-top:12px;font-size:12px;color:var(--g400);text-align:center">Mot de passe oublié ? Envoyez un email à <a href="mailto:cedric.jaumot@procyo.be" style="color:var(--blue);text-decoration:none">cedric.jaumot@procyo.be</a></p>
+        <p style="margin-top:8px;font-size:13px;color:var(--g400);text-align:center">Pas encore de compte ? <a href="#" onclick="switchTab('register');return false" style="color:var(--blue)">Créer un accès</a></p>
       </div>
       <div class="auth-form" id="form-register">
         <h3>Créer votre accès</h3>
@@ -536,6 +562,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
     <div class="topbar-right">
       <span class="topbar-email" id="tb-email"></span>
       <button class="topbar-btn admin-btn hidden" id="btn-admin" onclick="showAdmin()">Admin</button>
+      <button class="topbar-btn" onclick="openChangePwd()" title="Changer mon mot de passe">🔑</button>
       <button class="topbar-btn" onclick="doLogout()">Déconnexion</button>
     </div>
   </div>
@@ -594,7 +621,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.5</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.61</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')">Export réponses</button>
@@ -653,6 +680,40 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
     <div class="modal-actions">
       <button class="modal-btn cancel" onclick="closeObsModal()">Annuler</button>
       <button class="modal-btn confirm" onclick="submitObservation()">Ajouter l'observation</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHANGER MOT DE PASSE -->
+<div class="modal-overlay hidden" id="modal-change-pwd">
+  <div class="modal">
+    <h3>🔑 Changer mon mot de passe</h3>
+    <p>Saisissez votre mot de passe actuel puis choisissez un nouveau mot de passe.</p>
+    <div class="chpwd-err" id="chpwd-err"></div>
+    <div class="chpwd-ok" id="chpwd-ok"></div>
+    <div class="field"><label>Mot de passe actuel</label><input type="password" id="chpwd-current" placeholder="••••••••"></div>
+    <div class="field"><label>Nouveau mot de passe</label><input type="password" id="chpwd-new1" placeholder="Minimum 8 caractères"></div>
+    <div class="field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="chpwd-new2" placeholder="Répétez le nouveau mot de passe"></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeChangePwd()">Annuler</button>
+      <button class="modal-btn confirm" id="chpwd-submit-btn" onclick="doChangePwd()">Changer le mot de passe</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RESET PASSWORD ADMIN — affichage du mot de passe temporaire -->
+<div class="modal-overlay hidden" id="modal-reset-pwd">
+  <div class="modal">
+    <h3>🔑 Mot de passe temporaire généré</h3>
+    <p id="modal-reset-desc">Communiquez ce mot de passe au courtier par email ou téléphone. Il pourra le modifier depuis son espace via le bouton 🔑 en haut à droite.</p>
+    <div style="background:var(--g50);border:2px solid var(--blue-mid);border-radius:10px;padding:18px 24px;text-align:center;margin:8px 0 20px">
+      <div style="font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Mot de passe temporaire</div>
+      <div id="modal-reset-pwd-value" style="font-size:28px;font-weight:700;color:var(--navy);letter-spacing:.12em;font-family:monospace"></div>
+      <div style="font-size:11px;color:var(--g400);margin-top:6px">pour <span id="modal-reset-email" style="color:var(--g600)"></span></div>
+    </div>
+    <button onclick="copyTempPwd()" id="copy-pwd-btn" style="width:100%;padding:10px;background:var(--blue-pale);color:var(--blue);border:1.5px solid var(--blue-mid);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-bottom:16px;transition:all .15s">📋 Copier le mot de passe</button>
+    <div class="modal-actions">
+      <button class="modal-btn confirm" onclick="closeResetPwdModal()" style="background:var(--navy)">Fermer</button>
     </div>
   </div>
 </div>
@@ -1915,6 +1976,7 @@ async function showAdmin(){
           ${unlockBtns}
           <button class="add-obs-btn" onclick="openObsModal('${b.id}')">➕ Observation M4</button>
           <button class="dossier-btn" onclick="showDossier('${b.id}')">📋 Voir le dossier</button>
+          <button class="unlock-btn" style="border-color:#f97316;color:#ea580c" onclick="adminResetPassword('${b.id}','${escA(b.email)}',this)">🔑 Réinitialiser le mot de passe</button>
         </div>`;
       list.appendChild(card);
     }
@@ -2081,10 +2143,115 @@ function setLoading(show,msg='Chargement…'){
 document.addEventListener('DOMContentLoaded',async ()=>{
   document.getElementById('login-pwd').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin();});
   document.getElementById('reg-pwd2').addEventListener('keypress',e=>{if(e.key==='Enter')doRegister();});
-  // Vérifier d'abord si un token d'invitation est présent dans l'URL
+  document.getElementById('reset-pwd2').addEventListener('keypress',e=>{if(e.key==='Enter')doResetPassword();});
   const hasToken = await checkToken();
   if(!hasToken) checkSession();
 });
+
+// ══════════════════════════════════════════════════════════════
+// ADMIN — RESET MOT DE PASSE COURTIER
+// ══════════════════════════════════════════════════════════════
+function genTempPassword(){
+  // 10 caractères lisibles (sans 0/O/1/l/I qui se confondent)
+  const chars='23456789ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz';
+  let pwd='';
+  for(let i=0;i<10;i++) pwd+=chars[Math.floor(Math.random()*chars.length)];
+  return pwd;
+}
+
+async function adminResetPassword(brokerId, email, btn){
+  btn.disabled=true; btn.textContent='…';
+  try{
+    const tmpPwd = genTempPassword();
+    const hash = await hashPassword(tmpPwd);
+    await sbUpdate('brokers','id=eq.'+brokerId,{password_hash:hash});
+    // Afficher la modal avec le mot de passe temporaire
+    document.getElementById('modal-reset-pwd-value').textContent = tmpPwd;
+    document.getElementById('modal-reset-email').textContent = email;
+    document.getElementById('copy-pwd-btn').textContent = '📋 Copier le mot de passe';
+    document.getElementById('modal-reset-pwd').classList.remove('hidden');
+  }catch(e){
+    alert('Erreur : '+e.message);
+  }finally{
+    btn.disabled=false; btn.textContent='🔑 Réinitialiser le mot de passe';
+  }
+}
+
+function closeResetPwdModal(){
+  document.getElementById('modal-reset-pwd').classList.add('hidden');
+}
+
+function copyTempPwd(){
+  const pwd = document.getElementById('modal-reset-pwd-value').textContent;
+  navigator.clipboard.writeText(pwd).then(()=>{
+    const btn = document.getElementById('copy-pwd-btn');
+    btn.textContent='✓ Copié !';
+    btn.style.background='var(--green-pale)';
+    btn.style.borderColor='var(--green-mid)';
+    btn.style.color='var(--green)';
+    setTimeout(()=>{
+      btn.textContent='📋 Copier le mot de passe';
+      btn.style.background='var(--blue-pale)';
+      btn.style.borderColor='var(--blue-mid)';
+      btn.style.color='var(--blue)';
+    },2000);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// CHANGER MOT DE PASSE (depuis l'app, utilisateur connecté)
+// ══════════════════════════════════════════════════════════════
+function openChangePwd(){
+  document.getElementById('chpwd-current').value='';
+  document.getElementById('chpwd-new1').value='';
+  document.getElementById('chpwd-new2').value='';
+  document.getElementById('chpwd-err').style.display='none';
+  document.getElementById('chpwd-ok').style.display='none';
+  document.getElementById('chpwd-submit-btn').disabled=false;
+  document.getElementById('chpwd-submit-btn').textContent='Changer le mot de passe';
+  document.getElementById('modal-change-pwd').classList.remove('hidden');
+}
+
+function closeChangePwd(){
+  document.getElementById('modal-change-pwd').classList.add('hidden');
+}
+
+async function doChangePwd(){
+  const current = document.getElementById('chpwd-current').value;
+  const new1    = document.getElementById('chpwd-new1').value;
+  const new2    = document.getElementById('chpwd-new2').value;
+  const errEl   = document.getElementById('chpwd-err');
+  const okEl    = document.getElementById('chpwd-ok');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(!current){ errEl.textContent='Veuillez saisir votre mot de passe actuel.'; errEl.style.display='block'; return; }
+  if(new1.length<8){ errEl.textContent='Le nouveau mot de passe doit faire au moins 8 caractères.'; errEl.style.display='block'; return; }
+  if(new1!==new2){ errEl.textContent='Les nouveaux mots de passe ne correspondent pas.'; errEl.style.display='block'; return; }
+  if(current===new1){ errEl.textContent='Le nouveau mot de passe doit être différent de l\'actuel.'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('chpwd-submit-btn');
+  btn.disabled=true; btn.textContent='Vérification…';
+  try{
+    // Vérifier le mot de passe actuel
+    const currentHash = await hashPassword(current);
+    if(currentUser.password_hash !== currentHash){
+      errEl.textContent='Mot de passe actuel incorrect.';
+      errEl.style.display='block';
+      btn.disabled=false; btn.textContent='Changer le mot de passe';
+      return;
+    }
+    btn.textContent='Enregistrement…';
+    const newHash = await hashPassword(new1);
+    await sbUpdate('brokers','id=eq.'+currentUser.id,{password_hash:newHash});
+    currentUser.password_hash = newHash;
+    okEl.textContent='✓ Mot de passe modifié avec succès.';
+    okEl.style.display='block';
+    btn.textContent='Modifié ✓';
+    setTimeout(()=>closeChangePwd(), 2000);
+  }catch(e){
+    errEl.textContent='Erreur : '+e.message;
+    errEl.style.display='block';
+    btn.disabled=false; btn.textContent='Changer le mot de passe';
+  }
+}
 
 // ── ADMIN TABS ──────────────────────────────────────────────
 function switchAdminTab(tab){
