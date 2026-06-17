@@ -518,7 +518,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-step"><div class="step-dot">4</div><div class="step-text"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.61</span></div>
+    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.62</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -621,7 +621,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.61</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.62</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')">Export réponses</button>
@@ -2000,7 +2000,7 @@ async function showDossier(brokerId){
   if(!b){body.innerHTML='Introuvable';return;}
   const answers=await sbGet('answers','broker_id=eq.'+brokerId+'&select=*');
   const ansMap={};
-  (answers||[]).forEach(a=>ansMap[a.question_id]=a.value);
+  (answers||[]).forEach(a=>ansMap[a.question_id]=a.answer_value);
 
   // Build dossier HTML
   let html=`<div class="dos-header">
