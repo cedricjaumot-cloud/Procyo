@@ -521,7 +521,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-step"><div class="step-dot">4</div><div class="step-text"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.67</span></div>
+    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.68</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -624,7 +624,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.67</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.68</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')">Export réponses</button>
@@ -2365,15 +2365,57 @@ var _pivot = null;
 
 function _pval(v){
   if(v===null||v===undefined) return '';
+
+  // Si c'est un string — tenter de parser le JSON d'abord
   if(typeof v==='string'){
-    try{
-      var p=JSON.parse(v);
-      if(Array.isArray(p)) return p.join(', ');
-      if(p&&typeof p==='object') return Object.entries(p).map(function(kv){return kv[0]+': '+kv[1];}).join(' | ');
-      return String(p).replace(/^"|"$/g,'');
-    }catch(e){ return v.replace(/^"|"$/g,''); }
+    try{ v=JSON.parse(v); }catch(e){ return v.replace(/^"|"$/g,''); }
   }
-  if(Array.isArray(v)) return v.join(', ');
+
+  // Array simple (checkbox, checkbox-other)
+  if(Array.isArray(v)){
+    return v.map(function(x){
+      return typeof x==='string'&&x.startsWith('Autre::')?'Autre: '+x.slice(7):String(x);
+    }).join(', ');
+  }
+
+  if(v&&typeof v==='object'){
+
+    // percent-split : {IARD particulier:40, IARD entreprise:20, ...}
+    // détecté si les valeurs sont des nombres
+    var vals=Object.values(v);
+    if(vals.length>0&&vals.every(function(x){return typeof x==='number'||(!isNaN(parseFloat(x))&&x!=='');})){
+      return Object.entries(v).filter(function(kv){return kv[1]!==''&&kv[1]!==null;})
+        .map(function(kv){return kv[0]+' : '+kv[1]+'%';}).join(' | ');
+    }
+
+    // behavior-matrix : {production:{ok:true,custom:''}, sinistre:{ok:false,custom:'...'}, ...}
+    if(vals.length>0&&vals[0]&&typeof vals[0]==='object'&&('ok' in vals[0]||'custom' in vals[0])){
+      return Object.entries(v).map(function(kv){
+        var key=kv[0], beh=kv[1];
+        if(beh.ok) return key+' : OK (défaut)';
+        if(beh.custom&&beh.custom.trim()) return key+' : '+beh.custom.trim();
+        return null;
+      }).filter(Boolean).join(' | ');
+    }
+
+    // company-matrix : {AG Insurance:['Habitation','Auto'], ...}
+    // détecté si les valeurs sont des arrays
+    if(vals.length>0&&Array.isArray(vals[0])||(vals.some(function(x){return Array.isArray(x);}))){
+      return Object.entries(v).filter(function(kv){
+        return kv[0]!=='__custom__'&&Array.isArray(kv[1])&&kv[1].length>0;
+      }).map(function(kv){return kv[0]+' ['+kv[1].join(', ')+']';}).join(' | ');
+    }
+
+    // contact-fields : {nom, fonction, email, tel}
+    if('nom' in v||'email' in v){
+      return [v.nom,v.fonction,v.email,v.tel].filter(Boolean).join(' — ');
+    }
+
+    // fallback objet générique
+    return Object.entries(v).filter(function(kv){return kv[1]!==''&&kv[1]!==null&&kv[1]!==undefined;})
+      .map(function(kv){return kv[0]+': '+kv[1];}).join(' | ');
+  }
+
   return String(v);
 }
 
