@@ -661,7 +661,7 @@ function construirePDF(){
   doc.text("Date :",X+2,y);
   doc.line(X+18,y,X+W-2,y);y+=8;
   doc.text("Signature :",X+2,y);
-  doc.line(X+26,y+10,X+W-2,y+10);y+=20;
+  y+=20;
   doc.setFontSize(7.5);doc.setFont("helvetica","italic");doc.setTextColor(MID[0],MID[1],MID[2]);
   doc.text("Prix affich\u00e9s HTVA, TVA (21 %) et TVAC. La TVA n'est pas r\u00e9cup\u00e9rable par les courtiers belges.",105,y+3,{align:"center"});
   doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(0,282,210,15,"F");
