@@ -166,7 +166,7 @@ header img.logo{height:34px}
     </div>
   </div>
 
-  <div>
+<div>
     <div class="slabel">Client</div>
     <div class="card">
       <div class="frow" style="position:relative">
@@ -178,6 +178,7 @@ header img.logo{height:34px}
 </div>
       <div class="frow"><label>Contact</label><input type="text" id="ccont" placeholder="Prénom Nom" readonly style="background:#F7F9F8;color:#8B9794"/></div>
 <div class="frow" style="display:none"><label>Odoo ID</label><input type="text" id="codoo" readonly/></div>
+<div id="broker-warning" style="display:none;color:#E85D04;font-size:12px;padding:6px 2px">⚠ Veuillez sélectionner un courtier avant d'envoyer l'offre.</div>
     </div>
   </div>
 
@@ -754,7 +755,11 @@ function genererPDF(){
 
 // Envoie vers Odoo Sign
   var odooId = document.getElementById('codoo').value;
-if(odooId) {
+  if(!odooId) {
+    document.getElementById('broker-warning').style.display='block';
+    return;
+  }
+  document.getElementById('broker-warning').style.display='none';
   var pdfBase64 = doc.output('datauristring').split(',')[1];
   fetch('https://rzeequxjvsoqvbetxmev.supabase.co/functions/v1/send-pdf-odoo', {
     method: 'POST',
@@ -764,7 +769,6 @@ if(odooId) {
       pdf_base64: pdfBase64
     })
   }).then(function(r){ console.log('Envoyé à Odoo:', r.status); });
-}
 }
 
 document.getElementById("nb-etp").addEventListener("input",function(){S.nbEtp=Math.max(1,parseInt(this.value)||1);render();});
