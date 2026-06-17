@@ -687,7 +687,13 @@ function genererPDF(){
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       odoo_id: parseInt(odooId),
-      pdf_base64: pdfBase64
+      pdf_base64: pdfBase64,
+      nb_etp: S.nbEtp,
+      nb_addr: S.nbAddr,
+      modules: modsArr,
+      engagement: S.engagement,
+      remise_setup: S.setupDiscType === 'pct' ? S.remisePct : null,
+      remise_abo: S.subMonths > 0 ? S.subMonths : null,
     })
   }).then(function(r){ console.log('Envoyé à Odoo:', r.status); });
 }
