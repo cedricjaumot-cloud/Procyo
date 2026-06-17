@@ -280,10 +280,10 @@ header img.logo{height:34px}
     <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
     Prévisualiser
   </button>
-  <button class="dlbtn" id="dlbtn">
+  <button class="dlbtn" id="dlbtn" disabled style="opacity:0.4;cursor:not-allowed">
     <svg viewBox="0 0 24 24"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-6 2v2h12v-2H6z"/></svg>
     Envoyer pour signature
-  </button>
+</button>
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -795,9 +795,18 @@ document.getElementById("cond-toggle").addEventListener("click",function(){
 });
 document.getElementById("validite").addEventListener("input",function(){S.validite=Math.max(1,parseInt(this.value)||30);render();});
 document.getElementById("prevbtn").addEventListener("click",function(){
+  var odooId = document.getElementById('codoo').value;
+  if(!odooId) {
+    document.getElementById('broker-warning').style.display='block';
+    return;
+  }
+  document.getElementById('broker-warning').style.display='none';
   var doc = construirePDF();
   if(!doc) return;
   window.open(doc.output('bloburl'),'_blank');
+  document.getElementById('dlbtn').disabled=false;
+  document.getElementById('dlbtn').style.opacity='1';
+  document.getElementById('dlbtn').style.cursor='pointer';
 });
 document.getElementById("dlbtn").addEventListener("click",genererPDF);
 render();
