@@ -410,7 +410,7 @@ async function selectBroker(name, email, odooId) {
   try {
     const broker = allBrokers.find(b => b.odoo_id == odooId);
     if(broker) {
-      const r = await (SB_URL+'/rest/v1/answers?broker_id=eq.'+broker.id+'&question_id=eq.M1Q1&select=answer_value', {
+      const r = await fetch(SB_URL+'/rest/v1/answers?broker_id=eq.'+broker.id+'&question_id=eq.M1Q1&select=answer_value', {
         headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY}
       });
       const data = await r.json();
