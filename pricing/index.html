@@ -771,6 +771,37 @@ function genererPDF(){
   if(S.modules.relancia) modsArr.push("Assistant Commercial");
   if(S.modules.portfolia) modsArr.push("Assistant Portefeuille");
   var pdfBase64 = doc.output('datauristring').split(',')[1];
+
+  // Mettre à jour / créer réponses dans Supabase
+  var broker = allBrokers.find(b => b.odoo_id == odooId);
+  if(broker) {
+    var newRange = S.nbEtp <= 3 ? '1 à 3' :
+                  S.nbEtp <= 10 ? '4 à 10' :
+                  S.nbEtp <= 30 ? '11 à 30' :
+                  S.nbEtp <= 50 ? '31 à 50' : 'Plus de 50';
+    fetch(SB_URL+'/rest/v1/answers', {
+      method: 'POST',
+      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'},
+      body: JSON.stringify({ broker_id: broker.id, question_id: 'M1Q1', answer_value: newRange })
+    });
+    window._m1q1 = newRange;
+    fetch(SB_URL+'/rest/v1/answers', {
+      method: 'POST',
+      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'},
+      body: JSON.stringify({ broker_id: broker.id, question_id: 'M2Q1', answer_value: String(S.nbAddr) })
+    });
+    var modulesM2 = [];
+if(S.modules.regulia)   modulesM2.push('Assistant conformité (Regulia) — KYC / AML / IDD');
+if(S.modules.portfolia) modulesM2.push('Assistant portefeuille (Portfolia) — analyse et tableaux de bord');
+if(S.modules.relancia)  modulesM2.push('Assistant commercial (Relancia) — opportunités et campagnes');
+if(modulesM2.length === 0) modulesM2.push('Aucun pour l\'instant — uniquement l\'Assistant mail');
+    fetch(SB_URL+'/rest/v1/answers', {
+      method: 'POST',
+      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'},
+      body: JSON.stringify({ broker_id: broker.id, question_id: 'M2Q3', answer_value: JSON.stringify(modulesM2) })
+    });
+  }
+
   fetch('https://rzeequxjvsoqvbetxmev.supabase.co/functions/v1/send-pdf-odoo', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
