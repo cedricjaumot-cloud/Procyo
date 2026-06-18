@@ -410,7 +410,7 @@ async function selectBroker(name, email, odooId) {
   try {
     const broker = allBrokers.find(b => b.odoo_id == odooId);
     if(broker) {
-      const r = await fetch(SB_URL+'/rest/v1/answers?broker_id=eq.'+broker.id+'&question_id=eq.M1Q1&select=answer_value', {
+      const r = await (SB_URL+'/rest/v1/answers?broker_id=eq.'+broker.id+'&question_id=eq.M1Q1&select=answer_value', {
         headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY}
       });
       const data = await r.json();
@@ -781,27 +781,26 @@ function genererPDF(){
                   S.nbEtp <= 50 ? '31 à 50' : 'Plus de 50';
     fetch(SB_URL+'/rest/v1/answers', {
       method: 'POST',
-      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'},
+      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates', 'on-conflict': 'broker_id,question_id'},
       body: JSON.stringify({ broker_id: broker.id, question_id: 'M1Q1', answer_value: newRange })
     });
     window._m1q1 = newRange;
     fetch(SB_URL+'/rest/v1/answers', {
       method: 'POST',
-      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'},
+      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates', 'on-conflict': 'broker_id,question_id'},
       body: JSON.stringify({ broker_id: broker.id, question_id: 'M2Q1', answer_value: String(S.nbAddr) })
     });
     var modulesM2 = [];
-if(S.modules.regulia)   modulesM2.push('Assistant conformité (Regulia) — KYC / AML / IDD');
-if(S.modules.portfolia) modulesM2.push('Assistant portefeuille (Portfolia) — analyse et tableaux de bord');
-if(S.modules.relancia)  modulesM2.push('Assistant commercial (Relancia) — opportunités et campagnes');
-if(modulesM2.length === 0) modulesM2.push('Aucun pour l\'instant — uniquement l\'Assistant mail');
+    if(S.modules.regulia)   modulesM2.push('Assistant conformité (Regulia) — KYC / AML / IDD');
+    if(S.modules.portfolia) modulesM2.push('Assistant portefeuille (Portfolia) — analyse et tableaux de bord');
+    if(S.modules.relancia)  modulesM2.push('Assistant commercial (Relancia) — opportunités et campagnes');
+    if(modulesM2.length === 0) modulesM2.push('Aucun pour l\'instant — uniquement l\'Assistant mail');
     fetch(SB_URL+'/rest/v1/answers', {
       method: 'POST',
-      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates'},
+      headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates', 'on-conflict': 'broker_id,question_id'},
       body: JSON.stringify({ broker_id: broker.id, question_id: 'M2Q3', answer_value: JSON.stringify(modulesM2) })
     });
   }
-
   fetch('https://rzeequxjvsoqvbetxmev.supabase.co/functions/v1/send-pdf-odoo', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
