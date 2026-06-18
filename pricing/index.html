@@ -191,12 +191,14 @@ header img.logo{height:34px}
         <div class="qlabel">Utilisation Procyo</div>
         <div class="q">Combien d'utilisateurs vont utiliser le produit ?</div>
         <div class="inp-row">
-          <input type="number" class="big-inp" id="nb-addr" value="5" min="1" max="500" step="1"/>
+         <input type="number" class="big-inp" id="nb-addr" value="5" min="1" max="500" step="1"/>
           <span class="ilbl">adresse(s) email</span>
         </div>
         <div class="res-box" id="addr-result"></div>
+        <div id="addr-warning" style="display:none;color:#E85D04;font-size:12px;padding:4px 2px;margin-top:4px;">
+          ⚠ Vous dépassez le nombre d'adresses autorisées pour ce palier.
+        </div>
       </div>
-    </div>
   </div>
 
 <div>
@@ -559,12 +561,22 @@ function render(){
     }
   }
 
-  var abo=c.abo;
+ var abo=c.abo;
   var subStr=money(abo.palier.base*TVA)+" base";
   if(abo.suppl>0) subStr+=" + "+abo.suppl+" suppl. \u00d7 "+money(abo.palier.prixSuppl*TVA);
   document.getElementById("addr-result").innerHTML=
     "<div class=\"res-top\"><span class=\"res-name\">Abonnement</span><span class=\"res-price\">"+money(abo.total*TVA)+"</span><span class=\"res-unit\">/mois TVAC</span></div>"+
     "<div class=\"res-sub\">"+subStr+"</div>";
+
+  var addrWarn = document.getElementById('addr-warning');
+  if(addrWarn) {
+    var maxAddr = sp.etpMax < 9999 ? sp.etpMax : 9999;
+    if(maxAddr < 9999 && S.nbAddr > maxAddr) {
+      addrWarn.style.display = 'block';
+    } else {
+      addrWarn.style.display = 'none';
+    }
+  }
 
   document.getElementById("cred-total").textContent=intf(c.creditsTotal);
   document.getElementById("cred-mails").textContent="\u2248 "+intf(c.mailsTotal)+" emails / mois";
@@ -766,6 +778,11 @@ function genererPDF(){
     return;
   }
   document.getElementById('broker-warning').style.display='none';
+  var btn = document.getElementById('dlbtn');
+  btn.disabled = true;
+  btn.style.opacity = '0.4';
+  btn.style.cursor = 'not-allowed';
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 16l-4-4h3V4h2v8h3l-4 4zm-6 2v2h12v-2H6z"/></svg> ✓ Offre envoyée';
   var modsArr=[];
   if(S.modules.regulia)  modsArr.push("Assistant Conformité");
   if(S.modules.relancia) modsArr.push("Assistant Commercial");
