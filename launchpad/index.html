@@ -1861,7 +1861,6 @@ async function saveAll(){
   try{
     await saveBatch();
     if(currentMod!==null)updateQProgress(MODULES[currentMod]);
-    renderNotif(currentMod);
     btn.classList.remove('saving');
     btn.disabled=false;
     lbl.textContent='✓ Sauvegardé';
@@ -1879,43 +1878,6 @@ async function saveAll(){
   }
 }
 
-// ── NOTIFICATIONS BREVO ─────────────────────────────────────────
-const NOTIF_FIXED = {
-  M1: [],
-  M2: [{email:'gianni.luyckx@procyo.be',name:'Gianni'},{email:'support@procyo.be',name:'Anne'}],
-  M3: [{email:'maxime.dejean@procyo.be',name:'Maxime'}],
-};
-
-async function sendModuleNotification(modId){
-  // Check not already sent
-  const modIdL=modId.toLowerCase();
-  const alreadySent=currentUser[modIdL+'_notif_sent'];
-  if(alreadySent)return;
-  // Build recipients
-  const to=[];
-  const salesEmail=currentUser.sales_email;
-  if(salesEmail)to.push({email:salesEmail,name:'Sales'});
-  (NOTIF_FIXED[modId]||[]).forEach(r=>to.push(r));
-  if(to.length===0)return;
-  const modNum=modId.replace('M','').replace(/[A-Z].*/,'');
-  const company=currentUser.company_name||currentUser.email;
-  const subject=`Module ${modNum} complété — ${company}`;
-  const html=`<p>Bonjour,</p>
-<p>Le <strong>Module ${modNum}</strong> de <strong>${company}</strong> vient d'être complété dans la webapp Procyo.</p>
-<p>Vous pouvez consulter les réponses et débloquer la suite depuis l'interface admin.</p>
-<br><p>— Procyo Onboarding</p>`;
-  try{
-    await fetch(SB_URL+'/functions/v1/send-notification',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},
-      body:JSON.stringify({to,subject,html,senderName:'Procyo',senderEmail:'noreply@procyo.be'}),
-    });
-    // Mark as sent in DB so we don't resend
-    await sbUpdate('brokers','id=eq.'+currentUser.id,{[modIdL+'_notif_sent']:true});
-    currentUser[modIdL+'_notif_sent']=true;
-  }catch(e){console.warn('Notif failed:',e);}
-}
-
 async function updateQProgress(mod){
   const{ans,tot}=getProgress(mod.id);
   const pct=tot>0?Math.round(ans/tot*100):0;
@@ -1926,32 +1888,13 @@ async function updateQProgress(mod){
     const status=currentUser[mod.id+'_status']||'locked';
     console.log('Completion check:', mod.id, 'status=', status, 'ans=', ans, 'tot=', tot);
     if(status==='active'){
-      // Enregistrer la date de complétion (toujours, indépendamment de l'envoi mail)
-      const modIdL=mod.id.toLowerCase();
+      // Enregistrer la date de complétion → déclenche l'Edge Function qui notifie Odoo
       const completedKey=mod.id+'_completed_at'; // ex: module1_completed_at
       if(!currentUser[completedKey]){
         const completedAt=new Date().toISOString();
         await sbUpdate('brokers','id=eq.'+currentUser.id,{[completedKey]:completedAt});
         currentUser[completedKey]=completedAt;
-        // Notifier Odoo que le module est complété
-        const modNum=mod.id.replace('module','');
-        if(currentUser.odoo_id){
-          try{
-            await fetch('https://procyo2.odoo.com/web/hook/b2afcdca-64ff-411b-b3fe-8b420b2c13ab',{
-              method:'POST',
-              headers:{'Content-Type':'application/json'},
-              body:JSON.stringify({
-                _model:'crm.lead',
-                _id:parseInt(currentUser.odoo_id),
-                odoo_id:parseInt(currentUser.odoo_id),
-                module:modNum
-              })
-            });
-          }catch(e){console.warn('Odoo notify failed:',e);}
-        }
       }
-      // Envoyer la notification si pas encore fait
-      sendModuleNotification(mod.id);
     }
   }
 }
