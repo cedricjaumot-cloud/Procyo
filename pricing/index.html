@@ -19,6 +19,17 @@
 .pwd-err{color:#E85D04;font-size:13px;margin-top:12px;min-height:20px}
 .pwd-footer{font-size:11px;color:#8B9794;margin-top:24px}
 #app{display:none}
+  /* CHOICE SCREEN */
+#choice-screen{position:fixed;inset:0;background:#1A2744;display:none;align-items:center;justify-content:center;z-index:9999}
+.choice-box{background:white;border-radius:16px;padding:48px 40px;max-width:480px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.choice-logo{font-size:28px;font-weight:700;color:#1A2744;margin-bottom:6px;letter-spacing:-.5px}
+.choice-sub{font-size:14px;color:#8B9794;margin-bottom:32px}
+.choice-btns{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.choice-btn{padding:20px 16px;border:2px solid #DDE5E3;border-radius:12px;background:white;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s}
+.choice-btn:hover{border-color:#00BFA5;background:#E8FBF5}
+.choice-btn-icon{font-size:28px;margin-bottom:8px}
+.choice-btn-title{font-size:15px;font-weight:700;color:#1A2744;margin-bottom:4px}
+.choice-btn-sub{font-size:12px;color:#8B9794}
 /* BROKER DROPDOWN */
 .broker-item{padding:8px 12px;cursor:pointer;font-size:13px;color:#1A2744;border-bottom:1px solid #DDE5E3}
 .broker-item:hover{background:#E8FBF5}
@@ -131,7 +142,25 @@ header img.logo{height:34px}
     <div class="pwd-err" id="pwd-err"></div>
   </div>
 </div>
-
+<!-- ÉCRAN DE CHOIX -->
+<div id="choice-screen">
+  <div class="choice-box">
+    <div class="choice-logo">PROCYO</div>
+    <div class="choice-sub">Que souhaitez-vous faire ?</div>
+    <div class="choice-btns">
+      <button class="choice-btn" onclick="goTo('offre')">
+        <div class="choice-btn-icon">📄</div>
+        <div class="choice-btn-title">Envoyer une offre</div>
+        <div class="choice-btn-sub">Simulateur tarifaire + signature</div>
+      </button>
+      <button class="choice-btn" onclick="goTo('contrat')">
+        <div class="choice-btn-icon">📝</div>
+        <div class="choice-btn-title">Envoyer un contrat</div>
+        <div class="choice-btn-sub">Conditions particulières + signature</div>
+      </button>
+    </div>
+  </div>
+</div>
 <!-- SIMULATEUR -->
 <div id="app">
 
@@ -308,8 +337,7 @@ async function checkPwd() {
   if(h === target) {
     sessionStorage.setItem('procyo_pricing','1');
     document.getElementById('pwd-screen').style.display='none';
-    document.getElementById('app').style.display='block';
-    loadBrokers();
+    document.getElementById('choice-screen').style.display='flex';
   } else {
     document.getElementById('pwd-err').textContent = 'Mot de passe incorrect.';
     document.getElementById('pwd-input').value='';
@@ -319,9 +347,20 @@ async function checkPwd() {
 document.getElementById('pwd-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPwd();});
 if(sessionStorage.getItem('procyo_pricing')==='1') {
   document.getElementById('pwd-screen').style.display='none';
-  document.getElementById('app').style.display='block';
+  document.getElementById('choice-screen').style.display='flex';
 }
-
+function goTo(page) {
+  document.getElementById('choice-screen').style.display='none';
+  if(page === 'offre') {
+    document.getElementById('app').style.display='block';
+    loadBrokers();
+    render();
+  } else {
+    // Page contrat — à construire
+    alert('Page contrat bientôt disponible !');
+    document.getElementById('choice-screen').style.display='flex';
+  }
+}
 // ── BROKER SEARCH ───────────────────────────────────────────
 let allBrokers = [];
 async function loadBrokers() {
