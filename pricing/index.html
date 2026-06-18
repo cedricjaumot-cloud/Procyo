@@ -568,14 +568,25 @@ function render(){
   document.getElementById("addr-result").innerHTML=
     "<div class=\"res-top\"><span class=\"res-name\">Abonnement</span><span class=\"res-price\">"+money(abo.total*TVA)+"</span><span class=\"res-unit\">/mois TVAC</span></div>"+
     "<div class=\"res-sub\">"+subStr+"</div>";
-
   var addrWarn = document.getElementById('addr-warning');
+  var maxAddr = sp.etpMax < 9999 ? sp.etpMax : 9999;
   if(addrWarn) {
-    var maxAddr = sp.etpMax < 9999 ? sp.etpMax : 9999;
     if(maxAddr < 9999 && S.nbAddr > maxAddr) {
       addrWarn.style.display = 'block';
     } else {
       addrWarn.style.display = 'none';
+    }
+  }
+  var prevbtn = document.getElementById('prevbtn');
+  if(prevbtn) {
+    if(maxAddr < 9999 && S.nbAddr > maxAddr) {
+      prevbtn.disabled = true;
+      prevbtn.style.opacity = '0.4';
+      prevbtn.style.cursor = 'not-allowed';
+    } else {
+      prevbtn.disabled = false;
+      prevbtn.style.opacity = '1';
+      prevbtn.style.cursor = 'pointer';
     }
   }
 
