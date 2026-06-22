@@ -684,9 +684,9 @@
         <h4>Tarification en clôture du rendez-vous démo</h4>
         Tarif ajusté selon la taille du bureau et les modules activés. La tarification est établie directement à l'issue du rendez-vous démo à l'aide du Launchpad.
         <h4>Envoi de l'offre au courtier</h4>
-        L'offre est transmise au courtier via Odoo. Le mail contient un CTA permettant au courtier de valider l'offre ou d'en demander une autre.
+        L'offre est transmise au courtier via Odoo Sign, ainsi le courtier valide l'offre en la signant ou demande par retour de mail une nouvelle offre.
         <h4>Validation de l'offre → Module Contractualisation</h4>
-        Lorsque le courtier répond positivement à l'offre via le CTA, cela débloque le Module Contractualisation dans le Launchpad. Un mail est alors envoyé au courtier. Le module comporte 13 questions, environ 10 minutes.
+        Lorsque le courtier signe, cela débloque le Module Contractualisation dans le Launchpad. Un <span class="mail-trigger" onclick="openMail('m05')">mail</span> est alors envoyé au courtier. Le module comporte 13 questions, environ 10 minutes.
         <div class="kv-grid" style="margin-top:14px">
           <span class="kv-k">Relance automatique</span><span class="kv-v">Mail envoyé si le Module Contractualisation n'est pas complété après 24h · objet : « Votre contrat est en préparation »</span>
           <span class="kv-k">Notification interne</span><span class="kv-v">Commercial et Gianni alertés dès complétion → préparation contrat par Gianni</span>
@@ -1170,6 +1170,91 @@ const MAILS = {
     </p>
   </div>
 
+</div>
+`
+  },
+
+  m05: {
+    phase: 'Phase 4 · Contractualisation',
+    title: 'Offre signée - Accès Module Contractualisation',
+    html: `<!-- ============================================================
+     PROCYO - Template email : "Préparation de votre contrat Procyo"
+     Usage Odoo : Technique > Email > Modèles > Corps (HTML)
+     Modèle applicable à : sale.order
+     Variables dynamiques Odoo :
+       {{object.partner_id.name}}   -> nom du prospect/client
+       {{object.launchpad_url}}     -> lien vers l'espace Procyo (module 2)
+       {{user.name}}                -> nom du conseiller
+       {{user.email}}               -> email du conseiller
+     ============================================================ -->
+<div style="background:#f0f0f0;padding:2rem;font-family:Arial,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;background:#FFFFFF;border-radius:12px;overflow:hidden;">
+
+    <!-- HEADER -->
+    <div style="background:#17284E;padding:32px 40px;text-align:center;">
+      <img src="https://procyo2.odoo.com/web/image/res.company/1/logo"
+           alt="Procyo"
+           style="height:60px;max-width:240px;object-fit:contain;">
+    </div>
+
+    <!-- BODY -->
+    <div style="padding:40px;">
+
+      <p style="font-size:15px;color:#17284E;margin:0 0 16px;">
+        Bonjour <strong>{{object.partner_id.name}}</strong>,
+      </p>
+
+      <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 16px;">
+        Votre offre Procyo a bien été signée - merci pour votre confiance !
+      </p>
+
+      <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 24px;">
+        Pour préparer votre contrat, nous avons besoin de quelques informations
+        complémentaires sur votre bureau. Cela nous permettra de personnaliser
+        votre contrat et de vous le transmettre rapidement.
+      </p>
+
+      <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 24px;">
+        Rendez-vous dans votre espace Procyo pour compléter le module 2 :
+      </p>
+
+      <!-- BOUTON LAUNCHPAD -->
+      <div style="text-align:center;margin:0 0 24px;">
+        <a href="{{object.launchpad_url}}"
+           style="display:inline-block;background:#17284E;color:#43D0BC;padding:14px 36px;
+                  border-radius:8px;text-decoration:none;font-size:15px;font-weight:700;">
+          Accéder à mon espace
+        </a>
+      </div>
+
+      <!-- TEMPS ESTIMÉ -->
+      <p style="font-size:13px;color:#888;margin:0 0 32px;">
+        ⏱ Temps estimé : 12 minutes
+      </p>
+
+      <!-- CARTE CONSEILLER -->
+      <div style="background:#f5f8ff;border-left:3px solid #43D0BC;border-radius:0 4px 4px 0;padding:16px 20px;">
+        <p style="font-size:12px;color:#888;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.5px;">
+          Votre conseiller
+        </p>
+        <p style="font-size:15px;font-weight:700;color:#17284E;margin:0;">
+          {{user.name}}
+        </p>
+        <p style="font-size:13px;color:#555;margin:4px 0 0;">
+          {{user.email}}
+        </p>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div style="background:#17284E;padding:20px 40px;text-align:center;">
+      <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:0;">
+        &copy; 2026 Procyo &middot; <a href="https://procyo.be" style="color:#43D0BC;text-decoration:none;">procyo.be</a>
+      </p>
+    </div>
+
+  </div>
 </div>
 `
   }
