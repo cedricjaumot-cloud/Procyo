@@ -671,7 +671,7 @@
         <h4>Question de clôture</h4>
         À la fin de la démonstration, on pose simplement la question : « Combien d'adresses mails ? »
         <div class="kv-grid" style="margin-top:14px">
-          <span class="kv-k">Démo concluante</span><span class="kv-v">Tarification réalisée via le Launchpad, offre envoyée au courtier avec CTA de validation</span>
+          <span class="kv-k">Démo concluante</span><span class="kv-v">Tarification réalisée via le Launchpad, <span class="mail-trigger" onclick="openMail('m04')">mail avec</span> offre envoyée au courtier avec CTA de validation</span>
           <span class="kv-k">Statut Odoo</span><span class="kv-v">Offre Envoyée</span>
           <span class="kv-k">Démo non concluante</span><span class="kv-v">Motif tracé, relance possible à 30 jours · statut Odoo <span class="flag flag-urg">à définir</span></span>
         </div>
@@ -1108,6 +1108,70 @@ const MAILS = {
     title: 'Présentation démo Procyo FR v5',
     type: 'pptx',
     url: 'https://raw.githubusercontent.com/cedricjaumot-cloud/Procyo/main/workflow_COOP/assets/Procyo_Demo_FR_v5.pptx'
+  },
+
+  m04: {
+    phase: 'Phase 3 · Démonstration',
+    title: 'Envoi offre commerciale - CTA signature',
+    html: `<!-- ============================================================
+     PROCYO - Template email : "Votre offre Procyo est prête à signer"
+     Usage Odoo : Technique > Email > Modèles > Corps (HTML)
+     Modèle applicable à : sale.order
+     Variables dynamiques Odoo :
+       {{object.partner_id.name}}       -> nom du prospect/client
+       {{object.sign_url}}              -> lien de signature Odoo Sign
+       {{user.name}}                    -> nom du conseiller
+     ============================================================ -->
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+
+  <!-- HEADER -->
+  <div style="background:#1A2744;padding:24px;text-align:center;">
+    <img src="https://procyo2.odoo.com/web/image/res.company/1/logo"
+         alt="Procyo"
+         style="height:50px;max-width:200px;object-fit:contain;">
+  </div>
+
+  <!-- BODY -->
+  <div style="padding:32px;background:#ffffff;color:#1A1A1A;">
+
+    <p style="margin:0 0 16px;">
+      Bonjour <strong>{{object.partner_id.name}}</strong>,
+    </p>
+
+    <p style="margin:0 0 32px;">
+      <strong>{{user.name}}</strong> vous a transmis votre offre commerciale Procyo.
+      Il ne vous reste plus qu'à la signer en quelques secondes.
+    </p>
+
+    <!-- BOUTON SIGNATURE -->
+    <div style="text-align:center;margin:0 0 32px;">
+      <a href="{{object.sign_url}}"
+         style="background:#00BFA5;color:#ffffff;padding:14px 32px;
+                border-radius:8px;text-decoration:none;font-weight:bold;
+                display:inline-block;">
+        Signer mon offre
+      </a>
+    </div>
+
+    <p style="color:#646E6C;font-size:13px;margin:0;">
+      Ce lien est personnel, merci de ne pas le transmettre.
+    </p>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background:#1A2744;padding:16px;text-align:center;">
+    <p style="color:#96B4AF;font-size:12px;margin:0;">
+      L'IA qui comprend votre métier de courtier, pas l'inverse
+    </p>
+    <p style="color:#96B4AF;font-size:11px;margin:4px 0 0;">
+      <a href="https://www.procyo.be" style="color:#96B4AF;text-decoration:none;">www.procyo.be</a>
+      &middot; contact@procyo.be
+    </p>
+  </div>
+
+</div>
+`
   }
 };
 
