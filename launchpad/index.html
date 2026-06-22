@@ -1091,8 +1091,8 @@ function getProgress(mid){
       else if(Array.isArray(v)&&v.length>0) ans++;
       else ans++; // optionnel — ne bloque pas
     } else if(q.type==='contact-fields'){
-      // answered if au moins nom rempli
-      if(v&&typeof v==='object'&&v.nom&&v.nom.trim())ans++;
+      const requiredFields = q.fields ? q.fields : [{key:'nom'}];
+      if(v&&typeof v==='object'&&requiredFields.every(f=>v[f.key]&&String(v[f.key]).trim()))ans++;
     } else if(q.type==='company-matrix'){
       if(v&&typeof v==='object'&&Object.values(v).some(arr=>Array.isArray(arr)&&arr.length>0))ans++;
     } else if(q.type==='percent-split'){
