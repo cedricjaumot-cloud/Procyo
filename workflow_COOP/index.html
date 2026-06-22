@@ -317,7 +317,7 @@
     font-weight: 500;
     padding: 3px 10px 3px 8px;
     border-radius: 6px;
-    margin-left: 4px;
+    margin-left: 2px;
     vertical-align: middle;
     background: #e8f0fd;
     color: #1a3c8b;
@@ -326,21 +326,15 @@
     transition: background 0.15s, transform 0.1s;
     user-select: none;
   }
-  .mail-trigger:hover {
-    background: #d0e2fb;
-    transform: translateY(-1px);
-  }
-  .mail-trigger::before {
-    content: '✉';
-    font-size: 12px;
-  }
+  .mail-trigger:hover { background: #d0e2fb; transform: translateY(-1px); }
+  .mail-trigger::before { content: '✉'; font-size: 12px; }
 
   /* ── MAIL MODAL ── */
   .mail-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(15,15,14,0.55);
+    background: rgba(15,15,14,0.6);
     z-index: 1000;
     align-items: center;
     justify-content: center;
@@ -350,9 +344,9 @@
   .mail-modal {
     background: #fff;
     border-radius: 14px;
-    max-width: 680px;
+    max-width: 640px;
     width: 100%;
-    max-height: 88vh;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 20px 60px rgba(0,0,0,0.25);
@@ -362,7 +356,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 20px 24px 16px;
+    padding: 18px 24px 14px;
     border-bottom: 1px solid #eee;
     background: #f8f9ff;
     gap: 12px;
@@ -373,90 +367,41 @@
     letter-spacing: .07em;
     text-transform: uppercase;
     color: #1a3c8b;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
   .mail-modal-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     color: #0f0f0e;
-    line-height: 1.3;
   }
   .mail-modal-close {
     background: none;
     border: none;
-    font-size: 22px;
+    font-size: 20px;
     cursor: pointer;
     color: #7a7870;
-    line-height: 1;
     padding: 2px 4px;
     flex-shrink: 0;
-    margin-top: -2px;
   }
   .mail-modal-close:hover { color: #0f0f0e; }
-  .mail-modal-meta {
-    display: flex;
-    gap: 16px;
-    padding: 12px 24px;
-    background: #faf9f6;
-    border-bottom: 1px solid #eee;
-    flex-wrap: wrap;
-  }
-  .mail-meta-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .mail-meta-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: #7a7870;
-  }
-  .mail-meta-val {
-    font-size: 12px;
-    color: #0f0f0e;
-    font-weight: 500;
-  }
-  .mail-modal-body {
-    padding: 20px 24px;
-    overflow-y: auto;
+  .mail-modal-preview {
     flex: 1;
+    overflow-y: auto;
+    padding: 0;
   }
-  .mail-subject-line {
-    font-size: 13px;
-    font-weight: 600;
-    color: #0f0f0e;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed #ddd;
-  }
-  .mail-subject-line span {
-    font-weight: 400;
-    color: #3a3935;
-  }
-  .mail-body-text {
-    font-size: 13px;
-    line-height: 1.75;
-    color: #2a2a28;
-    white-space: pre-wrap;
-  }
-  .mail-body-text .var {
-    background: #fff3cd;
-    color: #7a5200;
-    padding: 1px 5px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-family: monospace;
+  .mail-modal-preview iframe {
+    width: 100%;
+    border: none;
+    display: block;
   }
   .mail-modal-footer {
-    padding: 14px 24px;
+    padding: 12px 24px;
     border-top: 1px solid #eee;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
     background: #faf9f6;
+    align-items: center;
   }
   .mail-btn {
     font-family: 'Outfit', sans-serif;
@@ -466,25 +411,12 @@
     border-radius: 8px;
     cursor: pointer;
     border: 1px solid transparent;
-    transition: background 0.15s;
   }
-  .mail-btn-copy {
-    background: #1a3c8b;
-    color: #fff;
-  }
+  .mail-btn-copy { background: #1a3c8b; color: #fff; }
   .mail-btn-copy:hover { background: #142d6a; }
-  .mail-btn-close {
-    background: #eee;
-    color: #3a3935;
-    border-color: #ddd;
-  }
+  .mail-btn-close { background: #eee; color: #3a3935; border-color: #ddd; }
   .mail-btn-close:hover { background: #e0e0e0; }
-  .mail-copy-ok {
-    font-size: 11px;
-    color: #1a6645;
-    align-self: center;
-    display: none;
-  }
+  .mail-copy-ok { font-size: 11px; color: #1a6645; display: none; }
 
   /* ── SEPARATOR ── */
   .sep {
@@ -654,14 +586,14 @@
       <div class="drawer-inner">
         <span class="drawer-tag">Phase 2 · Prise de contact</span>
         <h4>Prise de rendez-vous</h4>
-        Le courtier reçoit un mail pour la prise de rendez-vous via Calendly. <span class="flag flag-urg">Quid présentiel vs Teams ?</span> <span class="mail-trigger" onclick="openMail('m01')">Template mail RDV Calendly</span>
+        Le courtier reçoit un <span class="mail-trigger" onclick="openMail('m01')">mail</span> pour la prise de rendez-vous via Calendly.
         <h4>Confirmation du rendez-vous</h4>
         Une fois le rendez-vous fixé par le courtier, un meeting request est envoyé dans son calendrier ainsi que dans celui du commercial.
         <h4>Accès au Launchpad &amp; Module Découverte</h4>
         Le courtier reçoit ensuite un mail lui donnant accès à un espace sécurisé « Launchpad » (profil prédéfini, seul un mot de passe reste à créer) afin de compléter le Module Découverte : 10 questions, moins de 5 minutes. Les données sont enregistrées dans la base Supabase, puis répercutées sur le contact dans Odoo.
         <div class="kv-grid" style="margin-top:14px">
           <span class="kv-k">Statut Odoo</span><span class="kv-v">RDV démo planifié</span>
-          <span class="kv-k">Relance automatique</span><span class="kv-v">Mail envoyé si le Module Découverte n'est pas complété après 48h - objet : « Préparons votre démonstration » <span class="mail-trigger" onclick="openMail('m03')">Template relance J+2</span></span>
+          <span class="kv-k">Relance automatique</span><span class="kv-v">Mail envoyé si le Module Découverte n'est pas complété après 48h - objet : « Préparons votre démonstration »</span>
           <span class="kv-k">Notification interne</span><span class="kv-v">Commercial alerté dès complétion → prépare la démo sur base des réponses</span>
         </div>
       </div>
@@ -780,7 +712,7 @@
         <div class="kv-grid" style="margin-top:14px">
           <span class="kv-k">Statut Odoo (début)</span><span class="kv-v">Emission Contrat - arrive automatiquement quand le Module Contractualisation est complété</span>
           <span class="kv-k">Relance J+3</span><span class="kv-v">Relance automatique si le contrat n'est pas signé après 3 jours</span>
-          <span class="kv-k">À la signature</span><span class="kv-v">Mail « Bienvenue chez Procyo » envoyé automatiquement - vu de manière plus complète en Phase 6 <span class="mail-trigger" onclick="openMail('m02')">Template Bienvenue</span></span>
+          <span class="kv-k">À la signature</span><span class="kv-v">Mail « Bienvenue chez Procyo » envoyé automatiquement - vu de manière plus complète en Phase 6</span>
           <span class="kv-k">Notification interne</span><span class="kv-v">Le commercial est notifié dès que le contrat est signé</span>
           <span class="kv-k">Statut Odoo (fin)</span><span class="kv-v">Contrat Signé - arrive automatiquement via la signature digitale</span>
         </div>
@@ -853,9 +785,9 @@
       <div class="drawer-inner">
         <span class="drawer-tag">Phase 6 · Bienvenue &amp; Set-Up</span>
         <h4>Mail J+1 - Demande de clé API</h4>
-        Le lendemain de la signature (J+1), automatisation suite au passage en statut Contrat Signé : un mail est envoyé au courtier pour lui indiquer la procédure de demande de clé API via Portima. <span class="mail-trigger" onclick="openMail('m04')">Template J+1 clé API</span>
+        Le lendemain de la signature (J+1), automatisation suite au passage en statut Contrat Signé : un mail est envoyé au courtier pour lui indiquer la procédure de demande de clé API via Portima. <span class="flag flag-urg">template à présenter</span>
         <h4>Mail J+2 - Module Paramétrage</h4>
-        Le surlendemain (J+2), un second mail automatique invite le courtier à démarrer le Module Paramétrage dans le Launchpad. <span class="mail-trigger" onclick="openMail('m05')">Template J+2 Module Paramétrage</span> Ce module peut également être complété lors d'un RDV Teams au besoin.
+        Le surlendemain (J+2), un second mail automatique invite le courtier à démarrer le Module Paramétrage dans le Launchpad. <span class="flag flag-urg">template à présenter</span> Ce module peut également être complété lors d'un RDV Teams au besoin.
         <div class="kv-grid" style="margin-top:14px">
           <span class="kv-k">Relance automatique</span><span class="kv-v">Rappel toutes les 48h si le Module Paramétrage n'est pas complété</span>
           <span class="kv-k">Notification interne</span><span class="kv-v">Une fois complété, information envoyée à onboarding@procyo2.odoo.com (via APP Assistance) et au Commercial</span>
@@ -863,14 +795,14 @@
         <h4>Demande de clé Brio effectuée</h4>
         Lorsque le courtier effectue sa demande de clé Brio, <strong>onboarding@procyo2.odoo.com</strong> (via APP Assistance) reçoit l'information. Ceci déclenche deux nouveaux mails :
         <ul>
-          <li>un mail avec Calendly pour fixer un RDV en présentiel au bureau du courtier pour la présentation globale (à ≈ J+10) <span class="mail-trigger" onclick="openMail('m06')">Template RDV présentiel</span> ;</li>
-          <li>un mail vers le commercial afin qu'il crée l'accès au Dashboard via la zone ADMIN (automatisation à prévoir dans le futur) <span class="mail-trigger" onclick="openMail('m07')">Template notif. commercial</span>.</li>
+          <li>un mail avec Calendly pour fixer un RDV en présentiel au bureau du courtier pour la présentation globale (à ≈ J+10) <span class="flag flag-urg">prévoir template</span> ;</li>
+          <li>un mail vers le commercial afin qu'il crée l'accès au Dashboard via la zone ADMIN (automatisation à prévoir dans le futur) <span class="flag flag-urg">prévoir template</span>.</li>
         </ul>
         <h4>Création de l'accès Dashboard</h4>
         À la création de l'accès au Dashboard, deux mails partent automatiquement vers le courtier :
         <ul>
-          <li>un mail pour l'accès à la plateforme Procyo <span class="mail-trigger" onclick="openMail('m08')">Template accès Procyo</span> ;</li>
-          <li>un mail dédié à la connexion Microsoft Graph <span class="mail-trigger" onclick="openMail('m09')">Template Microsoft Graph</span>.</li>
+          <li>un mail pour l'accès à la plateforme Procyo <span class="flag flag-urg">prévoir template</span> ;</li>
+          <li>un mail dédié à la connexion Microsoft Graph <span class="flag flag-urg">prévoir template</span>.</li>
         </ul>
       </div>
     </div>
@@ -883,7 +815,7 @@
         <h4>Présentation à l'équipe</h4>
         Selon toute logique, c'est durant cette période que se déroule la présentation à l'équipe du courtier, planifiée lors de la Phase 6 (RDV présentiel ≈ J+10).
         <h4>Mail Add-in Outlook</h4>
-        À la réception de la clé Brio chez Procyo, un mail automatique est envoyé au courtier pour le téléchargement et l'installation de l'add-in Outlook (Chatbox Procyo IA). <span class="mail-trigger" onclick="openMail('m10')">Template Add-in Outlook</span>
+        À la réception de la clé Brio chez Procyo, un mail automatique est envoyé au courtier pour le téléchargement et l'installation de l'add-in Outlook (Chatbox Procyo IA). <span class="flag flag-urg">template à prévoir</span>
         <h4>Préparation IA Factory</h4>
         L'IA Factory exécute un script Brio standard pour charger les tables : sinistres, objets de risques, contrats, clients, codes produits, etc., et prépare la personnalisation des prompts et des actions Brio pour le courtier.
         <h4>Go-Live (J+2 et au moins J+4 de la remise de la clé Brio)</h4>
@@ -966,9 +898,10 @@ if(sessionStorage.getItem('procyo_workflow')==='1') {
 }
 </script>
 
-<!-- ═══════════════════════════════════════════════════════
-     MAIL TEMPLATES MODAL
-════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════
+     MAIL MODAL
+════════════════════════════════════════════════ -->
 <div class="mail-overlay" id="mailOverlay" onclick="closeMail(event)">
   <div class="mail-modal" id="mailModal">
     <div class="mail-modal-header">
@@ -976,298 +909,126 @@ if(sessionStorage.getItem('procyo_workflow')==='1') {
         <div class="mail-modal-phase" id="mailPhase"></div>
         <div class="mail-modal-title" id="mailTitle"></div>
       </div>
-      <button class="mail-modal-close" onclick="closeMailBtn()">✕</button>
+      <button class="mail-modal-close" onclick="closeMailBtn()">&#x2715;</button>
     </div>
-    <div class="mail-modal-meta" id="mailMeta"></div>
-    <div class="mail-modal-body">
-      <div class="mail-subject-line">Objet : <span id="mailSubject"></span></div>
-      <div class="mail-body-text" id="mailBody"></div>
+    <div class="mail-modal-preview">
+      <iframe id="mailFrame" scrolling="auto"></iframe>
     </div>
     <div class="mail-modal-footer">
-      <span class="mail-copy-ok" id="mailCopyOk">✓ Copié !</span>
+      <span class="mail-copy-ok" id="mailCopyOk">&#x2713; Code copie !</span>
       <button class="mail-btn mail-btn-close" onclick="closeMailBtn()">Fermer</button>
-      <button class="mail-btn mail-btn-copy" onclick="copyMail()">Copier le mail</button>
+      <button class="mail-btn mail-btn-copy" onclick="copyMail()">Copier le code HTML</button>
     </div>
   </div>
 </div>
 
 <script>
 const MAILS = {
-
   m01: {
     phase: 'Phase 2 · Prise de contact',
-    title: 'Invitation à réserver un créneau de démonstration',
-    declencheur: 'Automatique · Création opportunité Odoo',
-    destinataire: 'Courtier prospect',
-    expediteur: '{{user.name}} · Procyo',
-    sujet: 'Découvrez Procyo en 45 minutes — réservez votre créneau',
-    corps: `Bonjour {{object.partner_id.name}},
-
-Merci de l'intérêt que vous portez à Procyo.
-
-Je serais ravi de vous présenter notre assistant IA dédié aux bureaux de courtage belges : en 45 minutes, vous verrez concrètement comment Procyo traite les mails entrants, génère des réponses conformes et libère votre équipe des tâches répétitives.
-
-Réservez directement le créneau qui vous convient :
-→ {{calendly_link_province}}
-
-La session se déroule en visioconférence (Teams) ou en présentiel si vous le préférez — indiquez-le simplement lors de la réservation.
-
-À très bientôt,
-
-{{user.name}}
-{{user.function}}
-Procyo — procyo.be`
-  },
-
-  m02: {
-    phase: 'Phase 5 · Contrat & signature',
-    title: 'Bienvenue chez Procyo',
-    declencheur: 'Automatique · Statut Odoo → Contrat Signé',
-    destinataire: 'Courtier — signataire du contrat',
-    expediteur: 'onboarding@procyo2.odoo.com',
-    sujet: 'Bienvenue chez Procyo — votre accès est en préparation',
-    corps: `Bonjour {{object.partner_id.name}},
-
-Votre contrat est signé. Bienvenue dans la famille Procyo.
-
-Voici ce qui se passe dans les prochains jours :
-
-J+1  Vous recevrez les instructions pour demander votre clé API via Portima.
-J+2  Un second mail vous invitera à compléter votre Module Paramétrage (10 min).
-≈ J+10  Notre équipe se déplace dans votre bureau pour la présentation à votre équipe.
-
-Votre interlocuteur dédié pour la suite de l'onboarding est {{user.name}}, joignable à {{user.email}}.
-
-À très vite,
-
-L'équipe Procyo`
-  },
-
-  m03: {
-    phase: 'Phase 2 · Prise de contact',
-    title: 'Relance J+2 — Module Découverte non complété',
-    declencheur: 'Automatique · 48h après accès Launchpad sans complétion',
-    destinataire: 'Courtier prospect',
-    expediteur: '{{user.name}} · Procyo',
-    sujet: 'Préparons votre démonstration — 5 minutes suffisent',
-    corps: `Bonjour {{object.partner_id.name}},
-
-Votre rendez-vous de démonstration approche — nous sommes impatients de vous présenter Procyo.
-
-Pour que la session soit au maximum adaptée à votre bureau, il nous manque encore votre Module Découverte (10 questions, moins de 5 minutes).
-
-Accédez-y directement ici :
-→ {{launchpad_url}}
-
-Si vous avez la moindre question avant notre rencontre, n'hésitez pas à me contacter.
-
-À bientôt,
-
-{{user.name}}
-{{user.function}}
-Procyo`
-  },
-
-  m04: {
-    phase: 'Phase 6 · Bienvenue & Set-Up — J+1',
-    title: 'Demande de clé API Portima',
-    declencheur: 'Automatique · J+1 après statut Contrat Signé',
-    destinataire: 'Courtier — administrateur BRIO',
-    expediteur: 'onboarding@procyo2.odoo.com',
-    sujet: 'Étape 1 — Demandez votre clé API Portima (2 minutes)',
-    corps: `Bonjour {{object.partner_id.name}},
-
-La première étape technique de votre mise en service Procyo est la demande de votre clé API auprès de Portima (BRIO).
-
-Voici comment procéder :
-
-1. Connectez-vous à votre espace BRIO sur portima.be
-2. Rendez-vous dans Paramètres > Intégrations > Clés API
-3. Créez une nouvelle clé avec les droits en lecture sur Sinistres, Contrats et Clients
-4. Copiez la clé générée et renvoyez-la à onboarding@procyo2.odoo.com
-
-L'opération prend environ 2 minutes. Dès réception de votre clé, nous planifions ensemble votre visite de présentation à l'équipe.
-
-En cas de question, notre équipe est disponible par retour de mail.
-
-L'équipe Procyo`
-  },
-
-  m05: {
-    phase: 'Phase 6 · Bienvenue & Set-Up — J+2',
-    title: 'Invitation Module Paramétrage',
-    declencheur: 'Automatique · J+2 après statut Contrat Signé',
-    destinataire: 'Courtier',
-    expediteur: 'onboarding@procyo2.odoo.com',
-    sujet: 'Étape 2 — Complétez votre Module Paramétrage (10 min)',
-    corps: `Bonjour {{object.partner_id.name}},
-
-Voici la seconde étape de votre onboarding Procyo.
-
-Le Module Paramétrage nous permet de configurer votre assistant IA aux couleurs et aux usages de votre bureau. Il comprend 13 questions et prend environ 10 minutes.
-
-Accédez-y via votre espace Launchpad :
-→ {{launchpad_url}}
-
-Si vous préférez le compléter en notre compagnie, nous pouvons aussi le faire ensemble lors d'un appel Teams — il vous suffit de le signaler en répondant à ce mail.
-
-À très vite,
-
-L'équipe Procyo`
-  },
-
-  m06: {
-    phase: 'Phase 6 · Bienvenue & Set-Up — ≈ J+10',
-    title: 'RDV présentiel — invitation Calendly',
-    declencheur: 'Automatique · Réception clé BRIO',
-    destinataire: 'Courtier',
-    expediteur: 'onboarding@procyo2.odoo.com',
-    sujet: 'Réservez votre visite de présentation — nous venons chez vous',
-    corps: `Bonjour {{object.partner_id.name}},
-
-Bonne nouvelle : votre clé BRIO est bien reçue et votre assistant Procyo IA est en cours de configuration.
-
-La prochaine étape est notre visite dans votre bureau pour présenter Procyo à toute votre équipe. C'est un moment clé : nous montrons les cas d'usage en live, sur vos propres données, et répondons à toutes les questions de vos collaborateurs.
-
-Réservez directement le créneau qui vous convient :
-→ {{calendly_link_presentiel}}
-
-La session dure environ 1 heure et se déroule dans vos locaux.
-
-À très vite,
-
-L'équipe Procyo`
-  },
-
-  m07: {
-    phase: 'Phase 6 · Bienvenue & Set-Up',
-    title: 'Notification interne — création accès Dashboard',
-    declencheur: 'Automatique · Réception clé BRIO · Destinataire interne',
-    destinataire: 'Commercial assigné (interne)',
-    expediteur: 'onboarding@procyo2.odoo.com',
-    sujet: '[ACTION] Créer accès Dashboard — {{object.partner_id.name}}',
-    corps: `Bonjour {{user.name}},
-
-La clé BRIO de {{object.partner_id.name}} vient d'être reçue.
-
-ACTION REQUISE : crée l'accès Dashboard pour ce courtier via la zone ADMIN.
-
-Fiche courtier : {{object.partner_id.name}}
-Bureau : {{object.partner_id.street}}, {{object.partner_id.city}}
-Mail : {{object.partner_id.email}}
-Lien Odoo : {{object_url}}
-
-Une fois l'accès créé, deux mails partent automatiquement vers le courtier (accès plateforme + connexion Microsoft Graph).
-
-Merci,
-L'équipe Onboarding Procyo`
-  },
-
-  m08: {
-    phase: 'Phase 6 · Bienvenue & Set-Up',
-    title: 'Accès à la plateforme Procyo',
-    declencheur: 'Automatique · Création accès Dashboard par le commercial',
-    destinataire: 'Courtier',
-    expediteur: 'onboarding@procyo2.odoo.com',
-    sujet: 'Votre accès à la plateforme Procyo est prêt',
-    corps: `Bonjour {{object.partner_id.name}},
-
-Votre espace Procyo est configuré et prêt à l'emploi.
-
-Accédez à votre Dashboard :
-→ https://app.procyo.be
-
-Identifiants :
-- Email : {{object.partner_id.email}}
-- Mot de passe temporaire : {{temp_password}}
-
-Nous vous recommandons de modifier votre mot de passe dès votre première connexion.
-
-Vous trouverez dans le Dashboard l'ensemble des traitements en cours, les statistiques d'usage et le catalogue de prompts de votre assistant.
-
-À bientôt,
-
-L'équipe Procyo`
-  },
-
-  m09: {
-    phase: 'Phase 6 · Bienvenue & Set-Up',
-    title: 'Connexion Microsoft Graph (Outlook)',
-    declencheur: 'Automatique · Création accès Dashboard par le commercial',
-    destinataire: 'Courtier — administrateur Microsoft 365',
-    expediteur: 'onboarding@procyo2.odoo.com',
-    sujet: 'Connectez votre boite Outlook à Procyo (5 minutes)',
-    corps: `Bonjour {{object.partner_id.name}},
-
-Pour que Procyo puisse lire et traiter les mails de votre bureau, une connexion à votre compte Microsoft 365 est nécessaire via Microsoft Graph.
-
-Voici comment procéder :
-
-1. Connectez-vous à votre Dashboard Procyo : https://app.procyo.be
-2. Allez dans Paramètres > Connexions > Microsoft 365
-3. Cliquez sur « Connecter » et authentifiez-vous avec le compte administrateur de votre tenant
-4. Accordez les permissions demandées (lecture des mails)
-
-Cette connexion est sécurisée, chiffrée et ne permet que la lecture — Procyo ne peut ni envoyer ni supprimer de mails.
-
-En cas de difficulté, notre équipe peut vous accompagner par appel Teams. Répondez simplement à ce mail.
-
-L'équipe Procyo`
-  },
-
-  m10: {
-    phase: 'Phase 7 · Préparation IA Factory',
-    title: 'Installation Add-in Outlook (Chatbox Procyo IA)',
-    declencheur: 'Automatique · Réception clé BRIO chez Procyo',
-    destinataire: 'Courtier',
-    expediteur: 'onboarding@procyo2.odoo.com',
-    sujet: 'Installez votre Chatbox Procyo IA dans Outlook',
-    corps: `Bonjour {{object.partner_id.name}},
-
-Votre assistant Procyo IA est prêt. Il s'intègre directement dans votre Outlook via un Add-in — pas de nouvel outil à apprendre, tout se passe dans votre environnement habituel.
-
-Installation en 3 étapes :
-
-1. Ouvrez Outlook (desktop ou web)
-2. Allez dans Accueil > Obtenir des compléments (ou Gérer les compléments sur OWA)
-3. Recherchez « Procyo IA » et cliquez sur Ajouter
-
-Ou téléchargez le fichier de déploiement pour installation centralisée via votre admin Microsoft 365 :
-→ {{addin_manifest_url}}
-
-Une fois installé, vous verrez le panneau Procyo IA s'ouvrir dans le volet latéral droit de chaque mail.
-
-Notre équipe vous présentera l'outil en détail lors du Go-Live.
-
-À très vite,
-
-L'équipe Procyo`
+    title: 'Invitation RDV demo — Calendly',
+    html: `<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body>
+<div style="background:#f0f0f0;padding:2rem;font-family:Arial,sans-serif;">
+<div style="max-width:560px;margin:0 auto;background:#FFFFFF;border-radius:12px;overflow:hidden;">
+
+  <!-- HEADER -->
+  <div style="background:#17284E;padding:32px 40px;text-align:center;">
+    <img src="https://procyo2.odoo.com/web/image/res.company/1/logo" alt="Procyo" style="height:60px;max-width:240px;object-fit:contain;">
+  </div>
+
+  <!-- BODY -->
+  <div style="padding:40px;">
+    <p style="font-size:15px;color:#17284E;margin:0 0 16px;">
+      Bonjour <strong>{{ object.partner_id.name }}</strong>,
+    </p>
+    <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 16px;">
+      Merci pour votre intérêt envers <strong style="color:#17284E;">Procyo</strong>.
+      Nous avons bien reçu votre demande et sommes ravis de pouvoir vous accompagner.
+    </p>
+    <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 24px;">
+      Choisissez le format qui vous convient et planifiez votre rendez-vous :
+    </p>
+
+    <!-- BOUTONS CALENDLY -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 32px;">
+      <tbody>
+        <tr>
+          <td width="45%" style="text-align:center;">
+            <a href="https://calendly.com/cja_procyo/60min?email={{ object.partner_id.email }}&amp;name={{ object.partner_id.name | urlencode }}&amp;utm_content={{ object.id }}"
+               style="display:inline-block;background:#17284E;color:#43D0BC;padding:14px 0;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;line-height:1.4;width:180px;text-align:center;">
+              En visio<br>
+              <span style="font-size:12px;font-weight:400;opacity:0.8;">via Teams</span>
+            </a>
+          </td>
+          <td width="10%" style="text-align:center;color:#aaa;font-size:13px;font-weight:500;">
+            ou
+          </td>
+          <td width="45%" style="text-align:center;">
+            <a href="https://calendly.com/cja_procyo/60-min-en-personne?email={{ object.partner_id.email }}&amp;name={{ object.partner_id.name | urlencode }}&amp;utm_content={{ object.id }}"
+               style="display:inline-block;background:#17284E;color:#43D0BC;padding:14px 0;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;line-height:1.4;width:180px;text-align:center;">
+              En présentiel<br>
+              <span style="font-size:12px;font-weight:400;opacity:0.8;">dans votre bureau</span>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- SIGNATURE -->
+    <div style="background:#f5f8ff;border-left:3px solid #43D0BC;border-radius:4px;padding:16px 20px;">
+      <p style="font-size:12px;color:#888;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.5px;">
+        Votre conseiller
+      </p>
+      <p style="font-size:15px;font-weight:700;color:#17284E;margin:0;">
+        {{ object.user_id.name }}
+      </p>
+      <p style="font-size:13px;color:#555;margin:4px 0 0;">
+        {{ object.user_id.function or '' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background:#17284E;padding:20px 40px;text-align:center;">
+    <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:0;">
+      &copy; {{ datetime.date.today().year }} Procyo &middot;
+      <a href="https://procyo.be" style="color:#43D0BC;text-decoration:none;">procyo.be</a>
+    </p>
+  </div>
+
+</div>
+</div>
+</body>
+</html>
+`
   }
-
 };
 
 function openMail(id) {
   const m = MAILS[id];
   if (!m) return;
-
   document.getElementById('mailPhase').textContent = m.phase;
   document.getElementById('mailTitle').textContent = m.title;
-  document.getElementById('mailSubject').textContent = m.sujet;
-
-  document.getElementById('mailMeta').innerHTML = `
-    <div class="mail-meta-item"><div class="mail-meta-label">Déclencheur</div><div class="mail-meta-val">${m.declencheur}</div></div>
-    <div class="mail-meta-item"><div class="mail-meta-label">Destinataire</div><div class="mail-meta-val">${m.destinataire}</div></div>
-    <div class="mail-meta-item"><div class="mail-meta-label">Expéditeur</div><div class="mail-meta-val">${m.expediteur}</div></div>
-  `;
-
-  // Rendre les variables Odoo visuellement distinctes
-  const bodyHtml = m.corps
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/\{\{[^}]+\}\}/g, match => `<span class="var">${match}</span>`);
-
-  document.getElementById('mailBody').innerHTML = bodyHtml;
   document.getElementById('mailCopyOk').style.display = 'none';
+
+  const frame = document.getElementById('mailFrame');
+  frame.srcdoc = m.html;
+
+  // Ajuster la hauteur apres chargement
+  frame.onload = function() {
+    try {
+      const h = frame.contentDocument.body.scrollHeight;
+      frame.style.height = Math.min(h + 20, 520) + 'px';
+    } catch(e) {
+      frame.style.height = '500px';
+    }
+  };
+  frame.style.height = '500px';
+
   document.getElementById('mailOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1282,20 +1043,16 @@ function closeMailBtn() {
 }
 
 function copyMail() {
-  const m = Object.values(MAILS).find(m =>
-    m.title === document.getElementById('mailTitle').textContent
-  );
-  if (!m) return;
-  const fullText = `Objet : ${m.sujet}\n\n${m.corps}`;
-  navigator.clipboard.writeText(fullText).then(() => {
+  const id = 'm01'; // sera dynamique quand il y aura plus de templates
+  const html = MAILS[id] ? MAILS[id].html : '';
+  navigator.clipboard.writeText(html).then(() => {
     const ok = document.getElementById('mailCopyOk');
     ok.style.display = 'inline';
     setTimeout(() => ok.style.display = 'none', 2500);
   });
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeMailBtn();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMailBtn(); });
 </script>
+
 </body></html>
