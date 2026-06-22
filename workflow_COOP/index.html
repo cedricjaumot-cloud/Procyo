@@ -658,7 +658,7 @@
       <div class="drawer-inner">
         <span class="drawer-tag">Phase 3 · Démonstration</span>
         <h4>Un deck, un discours sur mesure</h4>
-        Le PPT est identique pour tous les courtiers - ce qui change, c'est le discours oral du commercial, entièrement calibré sur les réponses du Module Découverte. Si le bureau est en Microsoft 365, avec 50+ mails entrants par jour et comme priorité la gestion des sinistres, la démo met en scène exactement ce scénario en live.
+        Le <span class="mail-trigger" onclick="openMail('m03')">PPT</span> est identique pour tous les courtiers - ce qui change, c'est le discours oral du commercial, entièrement calibré sur les réponses du Module Découverte. Si le bureau est en Microsoft 365, avec 50+ mails entrants par jour et comme priorité la gestion des sinistres, la démo met en scène exactement ce scénario en live.
         <h4>Structure de la session (~1h15)</h4>
         <ul>
           <li><strong>Contexte du courtage belge</strong> - enjeux réglementaires, pression sur la productivité, attentes clients.</li>
@@ -1101,6 +1101,13 @@ const MAILS = {
   </div>
 </div>
 `
+  },
+
+  m03: {
+    phase: 'Phase 3 · Démonstration',
+    title: 'Présentation démo Procyo FR v5',
+    type: 'pptx',
+    url: 'https://raw.githubusercontent.com/cedricjaumot-cloud/Procyo/main/workflow_COOP/assets/Procyo_Demo_FR_v5.pptx'
   }
 };
 
@@ -1112,18 +1119,32 @@ function openMail(id) {
   document.getElementById('mailCopyOk').style.display = 'none';
 
   const frame = document.getElementById('mailFrame');
-  frame.srcdoc = m.html;
+  const btnCopy = document.querySelector('.mail-btn-copy');
 
-  // Ajuster la hauteur apres chargement
-  frame.onload = function() {
-    try {
-      const h = frame.contentDocument.body.scrollHeight;
-      frame.style.height = Math.min(h + 20, 520) + 'px';
-    } catch(e) {
-      frame.style.height = '500px';
-    }
-  };
-  frame.style.height = '500px';
+  if (m.type === 'pptx') {
+    // Affichage via Google Docs Viewer
+    const viewerUrl = 'https://docs.google.com/gviewer?embedded=true&url=' + encodeURIComponent(m.url);
+    frame.src = viewerUrl;
+    frame.removeAttribute('srcdoc');
+    frame.style.height = '520px';
+    btnCopy.textContent = 'Télécharger le PPT';
+    btnCopy.onclick = function() { window.open(m.url, '_blank'); };
+  } else {
+    // Affichage HTML mail
+    frame.srcdoc = m.html;
+    frame.removeAttribute('src');
+    frame.onload = function() {
+      try {
+        const h = frame.contentDocument.body.scrollHeight;
+        frame.style.height = Math.min(h + 20, 520) + 'px';
+      } catch(e) {
+        frame.style.height = '500px';
+      }
+    };
+    frame.style.height = '500px';
+    btnCopy.textContent = 'Copier le code HTML';
+    btnCopy.onclick = function() { copyMail(); };
+  }
 
   document.getElementById('mailOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
