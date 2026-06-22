@@ -770,7 +770,15 @@ const MODULES = [
     {id:'M2B',name:'Identification juridique',questions:[
       {id:'M2Q4',type:'text',label:'Raison sociale complète',required:true,hint:'Telle qu\'inscrite au registre BCE.'},
       {id:'M2Q5',type:'radio',label:'Forme juridique',required:true,options:['SRL','SA','SCRL','Indépendant','Autre']},
-      {id:'M2Q6',type:'textarea',label:'Adresse du siège social',required:true,placeholder:'Rue, numéro, code postal, ville, pays'},
+      {id:'M2Q6',type:'contact-fields',label:'Adresse du siège social',required:true,
+  fields:[
+    {key:'rue',         label:'Rue',         type:'text', placeholder:'Rue de la Loi'},
+    {key:'numero',      label:'Numéro',      type:'text', placeholder:'16'},
+    {key:'code_postal', label:'Code postal', type:'text', placeholder:'1000'},
+    {key:'ville',       label:'Ville',       type:'text', placeholder:'Bruxelles'},
+    {key:'pays',        label:'Pays',        type:'text', placeholder:'Belgique'},
+  ]
+},
       {id:'M2Q7',type:'text',label:'Numéro BCE',required:true},
       {id:'M2Q8',type:'text',label:'Numéro d\'agrément FSMA',required:true},
       {id:'M2Q9',type:'text',label:'Nom et qualité du signataire du contrat',required:true,hint:'La personne qui signera électroniquement.'},
@@ -1363,13 +1371,13 @@ function buildQuestion(q,saved){
   else if(q.type==='contact-fields'){
     // saved is object {nom, fonction, email, tel}
     const sv=saved&&typeof saved==='object'?saved:{};
-    const fields=[
+    const fields = q.fields || [
       {key:'nom',    label:'Nom',      type:'text',  placeholder:'Prénom Nom'},
       {key:'fonction',label:'Fonction',type:'text',  placeholder:'Ex. : Directeur administratif'},
       {key:'email',  label:'Email',    type:'email', placeholder:'prenom.nom@cabinet.be'},
       {key:'tel',    label:'Téléphone',type:'tel',   placeholder:'+32 …'},
     ];
-    inp=`<button type="button" class="btn-cest-moi" onclick="fillCestMoi('${q.id}')">👤 C'est moi</button>`;
+    inp = q.id === 'M2Q6' ? '' : `<button type="button" class="btn-cest-moi" onclick="fillCestMoi('${q.id}')">👤 C'est moi</button>`;
     inp+=`<div class="contact-grid">`;
     fields.forEach(f=>{
       const v=sv[f.key]||'';
