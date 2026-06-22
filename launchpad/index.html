@@ -1193,10 +1193,10 @@ function openModule(idx){
           el.style.opacity = '0.7';
           el.style.cursor = 'not-allowed';
         });
-        document.querySelectorAll('#screen-questions .opt-btn, #screen-questions .chip').forEach(function(el){
-          el.style.pointerEvents = 'none';
-          el.style.opacity = '0.7';
-        });
+        document.querySelectorAll('#screen-questions .rbtn, #screen-questions .citem, #screen-questions .bm-ok, #screen-questions .cm-box, #screen-questions .fu-btn, #screen-questions .fu-del, #screen-questions .btn-cest-moi, #screen-questions .cm-add-btn').forEach(function(el){
+  el.style.pointerEvents = 'none';
+  el.style.opacity = '0.7';
+});
       }, 100);
     }
   }
