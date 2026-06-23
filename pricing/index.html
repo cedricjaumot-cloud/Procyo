@@ -1543,165 +1543,474 @@ function cBuildPDF(){
   const jsPDF=window.jspdf.jsPDF;
   const doc=new jsPDF({unit:'mm',format:'a4'});
 
-  const NAVY=[26,39,68],TEAL=[0,191,165],TEAL2=[76,230,185];
-  const DARK=[26,26,26],MID=[100,110,108],LIGHT=[247,249,248];
-  const BRD=[221,229,227],WHITE=[255,255,255],TEAL_BG=[232,251,245];
+  const NAVY=[26,39,68],TEAL=[0,191,165];
+  const DARK=[30,30,30],MID=[100,110,108],LIGHT=[245,247,250];
+  const BRD=[180,190,195],WHITE=[255,255,255];
+  const BLUE_HDR=[214,228,240],BLUE_ROW=[235,243,251];
 
-  const nom=cGetVal('c-nom');
-  const etp=cGetVal('f-m1q1');
-  const brio=cGetVal('f-m1q2');
-  const email=cGetVal('f-m1q4');
-  const nbAddr=cGetVal('f-m2q1');
-  const raison=cGetVal('f-m2q4');
-  const forme=cGetVal('f-m2q5');
-  const rue=cGetVal('f-m2q6-rue');
-  const num=cGetVal('f-m2q6-num');
-  const cp=cGetVal('f-m2q6-cp');
-  const ville=cGetVal('f-m2q6-ville');
-  const pays=cGetVal('f-m2q6-pays');
-  const bce=cGetVal('f-m2q7');
-  const fsma=cGetVal('f-m2q8');
-  const signataire=cGetVal('f-m2q9');
-  const effetDate=cGetVal('f-m2q10');
-  const modalites=cGetVal('f-m2q14');
-  const adresse=[rue,num,cp,ville,pays].filter(Boolean).join(', ')||'—';
-  const modsList=[];
-  if(cMods.regulia)modsList.push('Assistant Conformité (Regulia)');
-  if(cMods.portfolia)modsList.push('Assistant Portefeuille (Portfolia)');
-  if(cMods.relancia)modsList.push('Assistant Commercial (Relancia)');
+  // Valeurs depuis le formulaire
+  const nom=cGetVal('c-nom')||'XXX';
+  const raison=cGetVal('f-m2q4')||'XXX';
+  const siege=cGetVal('f-m2q6-rue')?[cGetVal('f-m2q6-rue'),cGetVal('f-m2q6-num'),cGetVal('f-m2q6-cp'),cGetVal('f-m2q6-ville'),cGetVal('f-m2q6-pays')].filter(Boolean).join(', '):'XXX';
+  const bce=cGetVal('f-m2q7')||'XXX';
+  const fsma=cGetVal('f-m2q8')||'XXX';
+  const signataire=cGetVal('f-m2q9')||'XXX';
+  const effet=cGetVal('f-m2q10')||'XXX';
+  const brio=cGetVal('f-m1q2')||'';
+  const email_contact=cGetVal('c-email')||'XXX';
+  const modalites=cGetVal('f-m2q14')||'';
+  const facturation=cGetVal('f-m2q15')||'Mensuel';
+  const nbAddr=parseInt(cGetVal('f-m2q1'))||0;
+  const etp=cGetVal('f-m1q1')||'';
 
-  // Contact helpers
-  function getContact(qid){
-    return {
-      nom:cGetVal('f-'+qid+'-nom')||'—',
-      fonction:cGetVal('f-'+qid+'-fonction')||'—',
-      email:cGetVal('f-'+qid+'-email')||'—',
-      tel:cGetVal('f-'+qid+'-tel')||'—'
-    };
+  // Calculs
+  const etpNum=etpFromRange(etp);
+  const sp=setupPalier(etpNum);
+  const abo=nbAddr>0?calcAbo(nbAddr):{palier:PALIERS[0],suppl:0,total:0};
+  const nbMod=[cMods.regulia,cMods.portfolia,cMods.relancia].filter(Boolean).length;
+  let mensHT=nbAddr>0?abo.total:0;
+  if(cMods.regulia)mensHT+=nbAddr*10;
+  if(cMods.relancia)mensHT+=nbAddr*10;
+  if(cMods.portfolia)mensHT+=abo.palier.base*0.1;
+  const setupHT=sp.setup+nbMod*500;
+
+  // Date fin (effet + 12 mois - 1 jour)
+  let dateFin='XXX';
+  if(effet&&effet!=='XXX'){
+    const parts=effet.split('/');
+    if(parts.length===3){
+      const d=new Date(parseInt(parts[2]),parseInt(parts[1])-1,parseInt(parts[0]));
+      d.setFullYear(d.getFullYear()+1);d.setDate(d.getDate()-1);
+      dateFin=d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear();
+    }
   }
-  const ref1=getContact('m2q11');
-  const ref2=getContact('m2q12');
-  const ref3=getContact('m2q13');
 
-  const LOGO_DATA="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA4QAAADICAYAAACwPC+xAAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nO2dB7QUVda2AUVUQB1RkPocZ+abcRTMigqIDmKTcxBQgiBZCZJzlCRJchS4RCOKimICw5hHxxwx56yIjiiM519vfTb/9XK7b99TVV3V3c9Zay+R7q46Z9dTh3prn7N3CeeEmMHwAQzAAAzAAAzAAAzAAAzAAAzEcs4HJcLuAIYPYAAGYAAGYAAGYAAGYAAGYCCGIAQCJgIYgAEYgAEYgAEYgAEYgAEYiBEhBAImAhiAARiAARiAARiAARiAARiIsWQUCJgIYAAGYAAGYAAGYAAGYAAGYCDGHkIgYCKAARiAARiAARiAARiAARiAgRhJZYCAiQAGYAAGYAAGYAAGYAAGYAAGYmQZBQImAhiAARiAARiAARiAARiAARiIUXYCCJgIYAAGYAAGYAAGYAAGYAAGYCBGHUIgYCKAARiAARiAARiAARiAARiAgRiF6YGAiQAGYAAGYAAGYAAGYAAGYAAGYvt8UAJncEPAAAzAAAzAAAzAAAzAAAzAQCwnfYAgjMBFwPABDMAADMAADMAADMAADMCAgyAEAiYCGIABGIABGIABGIABGIABGHCIEAIBEwEMwAAMwAAMwAAMwAAMwAAMOCwZBQImAhiAARiAARiAARiAARiAARhw2EMIBEwEMAADMAADMAADMAADMAADMOCQVAYImAhgAAZgAAZgAAZgAAZgAAZgwCHLKBAwEcAADMAADMAADMAADMAADMCAQ9kJIGAigAEYgAEYgAEYgAEYgAEYgAGHOoRAwEQAAzAAAzAAAzAAAzAAAzAAAw6F6YGAiQAGYAAGYAAGYAAGYAAGYAAGnN98UAIYgAEGYAAGYAAGYAAGYAAGYAAGYjnpAwRhBC4Chg9gAAZgAAZgAAZgAAZgAAYcBCEQMBHAAAzAAAzAAAzAAAzAAAzAgEOEEAiYCGAABmAABmAABmAABmAABmDAYckoEDARwAAMwAAMwAAMwAAMwAAMwIDDHkIgYCKAARiAARiAARiAARiAARiAAYekMkDARAADMAADMAADMAADMAADMAADDllGgYCJAAZgAAZgAAZgAAZgAAZgAAYcyk4AARMBDMAADMAADMAADMAADMAADDjUIQQCJgIYgAEYgAEYgAEYgAEYgAEYcChMDwRMBDAAAzAAAzAAAzAAAzAAAzDg/OaDEsAADDAAAzAAAzAAAzAAAzAAAzAQy0kfIAgjcBEwfAADMAADMAADMAADMAADMOAgCIGAiQAGYAAGYAAGYAAGYAAGYAAGHCKEQMBEAAMwAAMwAAMwAAMwAAMwAAMOS0aBgIkABmAABmAABmAABmAABmAABhz2EAIBEwEMwAAMwAAMwAAMwAAMwAAMOCSVAQImAhiAARiAARiAARiAARiAARhwyDIKBEwEMAADMAADMAADMAADMAADMOBQdgIImAhgAAZgAAZgAAZgAAZgAAZgwKEOIRAwEcAADMAADMAADMAADMAADMCAQ2F6IGAigAEYgAEYgAEYgAEYgAEYgAHnNx+UAAZggAEYgAEYgAEYgAEYgAEYgIFYTvoAQRiBi4DhAxiAARiAARiAARiAARiAAQdBCARMBDAAAzAAAzAAAzAAAzAAAzDgECEEAiYCGIABGIABGIABGIABGIABGHBYMgoETAQwAAMwAAMwAAMwAAMwAAMw4LCHEAiYCGAABmAABmAABmAABmAABmDAIakMEDARwAAMwAAMwAAMwAAMwAAMwIBDllEgYCKAARiAARiAARiAARiAARiAAYeyE0DARAADMAADMAADMAADMAADMAADDnUIgYCJAAZgAAZgAAZgAAZgAAZgAAYcCtMHD0Gl81qY8oOHuqY/c+Nx48EADMAADMAADMAADMAADDgR9UGJsDuQTVbx/Fam5NY8U+LBDa7pzxVrtQq9Xxg+gAEYgAEYgAEYgAEYgAEYcBCEwUJQbvTIfWIwbuVGjeTm4+aDARiAARiAARiAARiAARgwUfQBEUIfnXnIzMn7CUL9XdgXGcMHMAADMAADMAADMAADMAADDoIwWAgQhNxkTLQwAAMwAAMwAAMwAAMw4GSQD4gQIghDhxDDBzAAAzAAAzAAAzAAAzAQQxBmOgRECMO/Bhg+gAEYgAEYgAEYgAEYgIFYyj4gQogg5IZh0oQBGIABGIABGIABGICBE3LTBwhCBGHoEGL4AAZ+z8D/nFjX1KrfxXTpM9aMuXqhWbLyJnPrndvMQ48+Yx557Fnzwstv7rMn//Wi+3d33/eoWbPxDjNt9krTd8g006RtP/PX0xrnrM8WrbjBbLrjAbP9kadd/zz34uu/89tTz7xk7n/wCXPTbfe63x0xYZ5p33W4qVb7ktDHggXvg8on1TdH12tv/tCxpzms30BTdtxoc/C1U02ZxTPNQctnm9Jr5u+zMktnmTKLZ5hDZlxtyo0eZQ7v098c2f5yU/HCNsapUpfrBbMwAAMm032AIPTRmSwZzXxr3Wnw7x4a023PPPeK+/C67eGn3AfVBcuuN6MnLTBtuww1p5/XNq2+mDEvL1Rf5Dc9zMsvDz/2jCuMVqy51UyZtcL06DfRXNi4uznupAahs+PFjq1S1zRrP8DMW7rR/PPxf5vvv//B+NH27N1rXn39bbPx5rvNlYOnmhPPbhH6WP2yP1atZ1p2GOjeI489+ZxvPlP7/Muvzb3bHjfjpy425zfoGtgYzrmww35CNVXTy4E/ndwgY+fL62/Zmta+Vj6lgTmyXTdTduI4V+SVfGDdflnBbazkPXnmoOVz3BJTFZp1Mk6VeqHfGxg+gAEYcIrpAwShj9AgCDP/Brz8yvEmyu2TT78wN2++3/Qffk3gD/cSEZnSfvppt3n86RfMnIXrTINWfULnKFVr2q6/2XDT3ebLr75Ni5/27NnjiurBo2dnbPSwVceB5ubb7jPffLvTpKvtePsDM33OykCih+tu3GLdrwnTl4YqyPWywab9+uuv7guQoPtYuWo9NwJ48PzppuR9a30RgEVZqbtWmUOmTzIVWnQ2zolED8OeLzB8AAOxlHyAIPTxZkEQZv7EE3VBmL/9/PMvZuv9j5qLLxticl0QFmwffPSZmTk/z5xW8+LQmSpoiuoMHDnTvPjKm6H66NvvvjeLr7vRnF370tB9korPho2ba157451QfaaI6y23P2DqNOnu29hOOreV+fqb76z6s3PnLnNy9dahXBNdD9t2w6Z7Au3bMdWamvJDhppSt69IiwhMZAduXGQO79nXVD65fuj3EIYPYAAGnCQ+QBD6CAiCMPNvtkwShPmblp216eyvMMxkQZhfNK9avzm0h+aC1q3vePPOex+ZKLXdu382C5ffYE44q1no/ilsX2DPAZPMex98YqLU/vvfX93I7qk12/gyziFjZlv3ZfX629N+XbQ64auv7UTsdzt3mVNqtA5sWehh/QeaklvzQhWCBe2A21aYI7pdaZwTw7+nMHwAAzDg5IogPP6s5uaKsUvMtJV3mWEz15tz6nbJekGoMWqsGnOfMYtdH4R9HTLRMlUQxtvmLdvdiIMfvsgGQRhv2l+mZZJhcVWjbmd3SWuUm5atKhlN2Pdg3M6t08FNmBPlJnHTe+BkX/aQPvv8q9ZRy9qNu6X12ixbdbO1z5S8J4g+Hdmmqzlg0/LQxV8yK503zxxdJ717wTF8AAMw4OSqIJQYnJF3zz6TSKrZqEfWCkKNTWPMP2aJwrCvQyZapgtCtY8++dw0urivZ19kkyCMt7vu+6c5/oymaWVK+z13/fCjyZSmzJxhRwslsvxMEhN0U4IUrwle6rfsY/bu/a/V+ZWEKl3XRplcf/llj1U/n3/pDXfvoZ/90XJMZQgtsX196IIvFSt5/1o3ikm0MLz5BcMHMBDLfkGoJUbTrtvyO3GULlEYhiAsTAzKpq7Y4voi7OuRaZYNgjCeZKVD95GefJGNgjD+UOrXUr9kpsyn2iuVie299z82FzQMLrtmItOcpRIbmdieePpFU/Wclp7Gr+XNts3r/Z6qqVSH7TJbP15U5bdKNZqb0usXhi7ybEwlLthbmN75BcMHMBDLHUEo09LJggIpHaIw3YIwkRiUDZuxLvTrkImWLYIwvn/uksuHW/siWwWh2kuv7DB/PzO4KNjfTm9itj30lMnkpkQnjdv6+wCfzBQ5ylQBHW9KFFTFQ/Zf7c374qtvrM79xo73zHFVg01eovnEtimbqp99qVi7jTng1mgvES3KDlo91xxzVpO03WMYPoABGHBySRBqP10ioRSkKEynIEwmBvX36do3mW2WTYIwnoXQto5aNgtCtQcefDKQKLqWpKqeZDa0H//zU2BZbPObroPqS2ZD017A//VQ0kNLjG3byInzA7tGEpsSnbYvF/za2yw7um47t7xD2ILODztw40JzTDVEYdBzDIYPYCCWe4JQVqNh90KXjsqmr7zb1GrSK2MFYc2GPZKPrbH/Y8sVyzZBqKZaYTaF27NdEAaR4EJ+3v7I0yabmvY/1m0R7Jwyb+lGk03tzq0PW79s0O8ef+p561IiXpetJrIxVy+09oefCZ0q1WwRejmJIJLNKENqkPcYhg9gAAacXBSEYYjCdAhCxGCwzGSjIFSbMmtFsX2RC4JQYsfPkhRBLXlUspG33vnAXYa6/sa7zKIVN7ilImTad6bssio98v2uYJLXfPrZl+asf/hflN1rRKyo9vmXX7uZSm/efL9ZsebWfT5TqQYlz3nksWfdTKFRe9lQp2kPN3uoTVu66mbfr5FE5jff7rSOmCqLqh/9OOaMxubA6xcHIspK3rvGlF4z3xwye4opO2GMKTdixD47dNJYc/C86W5dwRLb1gVyfh3f8clPGD6AARhwiumDrBaE6RaFQQtCxGC0BeGka5aZYWOvtbbJM1eYuYvXuw+qWpplm3GwsKaMjdqflA5BqKLwXvxQ0MZPXWyumbva5G243S3d4PcDvIqzh11LrrCmB/A1G+8wHXuMSjnrp/bhNWjVx0ybvdK8vuNdX/ujZbB+71GrflFH88OP//Gtj8p+ed/2J1yRec6FHVL/d6JuZzN07ByXLyU/8Wu5rY5r65vlq2+x9kFND+ctzFauu82qL5rDlD3Vr34cPHeav8s1r19syg8cbI5qcImpnGL208qnNjQVWnQ2ZcePMaXuXOlrf8oPCn55NoYPYAAGnFwUhOkUhUEKQsRg9AXh6ef5W1/qhGrNzbBxc93Ijx9t+rWr0iII1d8gr5GW1LW49Cqz9vo73YduP8Sylz1f7v1Zt7NvwkZF2CUuvZYxkLXsMND88/F/G7/ajHl5vl7Hx558zpd+yfeKmp5W82LP/Tq79qVm7Q13Wkfo8jdl5LS+/89qZj77/Cur8269/1HfrpNqHNr6QtFrv/pxRLcrfBNeZRbPNEc16ei5TxKRR3TtYw64eak/fdu2zhxVP5hIPIYPYAAGnFwXhOkShUEJQsRgbgrC/DZg+AzPkTEJjeLsa4qqICz48H7vtseN19Zn0BTrPsin//r3y577sGfPHjNn4TpfhGBB6953grt80o8+KgLpR5+0r8yv5EDVavv/EK2yG1pS6rW17TLUug9XDJpifd7WnQb74gfbPbHKllrcVQmJrFKNFqbkPXmeBdcBm68zR7br5jsrlU+qb8oPHWZKPuB9OemBNy5mP6HP1wfDBzAQK9IHOSMI0yEKgxCEiMH0MhJVQejyW7ez+fwLbw/1xSkjkAmCMC7ItCfMS9MyXdvzS0x6bXp4btZ+QKB+Uu1FP4TrU8+85Lkvfzm1kfn4ky889UNLO6fOvi7Qeqva+zZrwRpPy0i9+ss2ivryq2953rvXqddo63Fr2a5f1+GQayZ5FloHLZ8TeImHoxp3MKXu8L6M1C1cH2A/MXwAAzDg5LIgDFoU+i0IEYPp5yPKglAWa97T7N79s3UfZ87PyzpBKJMosC2YHU+aYnNeRfMUefXSPvz4s2Ltd/MqxLTHzmvresU4T/0YN2WRp/NLoPUfNj1tfCnC6mUJadN2/a3P/Y9Gl7uR2XRn91TGXCUysmlK5OOXUD861s6U2OZDEfgU9wh6tYq1Wnmuj1jqrtXmmDO9LWPH8AEMwIBTDB/knCAMUhT6KQgRg+GwEXVBKFuy8ibrPj706DNZKQjd+7puZ/Pzz7+k9fqp7pvXyOB59S5Lq5+0X1LJU7y0N9963zr6pMQ0tnvj4m3s5EVp52vgyJnm11/tIoW33G4fgZZpf6RN04qCv5+ZWkKigjZ+2hKrc0o4K0uqX34vs+Aaz/sFtaQznaxUrN3Gc8KZcqNHpZ1xDB/AQCxnfZCTgjAoUeiXIEQMhsdFJghCpYC3FT5ffvVt1gpC2d33PWpsW/NLirdkUxEQCSPbpgyMbTqHk1XwlBqt3aiol9ah+0irc3fpM9bTeVViIyy+ludtsuqzkh/ZCjPZ8Wc0tV5iqxqPxT2fSrHstNyzrOyofkbbvEQHD9i0PLRIW4VWXTz1veTWPFP5tIahsY7hAxiI5ZQPclYQBiEK/RCEiMFwmcgEQSjzkp0x1QfTTBSEXhKVKIFHcc4lMeelqcRImKyr/7YRLy8ZNL0sWVVEVdl3w/KZhJmW+Kba5N+XXtnh1j70Oj/06D/Jymc//bS72EuSlcHXpinym2qJlFRMUTLrKNu2DeaohulZih1I/x/cYA7vnvqebwwfwAAMOB58kNOC0G9R6FUQIgbD5yFTBKFKSNi2Cxt3z1pB2LD1FdZ+UR264pxLkSrbplqNXktd+GFayuglwllcoXHSua087cVTOY6wfdZ74OQiRdGNt95rrhw81U3k4+e5teQ76Kiqlnva1kAt7kuVZKY9f6XuWmUtpg6dPD50VlSz0Mt+wtLrFoY+BgwfwEAsJ3yQ84LQT1HoRRAiBqNhmSII+w6ZZt3PJm37Za0gVBkK26ZEJ6me58+nNDS7fvjR+lwSC2GzLjvzgvae9l2On7o4bWUUJKK1/zBsnynZSv49kP/5abdbmmHC9KWmTpPUXrbYWq36XayulyKVqSa2sa1bqVULfo61QovL7Jdb3rvGHFOtaeisyI7o0ttTlLBirZahjwHDBzAQy3ofIAh9FIW2ghAxGB3LFEF4abcRgddFy0RBqAiUbStORkYv/n//w08jIWy8Xmc1iYfinOvmzfdbn0uCK2xfxW3EhHluohfdS8rcms5zz1uywcp//37+tSIzf9rOf8qCqmyofo6z7Pgx1iKq7IQxoTOSP9LpJUp42JXBlqPB8AEMwIAYQBD6KArLThxXyD9MY5P+BjEYrRsxUwRhq44DAy9YnYmC8PwGXa390q1v6kvMVq3fbH2eyTNXhM55fruoWU/rsUgIpLqnT2JEewCtzrN3r5sIJ2xfRcH+elpjN1pq07SyIFnU+933P7Y6rsSx3+M84JZl9lG12v4u1fVqhw0YZD2WMktnhd5/DB/AQCzrfYAg9FEUVmja0ZTYvv7/T+bb15ujmnRM+H3EYPQsUwSh6qLZtrotemWtIPSS6EUiO9XzvPr629b186rVviR0zgvaa2+8Y+23jj1TS4+v/YbpikRmu9lmalWm0kR7V/WiwvaYSrbj5/gqVW9uv+9u7YLQr89+46nR4vfPBsVZ/nr/2rSXzcDwAQzEcs4HCMJCnFKzUQ8zbeVdhYpC/X31Bt0SOvTIdt1MmSWzXDuybeIlNNXrd096DvUhbDhy0TJFEA4be611P6tflPglRaYLwtkL1lr7JVWhpgdq28QoWrYXNuOF2Yx5edZ+mzk/L6VzqJh9NiwXjYopy6tN07UueKzTal5svt9ltydW2U/9Hpv+HbUVhOUHhVPKpSg7aNVc6zEdXbdd6P3H8AEMxLLaBwhCC1E4fuEmc2yVetZOP7ZKfTN+0SbEYAQtUwThuhu3WEeotOQsWwXhCy+/adVnlRJI9RxKymPb5i8rfk24dFiz9gOsx6QyEqmcY9aCNdbnaNTmytB9FDWrEevklpSwqYl4xvm/FxgbbrK715X1NIixlR82zFo8hV1qIpGVGz7cekyUnwj/+mH4wMlyHyAILUVhlXPt97NUqd4GMRhRyxRB+J7lXp+33vkg5XNkmiDU0kXbtumOB1I+z/Dxc9NezD0dmTOVLdOmqcB9Kue4c+vDVsffvfvnSCXhiZIpOmvTVBYjfox6LXu7L4qK25TtVFlPgxjXwfOn2y2vvHeNm8Ql7OtSmFVo0dlaEB46KXkuAgwfwAAMOB59gCC0EIUTF9/mRvlsnX5s1XruMVgmGr0bOBMEoZcI1R13P5SVglDFsN98631rvwwYPiPlcynKZ9sKRmaiZLpuNk0lDZSQpKjjP/PcK1bH137NsH0TVVOGU5tEMBKADVr1cY/xxNMvWl0XZTsNalwHblhkuX9wfujXJJGpDIatICyzeGbo/cfwAQxkNwMIwhScpD2DWiYaF4PJ9hCmatpDGBeFOrYfx8RyQxA+8tizaakblymCUGLEtnaa2jff7ixWkXjbYu7ffvd9pO/RGzbdY+3DGnU7F3n8jz753OrYiiyG7ZsoW8cedpFxCcGeAyZZ/VZZTlNdem5jpe5ebRdJmzYx9OuRdFx3rLQa14EbU6+RiuEDGIABx8IHCMIUHaU9g1om6iUyuP8x6/92zGgucclFi7ogHDRqlnX/FMlR4fZsEoQqBP7SKzuMl7ZwefFS5j/+9AtW59H+xrD5TmbXzF0dWCmTY6vUdUtU2LTlq28J3TdRt7vve9TKt7t+sEskoyynQY2l8mkNrSNp5QenVmM10xLLaCls2H3H8AEMxLLaBwjCCFwELDo+iLIgvOTy4dYP1TYZLqMsCLVsVvugtI/JS1OCjbP+UbwyEDve/sDqXA88+GTofCezwaNnW/vxikFTkh67ytktrI89ZVa06jZG0fSix3YPaHGbspsGOZaKtVrZJ1/pEe3kQwdfO9V6bBLKYfcfwwcwEMtaHyAII3ARsOj4IIqC8I9V67nJI2xLHcTb0LFz0iIIlfBGS9H8sv7DppsxVy80cxauczNafv7l18avVpwltHFTRlKbdv0tW0PnO5l17jXG2o8Sk8mOrb2TQR0b+z8fTJu90gTdlNVU2U2D9PnRdS62Fk1Htk9c6ikKpuQwtmPTHsSw+4/hAxiIZa0PEIQRuAhYdHwQJUH4t9ObuBktbSNS+Zv2b/3p5AZpEYSZ0pTkREsZi3tdvvzqW6vzrVq/OXS+k1mbzkOsfSnBnuzYEhG2re+QaaH7JhNM97eyCAfZUq056cWOqn+JtWiq0PKy0K9DMis3eqT12CrVbBF6/zF8AAOxrPUBgjACFwHLDkHY66qrTbuuw6xMe3KU6VIRK+2Zevb5V80vv9gvDy3YRk4sfva9bBaEijKmkgilMLPdd7Vk5U2h8x1U9trJM5Mv66zduJv1sYMofJ6tprkkqKZspspqGvQYjmrS0Vo06bdhX4Og6itWrN0m9P5j+AAGYlnrg4wQhBVrtTTlRo8yh8yaklbT8o4KTdP3D0yFZp3cc6Z7nPKtfBz2dc50QRjV9twLr1nVcctWQfjdzl3momY9rRmxKQZuk7wm3daw9RXWPp0+Z2XSY8vftq1b3/Gh+yaTTKVlgmjKZpqO/ldo3sleEDaOZlH6uCnpje3Yjq6Tvjq3GD6AgVjO+SDygrDSeS1Mya151pOoZ9u+3hzZLviSENr7oHOFNU75mCUp2ScIJV4uaNjVislsFIQqMdG0XX9P96oEpU1bnrcp9Pk0mTW/ZEBgS0ZVwNy29R44OXTfZJKdeUF76yh2oqYspunq/1GNLrX+d0xiMmz/J7Nyw4dbj03PQmH3H8MHMBDLWh9EXhCWH2L/Rs0vK7NkVuDjLLN0VujjLD94SOjXO2zLJkGoMhMDR9oXNM42Qag9g9VqFy+jaGH22edfWZ1/zcY7Quc7mV18mf0ewqtGzEh6bPndtimpUNi+yTSbdM0y41dT9tLilKvxakfH2ln/G3Zk6y6h+z6ZaTWO7diOOatJ6P3H8AEMxLLWB9EXhIMjIAgX2z9UZ5QgHIQgzCZB6DVdf7YIQj3Qzlu60Rx3UvGS6iQyZVG1abdt2R76fBoU+z36JS8IfkqN1mnd/5rrJtZf3/Gu8aMpe2k6+669crb/hv2ho/1S8HTYoZPHW4+t8kn+1UDG8AEMwICTaYIwEktG2wafypolo9GwbBCEigzOXrDWsy8yXRDu3v2zWbHmVt+zv7786ltW/XnsyedC5zuZDRs319rXqpGZ7Nj/e1pj62Or3EjYvslEa91xkDsXeGnKWlrc7MRerVL15tb/Xh925VWh+z2ZHTx/utW4Sj7APRD2tcPwgZPlPoi8IIwXqi03amTak62UnTgurVnLlMBG50x7UplRI10fh32do2CZLghVaF21+/zwRSYKQolA1SrUUtmTzg2GaRXmtn24DpvvZDZrwRprvzdqU3RB8G+/+97q2GtvuDN032Sq3XL7A8ZLU9bStPe7Sl1TYts6K+GkJZlh+zyZlc6bZzWuUndcF3rfMXwAA7Gs9kFGCEIMH6SLgUwWhNojV6dJd998kYmCcNGK4DN5ai+gTduzZ0/aoy3FsU132IuHE6o1L/L4r77+ttWxH37smdB9k6mm6LheEtm0Lfc+Elq/D9i03Eo4KQIXts+TWam7VluN66Dlc0LvO4YPYCCW1T5AEEbgImDR8UEmCkIVSldE7H9OLH6R9WwThBJdsebB7iPSnirb5qdg99tefOVNqzF9+tmXKR1/20NPWR3/40++CN03mWzvffBJZIvQJ7KDVs6xEk4H3LIsdH8nskrnNrNeCqtyVGH3H8MHMBDLah8gCCNwEbDo+CCTBKEe4AeNmuXuzwrCF7aC8Oeff3EfQr2YCsfbthdeftP8sWq9wBhRoXTb5iXra5CmyKVtfcVHHns2pXOsXn+71fG1D67K2aTczyVBeOi0idZ7/o+pFs1snMqAaisID+/jrVQOhlceixwAAB5jSURBVA9gAAacInyAIAQSJooMEYR79u41Tz3zkpl+7SpTv2WfwK+brSB87sXXPZ/7+DOaupEh26a0+0H5pUask3W/tKcrinNOi0uvsh7TdWtvTekcg0fPtj7HZb3HhO6jTLVMFISH9+5vLZ7+0KFH6D4vzMqNGGE9pgotLgu9/xg+gIFYVvsAQZiio46tUt9Uqd7G/a//xwwumoGlTxBqj5SiU15Mgu/Bf/7L3Ln1YVeQzV283vQdMs00bH2FK5LSeT3DFISy7n0neCo1UaNu50D8oqW5tsXpP//ia3NsFX+X9vph18xdHXjUUy8xbNuSlTeF7qNMtUwUhF6K0x86ZULoPi/MDlo110PUM71zP4YPYCCWcz5AEKbgpOoNupnxizaZGXn3mImLbzPV63vfB6Rj6Fg6po6tc4QNA+ZNEPpd3iBsC1sQyrY9bLfvTO3RJ57zfV9l3LRM0ra16Ry9ep8vvbLDejnnGee3S3lZ6i+/7LE6zzvvfRS6jwpanaY90lqwPZcEYeVTGlhnGlXilsoBLhm3LqWxzU7gll5LHc6wrx+GD5wc8AGCsAgH1WzUw0xbeZcr3OImIeclUnhs1Xr7xGDcdA6dK2wgct0QhNEShFqeabu3TU3LFIPgZPLMFdZ9uv6WraFznt/Ob9DVeiwSksU5l2ox2rZ6LXuH7qv8Js7/+99f3ZcDiuIHtZc3FwWhTJk1baOEqusbtt/zm+oj2o6l/JChofcfwwcwEMt6HyAIiykG41bl3NbWTtcy0cKOiSgM/4ZAEEZLEMr0YGrbvv/+B3PmBe1956R2427WfVLSndNrRSeavHLdbdZj0ZLm4pzr6hnLrc+19vro1CNs3Wnwfv37fteP5ubN97u1+4KKTOeSIDys30BrEXXQigiVaTgxZg68aan1WI5qcEn4Y8DwAQyYbPcBgtBCDI5fuMnTvj9FF+NLUBGF0TIEYfQE4Z9PaWjefvdDY9u23PNwpB601RYuD75eYipW9ZyW5ocf/2M9jmbtB6RNSGtf6MnV7V/E+WnbH3k6aV/feucDM3X2dYG8jMgVQVixdhtrEeUKqSYdQve9TNFK2zGUunOlcSK45xjDBzAQyzofIAiLKQb198n2+x3Zrpsps3SWa8mWregYyc7B8tFwbggEYfQEoUxRFy+tW9/xvvdp/rKN1v3ZvfvnwJLeFMeW522yHsP7H35qlSBnx9sfWJ9zxZrUMpoGacp4mmrbu/e/7j7YXlddbf5yaqNQ+pupglBWev1CazFVes18NzoXZv+1l/HAjYusx1B2PPUHw2YQwwdOjvgAQVjAITUb9jDTrttSqFCbvvJuU6txr4TOrNCsk5sRbN+Evn29qdC0Y8Lv12jYPfm5miQ+FxaMDxCE0RSEss1bthvb9tnnX5kTfa5ld26dDu4eMtumKFOYSwvrNOlu9uyxS/KiNm32SqvzTpy+1Pqc6q+ijGH57G+nNzEffvyZVd+//Opb9/fp7nMmC8LDe/bzFCVU+Yow+3/YlQM89f/oOtFZWo7hAxiIZbUPEIQ+iUFZ2Ynj9n/DN3Fc0t8gCqNlCMLoCkJls9Q+Ldu2/sa7fO/Ttofss6CqSRyFwbkSoLz2xjuelm+eWrON1bm17FP7KG3by6++FVq0bd2NW6z7feud20LpcyYLwsqnNTQl78mzFlQl71trjr7o4lD6fnSsrXt+276XWRZMQiwMH8AADDiF+ABB6JMYlB0yc/J+k7r+rqjfIQqjc3MiCKMrCGVjJy8ytk0lEvwu+eB1KasiXh26j0wr44pK3nL7A576nWox+kR28233eTq/2Ex3dHXcFG/sqQ5jOvubDYJQVnbsaE9RtgNuXmoqnZPeOn7HVGtiDrxxiad+V2gR/pJyDB/AQCxnfIAg9EkMehGEMkRhNAxBGG1B+Meq9axr5sXr2fldHsBLTUK1H//zk2nZYWBa+JaI8pJVNN5fr8lStH/Sy3JVtcXX3Zi2eaFHv4nufkDbtvX+R9PW12wThBJXJbfaRwllpdcvMMeclZ7lusec0cjdv+ilv5HKkorhAxgwueCDnBeEfolBr4JQhigM/4ZAEEZbEMqatO3nae+e3xk+G7Tq40aAvDQlmVHikSD9pmWWt3nYh+m3UMjbcLvnvtyw6R634H2Qfhs/dbEnMajfXti4e6B9zGZBKCs/aIgngRWPFFb8R7BZaiud19JTEhnXtm0wR9cPPzsthg9gIJZTPshpQeinGPRDEMoQheEygSCMviD0updrz969vi/f23CTna/yN4nKNRvvMMef4f/yNo33ldfe9txHPyOsp5/X1ny3c5fnPom3i5r1DKQkhwSn16aIbLrmr2wVhJVPaWAOvMnbEkyZIo1HXH5FIH084rLeptRdqz338dBJZBYNmzcMHzg56IOcFYR+i0G/BKEMURgeFwjCzBCEelj/6uvvjG3TstPjqtb3rT9/P7OZW4bBj/bxJ1+YoWPnmONO8h75OufCDq54lgj22hSV9Xtpa7+h03zxmZafKuJ4du1LPfdJEcdh4+aab77d6blfn372pTnhrGahzWfZIghlRzW61JTYli+Lt5clmcvn+Fan8KgmHd3j+dGvA25d7ibSCdvXGD6AgVjO+SAnBWEQYtBPQShDFIbDBoIwMwSh7KoRM4yXpsLhfvanVceBnpayFlYqQ8tbtSRVeyeLk8Wzz6Ap5v4Hn/C8Ty9/m7t4fSDX8a77/ulbHzXe+7Y/Ya4YNMWcUiP15YHyb72Wvc3y1beYr7+xf9GQv4mFS7uNCGUey0ZBKCs3fLgvwitupfPmmcN79TOVahavJE3F81ubw668yvNewd9FLx9YZ45q7I9IxfABDMCAU0wf5JwgDEoM+i0IZYjC9POBIMwcQagEKU/+60Vj2376abc5r95lvvZp/LQlJoi2c+cu8/Bjz7hLSlX/TxEsCeJhY691z7lg2fXmzq0Pmzd2vOd5P2Nh7cF//qtYorQ4dtK5rdylqEG0HW9/YLbc+4ibgEYlPuSvgSNnmtGTFpgZ8/LM8rxN5vGnnje7frAvZ5KoLVrh715VW8smQehUqWfKLJ7pqyjcF527ZZk5+NqpptyokW79wCO6XWmO6NLb/e9h/QeasuNGm4PnTzcHbL4ukPMf3ifcmokYPoCBWE77IKcEYZBiMAhBKEMUppcRBGHmCEKZknV4iYI9/vQLvpcvWLV+s8mmpnqFJ55dvAhKsee5WCdPS4Cj1rY/8rSvS5K9WFYJwt9qE5ZetzAQURaWlZ3AvsGwucLwgZPjPsgZQRi0GAxKEMoQhenjBEGYWYJQpuiPl6aokZ/9USRNUalsaIqwnV6rbVquY4tLr3JLWmR6e/GVN909pem8B3JJEMoq1WjuZg0NW8j5YYdMm2ScE8P3KYYPYCCW0z7ICUGYDjEYpCCUIQrTwwqCMPMEobJyKhGLbfv++x/MGee3810UXn/LVpPpwqY4+/D8Kiny7Xffm0xtz7/0hpvwKJ0+y0VBKFOx+QM3LMrwyOAYxGAEWMLwgYMPsl8QpksMBi0IZYjC4HlBEGaeIJR17zvBeGlBFA7XUlTtIwtiT1/Q7e77Hg2k/EWqy4A/+dRe4IfVHn3iucCX1tpYtgpC2TFnNHaLuIct7Ipt29a7+xTD9h+GD2AABpxcEITpFIPpEIQyRGGwzCAIM1MQyrY99JTx0nr0nxQYU5kS9frllz1myqwVvu+rLK4pU6qyhWZKU63BqOwZzCVB6FqVev+XfXRbBIReiqUlKjTrFL7fMHwAAzBwQg4IwnSLwXQJQhmiMDhuEISZKwiVmESZQ23b519+baoEFOFRfTxFkKLcXnj5TVO3hf/zoq1JlI6dvCjS+wrFTOdeY0L3VU4Lwt+sQovOrtgKW/AltO3rzaHTJppjzmgUuq8wfAADMODkgiA8p24XM23lXYWKQf19zUY9AjlvugShTGNINkb5IOzrkImGIMxcQSi7Zu5q46Vp31+Q/evRb6JvBez9al989Y0ZPn6uObZKuFHBRKb9nTfeeq+vNR69NmW2VVQwavsFc1kQyiqf0sCUHzTElLxvbfgCsEC9Q2oMhs8Hhg9gIJZbgnDYzPVpF4PpFoRFicLhM4MpIp3thiDMbEH451Mamrfe+cDYNu33a9tlaKB9/Mupjdw6eEHV3ku1KRHPhOlLzV9Paxz6fZeKKXp5653b3GWtYTWdW+K0Vv3MeeGWS4IwbpWqNzflRo80pe5eHaoQPGjlHHNkm67GCXkJNoYPYAAGnFwThFpmVNhS0aDFYBiCMJkonLpiS+j7gDLREISZLQhl7boOM16aHqDTIZIUkbus9xh3r9zu3T+bdAma+x98wnTrOz6wQvNBm8pgzF6w1rz97ocmXe2Djz5zz1mt9iWhj7+4louCMH/NwsN793cjdFqymQ4RWGrLKlN24jhzdF1/Mxdj+AAGYMAJ0AdZJwhlfcYsTrsYDEsQJhKFfcYsCv06ZKIhCDNfEMo2b9luvLSlq25Oa3+V0bPngEnm5s33m3ff/9j42ZSxU8ftN3RaYHskw7ILGnZ1k+A88tizZufOXb75bM/evW7ZjXlLN5qm7fpHdjltKpbLgrBg7UKJw4MXXGNK3bnSPxG4bb0pvX6hG5HUPsbKGfqiBcMHMBDLaR9kpSA8/qzmriBSpHDYjHVp208XliCUaYxaJqoxa+zyQdjXAcMHMGDHwEnntjIde45yl3Ret/ZWc++2x81Lr+xwH+4//+Jr893OXa5o0X8//Pgz89qb75pnnnvFbH/kabN6/e3unsCWHQZmxB43v0wrIrSUs8+gKWbGvDyz/sa7XH+8vuNd129ffvWt6y8tC1btSf35o08+N8+98JobNZWfR0yYZ1p1HGj+dnqT0MeDBeuDirVamT907OnuOTz06vGmzOKZ5sCNi9yC9xKMWm5a8oF1bsRPf1d6zXxz0PI55uC509yspn/o1MuNAlY+OZrZZTF8AAMw4OS6IAzLwhSEGD6AARiAARiAARiAARiAARhwiukDBCGCkImDiQMGYAAGYAAGYAAGYAAGTshNHyAIEYShQ4jhAxiAARiAARiAARiAARiIIQgzHQKWjIZ/DTB8AAMwAAMwAAMwAAMwAAOxlH1AhBBByA3DpAkDMAADMAADMAADMAADJ+SmDxCECMLQIcTwAQzAAAzAAAzAAAzAAAzEEISZDgFLRsO/Bhg+gAEYgAEYgAEYgAEYgIFYyj4gQogg5IZh0oQBGIABGIABGIABGICBE3LTBwhCBGHoEGL4AAZgAAZgAAZgAAZgAAZiCMJMh4Alo+FfAwwfwAAMwAAMwAAMwAAMwEAsZR8QIfTxhik3epQp8eCG31m5kSMAkkkJBmAABmAABmAABmAABmDARNEHCEIfnVmxVktTcmvePjGoP1es1Sr0i4zhAxiAARiAARiAARiAARiAAQdBGDwElWq2MOUHD3FNf+bG48aDARiAARiAARiAARiAARhwIuoDIoQRuAgYPoABGIABGIABGIABGIABGHAQhEDARAADMAADMAADMAADMAADMAADDhFCIGAigAEYgAEYgAEYgAEYgAEYgAGHJaNAwEQAAzAAAzAAAzAAAzAAAzAAAw57CIGAiQAGYAAGYAAGYAAGYAAGYAAGHJLKAAETAQzAAAzAAAzAAAzAAAzAAAw4ZBkFAiYCGIABGIABGIABGIABGIABGHAoOwEETAQwAAMwAAMwAAMwAAMwAAMw4FCHEAiYCGAABmAABmAABmAABmAABmDAoTA9EDARwAAMwAAMwAAMwAAMwAAMwIDzmw9KAAMw5CoDrTsNNsPGzS3SCvvtaTUvdj+rVb9LoZ+fc2EH9/Oz/nFJwvMPHDkz6XmvGjHD0/j6DplmOvYYlfDzwaNnm9YdByX8/NJuI0y/odMS+6/jIPcYiT6vflFHdxzJjnH8GU33jfe4kxqkPC59/6RzW6X0/Z4DJrnfP/28toV+flnvMaZ91+FWPj6hWvOUGKrbolfCYxxbpa6p37KPe70nXbPMXD1juRk29lrTquNA89fTGhfZh/7DrzHtug5L+Hmvq642nXuNKfI4Vc9p6X5vzNULzbTZK93/6rdn17406e+q1b7EHeO5dToU+vl59S5zP9c944XnVO2UGq3d8/UZNCXl3wwZk/xeSNXiPhwxYZ6ZMmuFGT9tiek/bLq5sHH3pL/TPFKQGd1b3fqON43aXGmOq1o/4W//WLVekfz1Hjg56X1e1O8T3Ws163ber89XDJpi2nYZmvB+w/ABDMAADMQi5wMEYQQuAhaOD/Sg1aP/pH2mB/ElK2/63d/JCvutHn6XrrrZNGx9RaGf6wFQnycSjLJ5SzaYqbOv2+98cevSZ6yn8V0zd3VSwbZg2fXuA3+izyVQZszLSyq0Fi6/IeHnFzXr6fpg8XU3JhQLLTsMdD/X9/58SsMixySRqWs0Z+E606nX6JT8IJGl44+etMD8z4l19/tcD+8SVTY+/vuZzX53zSRWda6xkxf97u8vaNi10N//72mNzahJ890xSZToQVrCRL6dt3SjmTk/z325kKwPsxesdUVHos/F9fDxhb/YyH+tdC1nLVhjul4xzu1Dx56jXD7Vt2SCU2PTmOs0KVz0NGjVx/28qHH4Zeq/fKJzFiVm47ZoxQ1J74VUTOPTPSXe9LKpXsvepln7Aa64V18uvmxIwt9qHtF39JIozoz6Izbl/3FTFpk/nVz4CxOJRf1W5000l0j0JbvP1e9Ev5WdeHaLQn+rMercg0bN2vddvQDSvKF+Sxwm6jeGD2AABmAgFhkfIAgjcBGwaPigR7+JrjhJ5bt+CUIJiKDGExVBGI80FfadCdOXukItVUEof0lsSQzqoV/RkaJ+owdlCSI9oDZt199XQVjQqpzdwh2LBEEq35ePJUYKE4x6CFeUSaLwb6c3CUwQnl6rrXsdR06cv981UPRSD/Uak6JBUReEijLPXbzetOk8xI1ypiry/BCEYkjXoqAA0kuI+L2UKAoeF4SFvThR9FifNb9kQFJBKCFs02/1TS8CbH4bF4Q1Yp32G7PuNc2nXlc6YPgABmAABmKB+wBByI3GjfYbAwjCYAShokuKdhV8UD7zgvbu51qumYog1PJSnU9RRYkY/SbWvGdKgvDyK8e7y+8kFk44q1kkBGF8/MmW9UpE6TuKHAYlCCWyJYi0/LWwz3VdGl3cN+Hy1SgJQkX9Jfwlpi+5fLiZv2yj+cupjdIiCBUJlK8L+6yoFxfJBKFEebKXN1EUhHGL39s1ErxMwPABDMAADMQi4QMEYQQuAhYNHyAIgxGE2kukB249rOf/XCJN0b74w3BRglBRH50vHi3Tb4taCilzl9L1m+gKA42noHgKSxBqCaG+W9TeOkUJFWUNShBq+a18YDvmKAlCMSFhFr8WEodatpkOQSg+NU4tm9Q+xuL8NpkgVFRRkbZES8ijLAj1EkfXQPt0g772GD6AARiAgZi1DxCE3EDcQB4EocRGYUkYtBQylSWjWtaph/nCLNG+s1RNx9bDfqJEERprOpaMap+dBJf2yuWPmFy7aJ27rExCsShBqCVoWgKYX/g0advPfdg8uXrrlASh/lynaQ/3XLUbdwtdEKpP6r8iQMm+p31lWjYahCBU1Fb91bX0KgjFfGGcxfdwBi0I4xHX/FFjiUP1Kx2CUNdRLznie2KnX7vKTeYi0VRUlDKRIJTYU2Rbn/2j0eVJBaH2eyaaSxLt4Y3f57qPE/02GctFCUKZxCbLRoPjHsMHMAADjg8+QBACEpOJB0GoB+3CkjAMHTvHc1KZRHu2iiMIZYmOn05BKNEg8ROPnOgzLYNTUpVUBGFcdOT3px6ytSSwqAya+QVhXGDJL/HzhS0Ii8quOmD4DFf0BSEI5QP110sEJ35tJL4K40znTocgFI96AZI/I6fEYSrn9kMQxk28i2ktxdX9o/PrXi8YIS9MELqZSacudk3caqm17tNkSWFSSSqjTLC2SWWSRVhTEYQunz7dXxg+gAEYgIFYID5AEHJzcXP9xgBLRvd/UEwWmVJafz1IpiIIFT3Rw7EyV+ozJbuJJ9RJRRCqLxJPerDMH73Qw6YsWVr+goJQ+8v0oB1fYheWINQet1SWjCrDpMoXJIvAJOu/XjokKp8iky+8RHCisGQ0/nIgviQ4bhL/Oneysgt+C8KCpkynEngSdolKMcQFYfe+E9ylpzJlepVPE+3tzIQlo9p3qvvWa8ZkDB/AAAzAQCxQHyAIucm4yX5jAEG4f8RFD7GJxJaWgGoZZyqCUP/foftI94Fd/6/jqj5dKoJQD8T6voRbwehFvMyDHkxTFYT5y124NfTGXhuKIFQJjWTZI/OPPVmJDY1Pe+cK+0xCXFFcZQpN9HuVDJAoTLasUZkuFc2NqiCUD+PCryAj2n8Zj0YHvWQ0UfKYM85v5/YvUbQt2R7CoizKgjB+XeL3OoYPYAAGYCAWSR8gCCNwEbBo+ABBWHi6+8KWuinLp4SK9jelKghV3FrRAkVBtL8qXhOwKEGo5XI6V2GREh1Dy+ySJUUpTBDq4T0eeZMgCkMQqu86vyKchdV5Ux+1XFRiJtk+SflTgqaw6FPjtn2LFMxxQSfRWFidxvj10bGiKgh1jVW+pLDP4hlpkwlvr4JQbOs6KeqbzEfyRa4IQolgZfWVIC+MKwwfwAAMwEAsMj5AEEbgImC5Kwi1v0pvzxNZolT/6ahDqGiHHua0FE9lDxRNU+IORTn0AKnlpAVLOCQThDIJNz18598TlUwQShTpPBJtic4j8ZV/f2IqglCmseh6uwk1QqpDKBEnQSh/Kmqph+hTa7ZxxZXqAqp/iRiLm8SkjqHoq3wpASQ+FZHV2OTzohLXaA9hfE+s2FW/VCpAETb5VsXGEz3U+yEIFem1rckZj7Qm26OnCKo4CDJCKPEej+bqXtG9oWupfolhvQRJFIX1QxBK2CWbSxK9cNHvlOAp2W8TvZCIC8JWHQfu+27dFr3clxSaX/Sypuo5LX25tzB8AAMwAAOxwHyAIOQG4wYLURDqO8ks2e+DFoQyPcDq4S5/XyUyJBCK2ttUmCCUOJDAUEQlFUEYP4b8meg8Or4e6BMlRkkkCPMLobAEoUx+1HXQss24j+UjJSaS2EnlGPKnRLP8ED+GHvKVcKeopDX5I8KKWObnT/sPW1x6VdIIjx+CUJlAtc/OxucSkuKzYJ3LwiKliQSXH4JQL1D0oiOeSCZueqGi6Guy+8UPQViU6QVIIkFY1G/je38TCcL8pmshjvQSKZUakBg+gAEYgIFY6D5AEEbgImD4IOoM6GFXkSi97U+WwAWz94FEl6JKXnws8SdxKPFRVFQwkUlYKSKUbM+d36aIZLIocKaZhJB8GK+ZieEDGIABGIABJ8I+QBBG4CJg+AAGYCCXGVBkTcsOw+4Hhg9gAAZgAAacHPQBgjACFwHDBzAAA7nMgEpvpLq0FcMHMAADMAADMBDz1QcIQm4qbioYgAEYgAEYgAEYgAEYgIETctMHCMIIXAQMH8AADMAADMAADMAADMAADDgIQiBgIoABGIABGIABGIABGIABGIABhwghEDARwAAMwAAMwAAMwAAMwAAMwIDDklEgYCKAARiAARiAARiAARiAARiAAYc9hEDARAADMAADMAADMAADMAADMAADDkllgICJAAZgAAZgAAZgAAZgAAZgAAYcsowCARMBDMAADMAADMAADMAADMAADDiUnQACJgIYgAEYgAEYgAEYgAEYgAEYcKhDCARMBDAAAzAAAzAAAzAAAzAAAzDgUJgeCJgIYAAGYAAGYAAGYAAGYAAGYMD5zQclgAEYYAAGYAAGYAAGYAAGYAAGYCCWkz5AEEbgImD4AAZgAAZgAAZgAAZgAAZgwEEQAgETAQzAAAzAAAzAAAzAAAzAAAw4RAiBgIkABmAABmAABmAABmAABmAABhyWjAIBEwEMwAAMwAAMwAAMwAAMwAAMOOwhBAImAhiAARiAARiAARiAARiAARhwSCoDBEwEMAADMAADMAADMAADMAADMOCQZRQImAhgAAZgAAZgAAZgAAZgAAZgwKHsBBAwEcAADMAADMAADMAADMAADMCAQx1CIGAigAEYgAEYgAEYgAEYgAEYgAGHwvRAwEQAAzAAAzAAAzAAAzAAAzAAA85vPigBDMAAAzAAAzAAAzAAAzAAAzAAA7Gc9AGCMAIXAcMHMAADMAADMAADMAADMAADDoIQCJgIYAAGYAAGYAAGYAAGYAAGYMAhQggETAQwAAMwAAMwAAMwAAMwAAMw4LBkFAiYCGAABmAABmAABmAABmAABmDAYQ8hEDARwAAMwAAMwAAMwAAMwAAMwIBDUhkgYCKAARiAARiAARiAARiAARiAAcfSB/8P43B7m90rNZsAAAAASUVORK5CYII=";
+  let page=1;
+  const totalPages=7;
 
-  // Header
-  doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(0,0,210,34,'F');
-  try{doc.addImage(LOGO_DATA,'PNG',12,8,70,16);}catch(e){}
-  doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);doc.setFont('helvetica','bold');doc.setFontSize(14);
-  doc.text('CONDITIONS PARTICULIÈRES',195,12,{align:'right'});
-  doc.setFont('helvetica','normal');doc.setFontSize(10);
-  doc.text(raison||nom,195,19,{align:'right'});
-  doc.setFontSize(8);doc.setTextColor(150,220,200);
-  doc.text('Contrat Procyo AI · '+new Date().toLocaleDateString('fr-BE'),195,26,{align:'right'});
-
-  var y=42,X=14,W=182;
-  var VATRATE=0.21;
-
-  function sh(t){
-    doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(X,y,W,7.5,'F');
-    doc.setTextColor(TEAL2[0],TEAL2[1],TEAL2[2]);doc.setFont('helvetica','bold');doc.setFontSize(9);
-    doc.text(t,X+3,y+5.2);y+=10.5;
+  // ─── HELPERS ───────────────────────────────────────────────
+  function addPageHeader(){
+    doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(0,0,210,12,'F');
+    doc.setFont('helvetica','italic');doc.setFontSize(7.5);doc.setTextColor(180,200,200);
+    doc.text('PROCYO IA · Conditions Particulières Version avril 2026',14,7.5);
+    doc.text('Conditions Particulières - Procyo Broker · PROCYO BV · Confidentiel',105,7.5,{align:'center'});
+    doc.text('Page '+page+' / '+totalPages,196,7.5,{align:'right'});
+    doc.setTextColor(DARK[0],DARK[1],DARK[2]);
   }
-  function lr(l,v,bold){
-    doc.setFontSize(8.5);
-    doc.setFont('helvetica',bold?'bold':'normal');
-    doc.setTextColor(DARK[0],DARK[1],DARK[2]);doc.text(l,X+2,y);
-    doc.setFont('helvetica','normal');doc.setTextColor(MID[0],MID[1],MID[2]);
-    doc.text(v||'—',X+W-2,y,{align:'right',maxWidth:100});
-    doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.line(X,y+1.5,X+W,y+1.5);y+=6.5;
+
+  function addPage(){
+    doc.addPage();page++;addPageHeader();return 20;
   }
-  function lrFull(l,v){
-    doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(DARK[0],DARK[1],DARK[2]);
-    doc.text(l,X+2,y);y+=5;
-    doc.setFont('helvetica','normal');doc.setTextColor(MID[0],MID[1],MID[2]);
-    if(v){doc.text(v,X+4,y,{maxWidth:W-8});}
-    const lines=doc.splitTextToSize(v||'—',W-8);
-    y+=lines.length*5+2;
-    doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.line(X,y-1,X+W,y-1);y+=3;
+
+  function sectionTitle(y,num,txt){
+    doc.setFont('helvetica','bold');doc.setFontSize(10.5);
+    doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+    doc.text(num+'.  '+txt,14,y);
+    doc.setDrawColor(TEAL[0],TEAL[1],TEAL[2]);doc.setLineWidth(0.5);
+    doc.line(14,y+1.5,196,y+1.5);
+    doc.setLineWidth(0.2);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    return y+8;
   }
-  function contactBlock(title,ref){
+
+  function subTitle(y,txt){
+    doc.setFont('helvetica','bold');doc.setFontSize(9.5);
+    doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+    doc.text(txt,14,y);
+    doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    return y+6;
+  }
+
+  function body(y,txt,indent){
+    const x=indent?20:14;
+    doc.setFont('helvetica','normal');doc.setFontSize(9);
+    doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    const lines=doc.splitTextToSize(txt,196-x);
+    doc.text(lines,x,y);
+    return y+lines.length*4.5+1;
+  }
+
+  function bullet(y,txt){
+    doc.setFont('helvetica','normal');doc.setFontSize(9);
+    doc.text('–',18,y);
+    const lines=doc.splitTextToSize(txt,172);
+    doc.text(lines,22,y);
+    return y+lines.length*4.5+0.5;
+  }
+
+  function checkbox(y,checked,txt){
+    const bx=16,by=y-3,bs=3.5;
+    doc.setDrawColor(100,110,108);doc.setLineWidth(0.3);
+    doc.rect(bx,by,bs,bs);
+    if(checked){
+      doc.setFont('zapfdingbats','normal');doc.setFontSize(8);
+      doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+      doc.text('4',bx+0.4,y-0.1);
+    }
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    const lines=doc.splitTextToSize(txt,170);
+    doc.text(lines,22,y);
+    return y+lines.length*4.5+1;
+  }
+
+  function tableRow(y,cols,widths,isHeader,isTotal,fillColor){
+    let x=14;const h=6.5;
+    const fill=isHeader?BLUE_HDR:isTotal?BLUE_ROW:fillColor||WHITE;
+    cols.forEach(function(c,i){
+      doc.setFillColor(fill[0],fill[1],fill[2]);
+      doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.setLineWidth(0.2);
+      doc.rect(x,y-4.5,widths[i],h,'FD');
+      doc.setFont('helvetica',isHeader||isTotal?'bold':'normal');
+      doc.setFontSize(8.5);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+      const align=i>0?'right':'left';
+      const tx=align==='right'?x+widths[i]-2:x+2;
+      doc.text(String(c||''),tx,y-0.8,{align});
+      x+=widths[i];
+    });
+    return y+h;
+  }
+
+  function hline(y){
+    doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.setLineWidth(0.15);
+    doc.line(14,y,196,y);return y+3;
+  }
+
+  function moneyStr(v){return v?v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' €':'_____ €';}
+
+  // ═══════════════════════════════════════════════════════════
+  // PAGE 1 — COUVERTURE
+  // ═══════════════════════════════════════════════════════════
+  addPageHeader();
+  let y=22;
+
+  // Logo zone
+  doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(14,y,182,22,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
+  doc.text('PROCYO IA',105,y+9,{align:'center'});
+  doc.setFont('helvetica','italic');doc.setFontSize(8.5);doc.setTextColor(TEAL[0],TEAL[1],TEAL[2]);
+  doc.text('THE HUMAN TOUCH, AI SPEED',105,y+15,{align:'center'});
+  y+=28;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+  doc.text('CONDITIONS PARTICULIÈRES',14,y);y+=7;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(MID[0],MID[1],MID[2]);
+  doc.text('Souscription au logiciel Procyo Broker - Software as a Service',14,y);y+=5;
+  doc.setDrawColor(TEAL[0],TEAL[1],TEAL[2]);doc.setLineWidth(1);doc.line(14,y,196,y);
+  doc.setLineWidth(0.2);y+=8;
+
+  // Tableau infos générales
+  const infoRows=[
+    ['Référence','CP-'+bce.replace(/[^0-9]/g,'').slice(-6)+'-2026'],
+    ['Version','Avril 2026'],
+    ['Émetteur','PROCYO BV - BCE 1023.609.920'],
+    ['Prestataire','PROCYO BV · Groeningenveldstraat 1, 1755 Pajottegem'],
+    ['Courtier (Client)',raison+' · BCE '+bce+' · FSMA '+fsma],
+    ['Représenté par',signataire+', en qualité de représentant légal'],
+    ['Convention de référence','LSC-SAAS-'+bce.replace(/[^0-9]/g,'').slice(-6)+'-2026 · Version avril 2026'],
+  ];
+  infoRows.forEach(function(r){
+    doc.setFillColor(LIGHT[0],LIGHT[1],LIGHT[2]);
+    doc.rect(14,y-4,52,6,'F');
     doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
-    doc.text(title,X+2,y);y+=5;
-    doc.setFillColor(LIGHT[0],LIGHT[1],LIGHT[2]);doc.rect(X,y-1,W,22,'F');
-    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(MID[0],MID[1],MID[2]);
-    doc.text('Nom : '+ref.nom,X+4,y+4);
-    doc.text('Fonction : '+ref.fonction,X+4,y+10);
-    doc.text('Email : '+ref.email,X+4,y+16);
-    doc.text('Tél : '+ref.tel,X+110,y+4);
-    y+=26;
-    doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.line(X,y-1,X+W,y-1);y+=3;
-  }
+    doc.text(r[0],16,y-0.5);
+    doc.setFont('helvetica','normal');doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    doc.text(r[1],68,y-0.5,{maxWidth:128});
+    doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.setLineWidth(0.15);doc.line(14,y+1.5,196,y+1.5);
+    y+=6.5;
+  });
 
-  // Section identification
-  sh('IDENTIFICATION DE LA PARTIE CLIENTE');
-  lr('Raison sociale',raison);
-  lr('Forme juridique',forme);
-  lr('Siège social',adresse);
-  lr('Numéro BCE',bce);
-  lr('Agrément FSMA',fsma);
-  lr('Signataire',signataire);
-  lr('Date de prise d\'effet souhaitée',effetDate);
+  // ═══════════════════════════════════════════════════════════
+  // PAGE 2 — ARTICLE 1 ADHÉSION + ARTICLE 2 IDENTIFICATION
+  // ═══════════════════════════════════════════════════════════
+  y=addPage();
 
-  y+=4;sh('CONFIGURATION PROCYO AI');
-  lr('Nombre d\'ETP',etp);
-  lr('Nombre d\'adresses email activées',nbAddr);
-  lr('Version Brio',brio);
-  lr('Plateforme email',email);
-  lr('Mode de facturation',cFacturation||'—');
+  y=sectionTitle(y,'1','ADHÉSION AUX DOCUMENTS CONTRACTUELS');
+  y=body(y,'Par la signature des présentes Conditions Particulières, le Courtier déclare expressément :');
+  y=bullet(y,'Avoir pris connaissance de la Licence SaaS Cadre Procyo Broker (version avril 2026), remise en Annexe A aux présentes ;');
+  y=bullet(y,'Avoir pris connaissance des Conditions Générales de Vente (CGV) de PROCYO, disponibles en permanence à l\'adresse www.procyo.be/cgv ;');
+  y=bullet(y,'Accepter sans réserve l\'intégralité des dispositions de ces deux documents et y adhérer par la seule signature des présentes.');
+  y+=2;
+  y=body(y,'La version de la Licence SaaS Cadre applicable au présent contrat est la version avril 2026. En cas de mise à jour ultérieure de la Licence SaaS Cadre ou des CGV par PROCYO, les nouvelles dispositions s\'appliqueront au Courtier moyennant notification écrite de trente (30) jours, conformément à l\'article 19 de la Licence SaaS Cadre.');
+  y+=4;
 
-  // Modules
-  y+=4;sh('MODULES SOUSCRITS');
-  lr('Procyo AI – Assistant mail (Inboxia)','Inclus dans abonnement');
-  if(cMods.regulia) lr('Assistant Conformité (Regulia)','Activé – '+nbAddr+' × 10 €/mois HT');
-  if(cMods.portfolia) lr('Assistant Portefeuille (Portfolia)','Activé – 10% base/mois HT');
-  if(cMods.relancia) lr('Assistant Commercial (Relancia)','Activé – '+nbAddr+' × 10 €/mois HT');
+  y=sectionTitle(y,'2','IDENTIFICATION DES PARTIES ET CONTACTS');
+  y=subTitle(y,'2.1  PROCYO BV');
+  const procyoRows=[
+    ['Raison sociale','PROCYO BV'],['Siège social','Groeningenveldstraat 1, 1755 Pajottegem'],
+    ['BCE / TVA','BE 1023.609.920'],['Représentant','Maxime Dejean - Administrateur Délégué'],
+    ['Contact opérationnel','support@procyo.be'],['DPO PROCYO','XXX - dpo@procyo.be'],
+  ];
+  procyoRows.forEach(function(r){
+    doc.setFillColor(LIGHT[0],LIGHT[1],LIGHT[2]);doc.rect(14,y-4,52,6,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+    doc.text(r[0],16,y-0.5);
+    doc.setFont('helvetica','normal');doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    doc.text(r[1],68,y-0.5,{maxWidth:128});
+    doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.line(14,y+1.5,196,y+1.5);
+    y+=6.5;
+  });
+  y+=3;
 
-  // Tarif
-  if(nbAddr){
-    y+=4;sh('RÉCAPITULATIF TARIFAIRE');
-    const etpNum=etpFromRange(etp);
-    const sp=setupPalier(etpNum);
-    const abo=calcAbo(parseInt(nbAddr));
-    const nbMod=modsList.length;
-    let mensHT=abo.total;
-    if(cMods.regulia)mensHT+=parseInt(nbAddr)*10;
-    if(cMods.relancia)mensHT+=parseInt(nbAddr)*10;
-    if(cMods.portfolia)mensHT+=abo.palier.base*0.1;
-    const setupHT=sp.setup+nbMod*500;
-    lr('Palier',sp.label+' ('+sp.etpMin+(sp.etpMax<9999?'–'+sp.etpMax:'+')+'ETP)');
-    lr('Abonnement mensuel HTVA',money(mensHT));
-    lr('Abonnement mensuel TVAC',money(mensHT*TVA));
-    lr('Setup unique HTVA',money(setupHT));
-    lr('Setup unique TVAC',money(setupHT*TVA));
-  }
+  y=subTitle(y,'2.2  Courtier (Client)');
+  const ref1={nom:cGetVal('f-m2q11-nom'),email:cGetVal('f-m2q11-email')};
+  const ref2={nom:cGetVal('f-m2q12-nom'),email:cGetVal('f-m2q12-email')};
+  const ref3={nom:cGetVal('f-m2q13-nom'),email:cGetVal('f-m2q13-email')};
+  const clientRows=[
+    ['Raison sociale',raison],['Siège social',siege],['BCE / TVA',bce],
+    ['N° agrément FSMA',fsma],['Représentant légal',signataire],
+  ];
+  clientRows.forEach(function(r){
+    doc.setFillColor(LIGHT[0],LIGHT[1],LIGHT[2]);doc.rect(14,y-4,52,6,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+    doc.text(r[0],16,y-0.5);
+    doc.setFont('helvetica','normal');doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    doc.text(r[1]||'XXX',68,y-0.5,{maxWidth:128});
+    doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.line(14,y+1.5,196,y+1.5);
+    y+=6.5;
+  });
 
-  // Référents
-  y+=4;sh('RÉFÉRENTS');
-  contactBlock('Référent administratif',ref1);
-  contactBlock('Référent technique onboarding',ref2);
-  contactBlock('Référent compliance / DPO',ref3);
+  // ═══════════════════════════════════════════════════════════
+  // PAGE 3 — CONTACTS OPÉRATIONNELS + DURÉE
+  // ═══════════════════════════════════════════════════════════
+  y=addPage();
 
-  // Modalités
+  y=subTitle(y,'2.3  Contacts opérationnels du Courtier');
+  y=body(y,'Ces informations servent de références pour toute notification formelle au titre de la Licence SaaS Cadre.');
+  y+=2;
+
+  const W3=[80,116];
+  y=tableRow(y,['Rôle','Nom & coordonnées'],W3,true);
+  [
+    ['Administrateur principal Procyo IA',(ref1.nom||'XXX')+' — '+(ref1.email||'XXX')],
+    ['Personne de contact facturation',(ref2.nom||'XXX')+' — '+(ref2.email||'XXX')],
+    ['DPO / Référent données',(ref3.nom||'XXX')+' — '+(ref3.email||'XXX')],
+  ].forEach(function(r){y=tableRow(y,r,W3,false,false,WHITE);});
+  y+=4;
+
+  // Brio + API
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  doc.text('Logiciel métier (BRIO)   Version :',14,y);
+  ['First','Confort','Premium'].forEach(function(v,i){
+    const checked=(brio===v);
+    const bx=100+i*28,by=y-3,bs=3.5;
+    doc.setDrawColor(100,110,108);doc.setLineWidth(0.3);doc.rect(bx,by,bs,bs);
+    if(checked){doc.setFont('zapfdingbats','normal');doc.setFontSize(8);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);doc.text('4',bx+0.4,y-0.1);}
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    doc.text(v,bx+5,y);
+  });
+  y+=7;
+  y+=4;
+
+  y=sectionTitle(y,'3','DURÉE ET ENTRÉE EN VIGUEUR');
+  const dureeRows=[
+    ['Date de prise d\'effet',effet],
+    ['Date de fin de période initiale',dateFin+' (12 mois)'],
+    ['Renouvellement','Tacite, par périodes d\'un (1) an'],
+    ['Préavis résiliation','3 mois avant échéance (1 mois si révision tarifaire)'],
+  ];
+  dureeRows.forEach(function(r){
+    doc.setFillColor(LIGHT[0],LIGHT[1],LIGHT[2]);doc.rect(14,y-4,72,6,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+    doc.text(r[0],16,y-0.5);
+    doc.setFont('helvetica','normal');doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    doc.text(r[1]||'XXX',88,y-0.5,{maxWidth:108});
+    doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.line(14,y+1.5,196,y+1.5);
+    y+=6.5;
+  });
+  y+=4;
+  y=body(y,'Modalités particulières dérogatoires (le cas échéant) :');
+  y=checkbox(y,false,'Application standard de l\'article 4 de la Licence SaaS Cadre');
+  y=checkbox(y,false,'Modalités dérogatoires :');
+  doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.line(22,y,196,y);y+=5;
+  doc.line(22,y,196,y);y+=5;
+
+  // ═══════════════════════════════════════════════════════════
+  // PAGE 4 — MODULES + PALIER
+  // ═══════════════════════════════════════════════════════════
+  y=addPage();
+
+  y=sectionTitle(y,'4','MODULES SOUSCRITS');
+  y=body(y,'Le module Procyo IA est obligatoire et inclus dans tout abonnement. Les modules complémentaires sont facultatifs et activables à tout moment par voie d\'avenant.');
+  y+=2;
+
+  const Wm=[18,62,82,36];
+  y=tableRow(y,['Souscrit','Module','Description','Statut'],Wm,true);
+  [
+    [true,'Procyo IA','Gestion intelligente des communications e-mail','Inclus - obligatoire'],
+    [cMods.regulia,'Assistant Conformité','Conformité réglementaire (KYC / AML / IDD / IPID)','Optionnel'],
+    [cMods.portfolia,'Assistant Portefeuille','Analyse de portefeuille et tableaux de bord','Optionnel'],
+    [cMods.relancia,'Assistant Commercial','Identification d\'opportunités commerciales contextuelles','Optionnel'],
+  ].forEach(function(r){
+    const rowY=y;
+    const fill=r[0]?[232,251,245]:WHITE;
+    y=tableRow(y,['',r[1],r[2],r[3]],Wm,false,false,fill);
+    // checkbox
+    const bx=16+1,by=rowY-8,bs=3.5;
+    doc.setDrawColor(100,110,108);doc.setLineWidth(0.3);doc.rect(bx,by,bs,bs);
+    if(r[0]){doc.setFont('zapfdingbats','normal');doc.setFontSize(8);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);doc.text('4',bx+0.4,by+3.2);}
+    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  });
+  y+=2;
+  y=body(y,'L\'activation de tout module complémentaire fera l\'objet d\'un avenant écrit.');
+  y+=4;
+
+  y=sectionTitle(y,'5','PALIER TARIFAIRE ET ADRESSES E-MAIL');
+  const Wp=[30,20,20,26,26,24,36];
+  y=tableRow(y,['Palier','ETP min','ETP max','Adresses incluses','Adresses max','Sélection',''],Wp,true);
+  PALIERS.forEach(function(p){
+    const sel=(etpNum>=p.etpMin&&etpNum<=p.etpMax);
+    const rowY=y;
+    y=tableRow(y,[p.label,p.etpMin,p.etpMax<9999?p.etpMax:'∞',p.addrIncl,p.etpMax<9999?p.etpMax:'Illimité','',''],Wp,false,false,sel?[232,251,245]:WHITE);
+    const bx=14+30+20+20+26+26+4,by=rowY-8,bs=3.5;
+    doc.setDrawColor(100,110,108);doc.setLineWidth(0.3);doc.rect(bx,by,bs,bs);
+    if(sel){doc.setFont('zapfdingbats','normal');doc.setFontSize(8);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);doc.text('4',bx+0.4,by+3.2);}
+    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  });
+  y+=4;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  doc.text('Nombre d\'adresses souscrites :  '+( nbAddr||'_____')+' (entre le nombre inclus et le maximum du palier)',14,y);
+  y+=8;
+
+  // ═══════════════════════════════════════════════════════════
+  // PAGE 5 — CONDITIONS FINANCIÈRES
+  // ═══════════════════════════════════════════════════════════
+  y=addPage();
+
+  y=sectionTitle(y,'6','CONDITIONS FINANCIÈRES');
+  y=body(y,'Tous les montants sont exprimés hors TVA. La grille tarifaire de référence est celle de PROCYO en vigueur à la date de signature des présentes.');
+  y+=3;
+
+  y=subTitle(y,'6.1  Activation initiale (frais uniques - payables à la signature)');
+  const W2=[130,52];
+  y=tableRow(y,['Élément','Montant HTVA (€)'],W2,true);
+  const setupRows=[
+    ['Setup plateforme Procyo IA (selon palier)',nbAddr>0?moneyStr(sp.setup):'_____ €'],
+    cMods.regulia?['Setup module Assistant Conformité',moneyStr(500)]:null,
+    cMods.portfolia?['Setup module Assistant Portefeuille',moneyStr(500)]:null,
+    cMods.relancia?['Setup module Assistant Commercial',moneyStr(500)]:null,
+    ['Réduction commerciale exceptionnelle','– _____ €'],
+    ['TOTAL NET ACTIVATION INITIALE',nbAddr>0?moneyStr(setupHT):'_____ €'],
+  ].filter(Boolean);
+  setupRows.forEach(function(r,i){
+    const isLast=(i===setupRows.length-1);
+    y=tableRow(y,r,W2,false,isLast,isLast?BLUE_ROW:WHITE);
+  });
+  y+=5;
+
+  y=subTitle(y,'6.2  Abonnement mensuel récurrent');
+  y=tableRow(y,['Élément','Montant HTVA (€)'],W2,true);
+  const aboRows=[
+    ['Abonnement de base Procyo IA (selon palier)',nbAddr>0?moneyStr(abo.palier.base)+'/mois':'_____ €/mois'],
+    abo.suppl>0?['Adresses supplémentaires (× tarif unitaire)',moneyStr(abo.suppl*abo.palier.prixSuppl)+'/mois']:['Adresses supplémentaires (× tarif unitaire)','_____ €/mois'],
+    cMods.regulia?['Module Assistant Conformité (× nb total adresses actives)',moneyStr(nbAddr*10)+'/mois']:['Module Assistant Conformité (si souscrit)','— non souscrit'],
+    cMods.portfolia?['Module Assistant Portefeuille (% abonnement de base)',moneyStr(abo.palier.base*0.1)+'/mois']:['Module Assistant Portefeuille (si souscrit)','— non souscrit'],
+    cMods.relancia?['Module Assistant Commercial (× nb total adresses actives)',moneyStr(nbAddr*10)+'/mois']:['Module Assistant Commercial (si souscrit)','— non souscrit'],
+    ['Réduction commerciale exceptionnelle','– _____ €'],
+    ['TOTAL NET ABONNEMENT MENSUEL',nbAddr>0?moneyStr(mensHT)+'/mois':'_____ €/mois'],
+  ];
+  aboRows.forEach(function(r,i){
+    const isLast=(i===aboRows.length-1);
+    y=tableRow(y,r,W2,false,isLast,isLast?BLUE_ROW:WHITE);
+  });
+  y+=8;
+
+  // ═══════════════════════════════════════════════════════════
+  // PAGE 6 — CRÉDITS + RÉSILIATION
+  // ═══════════════════════════════════════════════════════════
+  y=addPage();
+
+  y=subTitle(y,'6.3  Crédits calls et calls supplémentaires');
+  const creditsTotal=nbAddr>0?abo.palier.credits+abo.suppl*abo.palier.creditsSuppl:0;
+  y=tableRow(y,['Élément','Volume / Tarif'],[130,52],true);
+  [
+    ['Crédits calls inclus dans l\'abonnement de base','Selon palier'],
+    ['Crédits calls additionnels (adresses supplémentaires)','× nb adresses suppl.'],
+    ['TOTAL CRÉDITS CALLS MENSUELS DISPONIBLES',nbAddr>0?creditsTotal.toLocaleString('fr-BE')+' crédits':'Selon palier'],
+    ['Réinitialisé le 1er de chaque mois',''],
+    ['Prix unitaire par call supplémentaire',nbAddr>0?abo.palier.extraCall.toFixed(3).replace('.',',')+' €':'_____ €'],
+  ].forEach(function(r,i){
+    const isTotal=(i===2);
+    y=tableRow(y,r,[130,52],false,isTotal,isTotal?BLUE_ROW:WHITE);
+  });
+  y+=6;
+
+  y=sectionTitle(y,'7','RÉSILIATION ET MODIFICATIONS');
+  const resilRows=[
+    ['Préavis résiliation standard','3 mois calendaires avant l\'échéance annuelle'],
+    ['Préavis en cas de révision tarifaire','1 mois - à notifier dans les 15 j suivant la notification PROCYO'],
+    ['Préavis en cas de modification Convention/CGV','1 mois - à notifier dans les 15 j suivant la notification PROCYO'],
+    ['Canal de notification officiel','E-mail avec accusé de réception - coordonnées section 2.3'],
+  ];
+  const Wr=[80,102];
+  y=tableRow(y,['Élément','Modalité'],Wr,true);
+  resilRows.forEach(function(r){y=tableRow(y,r,Wr,false,false,WHITE);});
+  y+=6;
+
   if(modalites){
-    y+=4;sh('MODALITÉS PARTICULIÈRES');
-    lrFull('',modalites);
+    y=sectionTitle(y,'8','DISPOSITIONS PARTICULIÈRES');
+    y=body(y,modalites);
+    y+=4;
   }
 
-  // Signature
-  doc.addPage();y=20;
-  sh('BON POUR ACCORD');
-  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(MID[0],MID[1],MID[2]);
-  doc.text('Le soussigné reconnaît avoir lu et accepté les présentes Conditions Particulières ainsi que les Conditions Générales de Procyo SRL.',X+2,y,{maxWidth:W-4});y+=10;
-  doc.text('Nom du signataire :',X+2,y);doc.line(X+45,y,X+W-2,y);y+=8;
-  doc.text('Qualité :',X+2,y);doc.line(X+45,y,X+W-2,y);y+=8;
-  doc.text('Date :',X+2,y);doc.line(X+45,y,X+120,y);y+=8;
-  doc.text('Signature :',X+2,y);y+=20;
+  // ═══════════════════════════════════════════════════════════
+  // PAGE 7 — SIGNATURES
+  // ═══════════════════════════════════════════════════════════
+  y=addPage();
+
+  y=sectionTitle(y,'8','SIGNATURES ET DÉCLARATION D\'ADHÉSION');
+  y=body(y,'En signant les présentes Conditions Particulières, chaque Partie confirme :');
+  y=bullet(y,'Avoir lu et compris l\'intégralité des présentes Conditions Particulières ;');
+  y=bullet(y,'Avoir pris connaissance de la Licence SaaS Cadre Procyo Broker (Annexe A) et y adhérer expressément ;');
+  y=bullet(y,'Avoir pris connaissance des CGV de PROCYO disponibles à l\'adresse www.procyo.be/cgv et les accepter ;');
+  y=bullet(y,'Que les informations relatives à la société et aux contacts renseignées en Section 2 sont exactes.');
+  y+=5;
+
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  doc.text('Fait à _____________, le _____________',14,y);y+=12;
+
+  // Deux colonnes signatures
+  const colW=84;
+  // PROCYO
+  doc.setFillColor(BLUE_HDR[0],BLUE_HDR[1],BLUE_HDR[2]);
+  doc.rect(14,y-5,colW,7,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+  doc.text('Pour PROCYO BV',14+colW/2,y,{align:'center'});y+=4;
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  doc.text('Maxime Dejean - Administrateur Délégué',14+2,y);y+=5;
+  doc.text('Date :',14+2,y);doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.line(14+20,y,14+colW-2,y);y+=6;
+  doc.text('Signature :',14+2,y);y+=18;
+  doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.rect(14,y-18,colW,18);
+
+  // Courtier (colonne droite)
+  const cx=14+colW+14;
+  y-=35;
+  doc.setFillColor(BLUE_HDR[0],BLUE_HDR[1],BLUE_HDR[2]);
+  doc.rect(cx,y-5,colW,7,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+  doc.text('Pour le Courtier',cx+colW/2,y,{align:'center'});y+=4;
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  doc.text(signataire+' - Représentant légal',cx+2,y);y+=5;
+  doc.text('Date :',cx+2,y);doc.line(cx+20,y,cx+colW-2,y);y+=6;
+  doc.text('Signature :',cx+2,y);y+=18;
+  doc.rect(cx,y-18,colW,18);
+  y+=5;
+
+  doc.setFont('helvetica','italic');doc.setFontSize(8);doc.setTextColor(MID[0],MID[1],MID[2]);
+  doc.text('Précédé de la mention manuscrite « Lu et approuvé »',105,y,{align:'center'});
+  y+=10;
+
+  doc.setFillColor(LIGHT[0],LIGHT[1],LIGHT[2]);doc.rect(14,y,182,22,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(NAVY[0],NAVY[1],NAVY[2]);
+  doc.text('ANNEXES AUX PRÉSENTES CONDITIONS PARTICULIÈRES',14+4,y+6);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+  doc.text('Annexe A - Licence SaaS Cadre Procyo Broker (version avril 2026)',14+4,y+12);
+  doc.text('Annexe B - Conditions Générales de Vente PROCYO (ou référence URL : www.procyo.be/cgv)',14+4,y+18);
+
+  // Footer navy
   doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(0,282,210,15,'F');
-  doc.setTextColor(TEAL2[0],TEAL2[1],TEAL2[2]);doc.setFont('helvetica','italic');doc.setFontSize(8.5);
-  doc.text('L\'IA qui comprend votre métier de courtier, pas l\'inverse',105,288.5,{align:'center'});
-  doc.setFont('helvetica','normal');doc.setTextColor(150,180,175);doc.setFontSize(7.5);
-  doc.text('www.procyo.be  ·  contact@procyo.be  ·  Procyo SRL  ·  BCE BE 1023.609.920',105,294,{align:'center'});
+  doc.setFont('helvetica','italic');doc.setFontSize(8);doc.setTextColor(TEAL[0],TEAL[1],TEAL[2]);
+  doc.text('PROCYO BV · BCE 1023.609.920 · Groeningenveldstraat 1, 1755 Pajottegem',105,289,{align:'center'});
+  doc.setTextColor(150,180,175);doc.setFontSize(7.5);
+  doc.text('www.procyo.be  ·  support@procyo.be  ·  Confidentiel',105,294,{align:'center'});
 
   return doc;
 }
