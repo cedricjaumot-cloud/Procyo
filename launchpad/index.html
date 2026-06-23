@@ -22,7 +22,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .hidden{display:none!important}
 
 /* AUTH */
-#screen-auth{min-height:100vh;display:flex}
+#screen-auth{min-height:100vh;display:flex;position:relative}
 #screen-activate{min-height:100vh;display:none;align-items:center;justify-content:center;background:var(--g50)}
 .activate-box{background:white;border-radius:var(--r-lg);padding:48px;max-width:480px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center}
 .activate-box .lf{font-size:28px;font-weight:700;color:var(--navy);margin-bottom:8px}
@@ -512,6 +512,14 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 </div>
 
 <div id="screen-auth">
+  <div style="position:absolute;top:16px;right:20px;z-index:10">
+    <div class="lang-switcher" id="lang-switcher-auth">
+      <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" data-lang="nl" onclick="setLang('nl')">NL</button>
+      <button class="lang-btn" data-lang="de" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
   <div class="auth-left">
     <div class="auth-logo">
       <img src="data:image/avif;base64,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" alt="Procyo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
@@ -527,7 +535,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-step"><div class="step-dot">4</div><div class="step-text"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.69</span></div>
+    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.70</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -636,7 +644,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.69</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.70</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')"><span id="admin-tab-brokers-el">Courtiers inscrits</span></button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')"><span id="admin-tab-export-el">Export réponses</span></button>
@@ -1097,7 +1105,7 @@ function setLang(lang){
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
   applyLang();
   // Re-render si on est dans un module
-  if(currentMod!==null) renderModule(MODULES[currentMod]);
+  if(currentMod!==null) renderModule(getModules()[currentMod]);
 }
 
 function applyLang(){
@@ -1495,8 +1503,6 @@ const MODULES_DATA = {
 };
 
 function getModules(){ return MODULES_DATA[currentLang] || MODULES_DATA.fr; }
-// Compatibilité avec le code existant qui utilise MODULES directement
-Object.defineProperty(window, 'MODULES', { get: () => getModules() });
     {id:'M2B',name:'Identification juridique',questions:[
       {id:'M2Q4',type:'text',label:'Raison sociale complète',required:true,hint:'Telle qu\'inscrite au registre BCE.'},
       {id:'M2Q5',type:'radio',label:'Forme juridique',required:true,options:['SRL','SA','SCRL','Indépendant','Autre']},
@@ -1797,7 +1803,7 @@ function showHome(){
 }
 
 function getProgress(mid){
-  const mod=MODULES.find(m=>m.id===mid);
+  const mod=getModules().find(m=>m.id===mid);
   if(mod.isObservation)return{ans:0,tot:0};
   let ans=0,tot=0;
   mod.sections.forEach(s=>s.questions.forEach(q=>{
@@ -1839,7 +1845,7 @@ function getProgress(mid){
 function renderModules(){
   const list=document.getElementById('mod-list');
   list.innerHTML='';
-  MODULES.forEach((mod,i)=>{
+  getModules().forEach((mod,i)=>{
     const status=currentUser[mod.id+'_status']||'locked';
     const {ans,tot}=getProgress(mod.id);
     const pct=tot>0?Math.round(ans/tot*100):0;
@@ -1873,7 +1879,7 @@ function renderModules(){
 
 function renderGlobalProgress(){
   let ta=0,tt=0;
-  MODULES.filter(m=>!m.isObservation).forEach(m=>{const p=getProgress(m.id);ta+=p.ans;tt+=p.tot;});
+  getModules().filter(m=>!m.isObservation).forEach(m=>{const p=getProgress(m.id);ta+=p.ans;tt+=p.tot;});
   const pct=tt>0?Math.round(ta/tt*100):0;
   document.getElementById('pc-ans').textContent=ta;
   document.getElementById('pc-tot').textContent=tt;
@@ -1886,7 +1892,7 @@ function renderGlobalProgress(){
 // ══════════════════════════════════════════════════════════════
 function openModule(idx){
   currentMod=idx;
-  const mod=MODULES[idx];
+  const mod=getModules()[idx];
   hideAll();
   document.getElementById('screen-questions').style.display='block';
   const badge=document.getElementById('q-badge');
@@ -1925,7 +1931,7 @@ function openModule(idx){
 }
 
 function renderNotif(idx){
-  const {ans,tot}=getProgress(MODULES[idx].id);
+  const {ans,tot}=getProgress(getModules()[idx].id);
   const n=document.getElementById('q-notif');
   if(ans>=tot&&tot>0) n.innerHTML=`<div class="done-bar"><h3>🎉 ${currentLang==='nl'?'Module voltooid!':currentLang==='de'?'Modul abgeschlossen!':currentLang==='en'?'Module completed!':'Module complété !'}</h3><p>${t('notif_readonly')}</p></div>`;
   else n.innerHTML=`<div class="notif-bar"><span>📧</span><span>${t('notif_reminder')}</span></div>`;
@@ -2280,7 +2286,7 @@ function sliderRangeFor(refQid, refVal){
 }
 
 function findQ(qid){
-  for(const mod of MODULES)for(const sec of mod.sections)for(const q of sec.questions)if(q.id===qid)return q;
+  for(const mod of getModules())for(const sec of mod.sections)for(const q of sec.questions)if(q.id===qid)return q;
   return null;
 }
 
@@ -2300,7 +2306,7 @@ async function pickRadio(el){
     }
   }
   await persistAnswer(qid,val);
-  updateQProgress(MODULES[currentMod]);
+  updateQProgress(getModules()[currentMod]);
   updateSecProg(qid);
 }
 
@@ -2313,7 +2319,7 @@ async function toggleChkOther(el){
     // removed — rebuild without other
     const checks=Array.from(el.closest('.checks').querySelectorAll('.citem.chk:not([data-val="__other__"])')).map(c=>c.dataset.val);
     await persistAnswer(qid,checks);
-    updateQProgress(MODULES[currentMod]);
+    updateQProgress(getModules()[currentMod]);
     updateSecProg(qid);
   }
 }
@@ -2365,7 +2371,7 @@ function fillCestMoi(qid){
   const obj={};
   qi.querySelectorAll('.contact-inp').forEach(i=>{obj[i.dataset.field]=i.value.trim();});
   persistAnswer(qid,obj);
-  updateQProgress(MODULES[currentMod]);
+  updateQProgress(getModules()[currentMod]);
   updateSecProg(qid);
 }
 
@@ -2468,7 +2474,7 @@ async function fuToggleNoFiles(el){
   const val=noFiles?{__noFiles:true}:files;
   localCache[qid]=val;
   await persistAnswer(qid,val);
-  updateQProgress(MODULES[currentMod]);
+  updateQProgress(getModules()[currentMod]);
   updateSecProg(qid);
 }
 
@@ -2497,7 +2503,7 @@ async function toggleCm(el){
   cmState[qid]=obj;
   cmUpdateSummary(qid,obj);
   await persistAnswer(qid,obj);
-  updateQProgress(MODULES[currentMod]);
+  updateQProgress(getModules()[currentMod]);
   updateSecProg(qid);
 }
 
@@ -2564,7 +2570,7 @@ async function toggleChk(el){
   }
   const vals=Array.from(el.closest('.checks').querySelectorAll('.citem.chk')).map(c=>c.dataset.val);
   await persistAnswer(qid,vals);
-  updateQProgress(MODULES[currentMod]);
+  updateQProgress(getModules()[currentMod]);
   updateSecProg(qid);
 }
 
@@ -2589,7 +2595,7 @@ async function saveAll(){
   st.textContent='';st.className='save-st';
   try{
     await saveBatch();
-    if(currentMod!==null)updateQProgress(MODULES[currentMod]);
+    if(currentMod!==null)updateQProgress(getModules()[currentMod]);
     renderNotif(currentMod);
     btn.classList.remove('saving');
     btn.disabled=false;
@@ -2687,7 +2693,7 @@ async function updateQProgress(mod){
 
 function updateSecProg(qid){
   if(currentMod===null)return;
-  const mod=MODULES[currentMod];
+  const mod=getModules()[currentMod];
   mod.sections.forEach(sec=>{
     if(!sec.questions.find(q=>q.id===qid))return;
     const{sa,st}=secProg(sec);
@@ -2724,7 +2730,7 @@ async function showAdmin(){
       const card=document.createElement('div');
       card.className='broker-card';
       // Module progress
-      const modHTML=MODULES.map((mod,i)=>{
+      const modHTML=getModules().map((mod,i)=>{
         const st=b[mod.id+'_status']||'locked';
         let progHTML='';
         if(!mod.isObservation){
@@ -2746,7 +2752,7 @@ async function showAdmin(){
         </div>`;
       }).join('');
       // Unlock buttons
-      const unlockBtns=MODULES.map((mod,i)=>{
+      const unlockBtns=getModules().map((mod,i)=>{
         const st=b[mod.id+'_status']||'locked';
         if(st==='locked')return`<button class="unlock-btn" onclick="adminUnlock('${b.id}','${mod.id}',this)">${t('btn_unlock')} M${i+1}</button>`;
         return '';
@@ -2803,7 +2809,7 @@ async function showDossier(brokerId){
   </div>`;
 
   // For each module
-  MODULES.filter(m=>!m.isObservation).forEach((mod,mi)=>{
+  getModules().filter(m=>!m.isObservation).forEach((mod,mi)=>{
     const status=b[mod.id+'_status']||'locked';
     if(status==='locked')return; // skip locked modules
     html+=`<div class="dos-module">
