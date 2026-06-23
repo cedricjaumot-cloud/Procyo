@@ -535,7 +535,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-step"><div class="step-dot">4</div><div class="step-text"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.70</span></div>
+    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.71</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -644,7 +644,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.70</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.71</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')"><span id="admin-tab-brokers-el">Courtiers inscrits</span></button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')"><span id="admin-tab-export-el">Export réponses</span></button>
@@ -1503,58 +1503,6 @@ const MODULES_DATA = {
 };
 
 function getModules(){ return MODULES_DATA[currentLang] || MODULES_DATA.fr; }
-    {id:'M2B',name:'Identification juridique',questions:[
-      {id:'M2Q4',type:'text',label:'Raison sociale complète',required:true,hint:'Telle qu\'inscrite au registre BCE.'},
-      {id:'M2Q5',type:'radio',label:'Forme juridique',required:true,options:['SRL','SA','SCRL','Indépendant','Autre']},
-      {id:'M2Q6',type:'textarea',label:'Adresse du siège social',required:true,placeholder:'Rue, numéro, code postal, ville, pays'},
-      {id:'M2Q7',type:'text',label:'Numéro BCE',required:true},
-      {id:'M2Q8',type:'text',label:'Numéro d\'agrément FSMA',required:true},
-      {id:'M2Q9',type:'text',label:'Nom et qualité du signataire du contrat',required:true,hint:'La personne qui signera électroniquement.'},
-      {id:'M2Q10',type:'text',label:'Date de prise d\'effet souhaitée',required:true},
-    ]},
-    {id:'M2C',name:'Référents',questions:[
-      {id:'M2Q11',type:'contact-fields',label:'Référent administratif du dossier',required:true},
-      {id:'M2Q12',type:'contact-fields',label:'Référent technique pour l\'onboarding',required:true},
-      {id:'M2Q13',type:'contact-fields',label:'Référent compliance / DPO',required:true},
-      {id:'M2Q14',type:'textarea',label:'Modalités contractuelles particulières ?',required:false},
-      {id:'M2Q15',type:'radio',label:'Mode de facturation souhaité',required:false,options:['Mensuel','Trimestriel','Annuel']},
-    ]},
-  ]},
-  {id:'module3',title:'Paramétrage',desc:'Configuration fine de votre agent IA Inboxia : ton, compagnies, filtres, sinistres, BRIO.',icon:'⚙️',sections:[
-    {id:'M3A',name:'Bloc 1 — Signature et ton',questions:[
-      {id:'M3Q1',type:'textarea',label:'Signature standard à apposer en fin de chaque mail',required:true,placeholder:'Texte exact, ligne par ligne…',hint:'Sera utilisé par défaut pour tous les brouillons générés.'},
-      {id:'M3Q2',type:'radio',label:'Forme par défaut',required:true,options:['Vouvoiement','Tutoiement','Miroir (s\'aligne sur la forme employée par l\'interlocuteur)']},
-      {id:'M3Q3',type:'radio',label:'Ton souhaité',required:true,options:['Sobre','Chaleureux','Technique','Formel','Familier','Miroir (s\'aligne sur le ton de l\'interlocuteur)']},
-      {id:'M3Q5',type:'text',label:'Formule de politesse préférée',required:false,placeholder:'Ex: Cordialement, Bien à vous…'},
-    ]},
-    {id:'M3B',name:'Bloc 2 — Compagnies partenaires',questions:[
-      {id:'M3Q6',type:'company-matrix',label:'Compagnies partenaires et branches',required:true,
-        companies:['AG Insurance','AXA Belgium','Allianz','Baloise','DKV','Foyer','NN Insurance','Vivium','Athora','La Patronale','Baloise Luxembourg','Wealins','OneLife','Vitis Life','Lombard','AXA Wealth','Cardif','Aviza','AfiEsca','Ethias','Federale Assurance','HDI','AIG','Zurich','Chubb','Hiscox','Legal Village','ARAG','Providis','DAS','Euromex','Axa Partners','Allianz Partners','Europ Assistance','Atradius','Coface','TVM','Aedes','Avise','Ibis Insurance','Vander Haeghen','Jean Verheyen','Elitis Insurance','April'],
-        branches:['Habitation','Auto','Hospi','PJ','Assistance','Entreprise','Vie','Prior','Délégation Sinistre']},
-      {id:'M3Q6b',type:'radio',label:'Convention RDR (auto) appliquée',required:false,options:['Systématiquement','Cas par cas','Pas appliquée']},
-    ]},
-    {id:'M3C',name:'Bloc 3 — Filtres et catégories sensibles',questions:[
-      {id:'M3Q10',type:'checkbox-other',label:'Ne JAMAIS préparer de brouillon si le mail vient de',required:true,options:['Client','Assurance','Expert','Autorité de régulation','Notaire','Prestataire et fournisseur','Consultant externe','Mail interne','Réclamation','Publicité','Banque'],otherLabel:'Précisez…'},
-      {id:'M3Q12',type:'text',label:'Boîte mail principale à surveiller',required:true},
-      {id:'M3Q13',type:'textarea',label:'Organigramme des boîtes mails secondaires',required:true,placeholder:'sinistres@ : gestionnaire X, règles…\ninfo@ : gestionnaire Y, règles…',hint:'Pour chaque boîte : intitulé, gestionnaire référent, règles de tri.'},
-    ]},
-    {id:'M3D',name:'Bloc 4 — Documentation interne',questions:[
-      {id:'M3Q14',type:'file-upload',label:'Templates et formulaires à transmettre à Procyo',required:false,accept:'.pdf,.doc,.docx',maxFiles:10,maxSizeMb:5,noFilesOption:'Pas de templates'},
-    ]},
-    {id:'M3E',name:'Bloc 5 — Actions BRIO',questions:[
-      {id:'M3Q15',type:'behavior-matrix',label:'Validation des comportements',required:false,
-        intro:'Voici le comportement par défaut de l\'IA sur les principales actions Brio. Ces règles s\'appliquent automatiquement et sont ajustables par les questions qui suivent.',
-        behaviors:[
-          {key:'production',title:'Production',text:'Lors d\'une production initiée par Procyo, l\'IA crée systématiquement un objet de risque (OR) en y rattachant les documents pertinents et en complétant les informations issues du mail. Si le preneur n\'existe pas dans Brio et qu\'aucun doute raisonnable n\'existe sur l\'identité (orthographe approchante, homonyme potentiel, etc.), l\'IA crée la fiche preneur.'},
-          {key:'sinistre',title:'Sinistre',text:'À la déclaration d\'un sinistre, l\'IA crée automatiquement le dossier sinistre, le rattache à l\'OR concerné, et y associe les documents et informations qu\'elle a pu détecter avec un niveau de certitude suffisant.'},
-          {key:'document',title:'Document',text:'Chaque document peut être renommé selon vos règles propres. Par défaut, l\'IA applique une nomenclature claire pour faciliter la recherche. Il peut arriver qu\'un document ne soit pas correctement détecté : classement initial ambigu (document de contrat déposé dans un sinistre), nomenclature peu lisible (« scan 1 », « contrat_v_finale » alors qu\'il ne l\'est pas), etc. Si la détection vous paraît évidente et qu\'elle échoue, transmettez-nous vos règles : nous les intégrons.'},
-          {key:'mail',title:'Mail',text:'Si le mail est en lien avec un sinistre, il est ajouté au sinistre concerné. Si le mail concerne une question sur un OR ou un contrat, il est rattaché à l\'OR. Si le mail ne rentre dans aucune catégorie ou pourrait relever de plusieurs catégories, il est rattaché au preneur.'},
-          {key:'autre',title:'Autre',text:''},
-        ]},
-    ]},
-  ]},
-  {id:'module4',title:'Optimisation continue',desc:'Après le go-live, l\'IA observe vos habitudes et vous propose des ajustements en un clic.',icon:'🔬',isObservation:true,sections:[{id:'M4',name:'Observations',questions:[]}]},
-];
 
 // ══════════════════════════════════════════════════════════════
 // STATE
