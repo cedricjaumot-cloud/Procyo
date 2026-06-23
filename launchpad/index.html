@@ -1883,8 +1883,8 @@ function openModule(idx){
     stickyBar.style.display = isCompleted ? 'none' : 'flex';
     if(isCompleted){
       setTimeout(function(){
-        document.querySelectorAll('#screen-questions input, #screen-questions select, #screen-questions textarea').forEach(function(el){
-          el.disabled = true;
+        document.querySelectorAll('#screen-questions .rbtn, #screen-questions .citem, #screen-questions .bm-ok, #screen-questions .cm-box, #screen-questions .fu-btn, #screen-questions .fu-del, #screen-questions .btn-cest-moi, #screen-questions .cm-add-btn').forEach(function(el){
+  el.style.pointerEvents = 'none';
           el.style.opacity = '0.7';
           el.style.cursor = 'not-allowed';
         });
