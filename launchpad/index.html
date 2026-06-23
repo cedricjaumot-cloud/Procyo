@@ -522,16 +522,16 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       <span class="lf" style="display:none">PROCYO</span>
     </div>
     <div class="auth-pitch">
-      <h2>Configurez votre agent IA Inboxia en quelques étapes</h2>
-      <p>Ce questionnaire nous permet de personnaliser votre environnement Procyo. Complétez à votre rythme — vos réponses sont synchronisées sur tous vos appareils.</p>
+      <h2 id="pitch-h2-el">Configurez votre agent Procyo IA en quelques étapes</h2>
+      <p id="pitch-p-el">Ce questionnaire nous permet de personnaliser votre environnement Procyo. Complétez à votre rythme — vos réponses sont synchronisées sur tous vos appareils.</p>
       <div class="auth-steps">
-        <div class="auth-step"><div class="step-dot">1</div><div class="step-text"><strong>Découverte</strong> — Calibrage de votre démo Procyo</div></div>
-        <div class="auth-step"><div class="step-dot">2</div><div class="step-text"><strong>Contractualisation</strong> — Informations juridiques et référents</div></div>
-        <div class="auth-step"><div class="step-dot">3</div><div class="step-text"><strong>Paramétrage</strong> — Configuration fine de votre agent IA</div></div>
-        <div class="auth-step"><div class="step-dot">4</div><div class="step-text"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
+        <div class="auth-step"><div class="step-dot">1</div><div class="step-text" id="step1-el"><strong>Découverte</strong> — Calibrage de votre démo Procyo</div></div>
+        <div class="auth-step"><div class="step-dot">2</div><div class="step-text" id="step2-el"><strong>Contractualisation</strong> — Informations juridiques et référents</div></div>
+        <div class="auth-step"><div class="step-dot">3</div><div class="step-text" id="step3-el"><strong>Paramétrage</strong> — Configuration fine de votre agent IA</div></div>
+        <div class="auth-step"><div class="step-dot">4</div><div class="step-text" id="step4-el"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.72</span></div>
+    <div class="auth-foot">© 2026 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.73</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -555,7 +555,6 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="field"><label id="login-pwd-lbl">Mot de passe</label><input type="password" id="login-pwd" placeholder="••••••••" autocomplete="current-password"></div>
         <button class="btn btn-primary" id="login-btn-el" onclick="doLogin()">Se connecter</button>
         <p style="margin-top:12px;font-size:12px;color:var(--g400);text-align:center" id="login-forgot-el">Mot de passe oublié ? Envoyez un email à <a href="mailto:cedric.jaumot@procyo.be" style="color:var(--blue);text-decoration:none">cedric.jaumot@procyo.be</a></p>
-        <p style="margin-top:8px;font-size:13px;color:var(--g400);text-align:center" id="login-no-account-el">Pas encore de compte ? <a href="#" onclick="switchTab('register');return false" style="color:var(--blue)">Créer un accès</a></p>
       </div>
       <div class="auth-form" id="form-register">
         <h3 id="reg-title-el">Créer votre accès</h3>
@@ -648,7 +647,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.72</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.73</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')"><span id="admin-tab-brokers-el">Courtiers inscrits</span></button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')"><span id="admin-tab-export-el">Export réponses</span></button>
@@ -779,8 +778,8 @@ const LANG = {
     tab_login:'Connexion', tab_register:'Créer un compte',
     login_title:'Bon retour 👋', login_sub:'Accédez à votre questionnaire depuis n\'importe quel appareil',
     login_email:'Adresse email', login_pwd:'Mot de passe',
-    login_btn:'Se connecter', login_forgot:'Mot de passe oublié ? Envoyez un email à',
-    login_no_account:'Pas encore de compte ?', login_create:'Créer un accès',
+    login_btn:'Se connecter', login_forgot:'Mot de passe oublié ? Envoyez un email à <a href="mailto:cedric.jaumot@procyo.be" style="color:var(--blue);text-decoration:none">cedric.jaumot@procyo.be</a>',
+    login_no_account:'', login_create:'',
     register_title:'Créer votre accès', register_sub:'Vos réponses seront accessibles depuis tous vos appareils',
     register_email:'Adresse email professionnelle', register_email_hint:'Utilisée pour les rappels et la connexion',
     register_company:'Nom de votre cabinet (optionnel)', register_company_ph:'Cabinet Dupont Assurances',
@@ -788,10 +787,12 @@ const LANG = {
     register_confirm:'Confirmer le mot de passe', register_btn:'Créer mon accès',
     register_has_account:'Déjà un compte ?', register_login:'Se connecter',
     // Auth pitch
-    pitch_h2:'Votre espace de préparation personnalisé', pitch_p:'Répondez à votre rythme, depuis n\'importe quel appareil. Vos réponses alimentent directement la configuration de votre IA.',
-    step1:'<strong>Module Découverte</strong> — calibrez votre démo',
-    step2:'<strong>Module Contractualisation</strong> — préparez votre contrat',
-    step3:'<strong>Module Paramétrage</strong> — configurez votre IA',
+    pitch_h2:'Configurez votre agent Procyo IA en quelques étapes',
+    pitch_p:'Ce questionnaire nous permet de personnaliser votre environnement Procyo. Complétez à votre rythme — vos réponses sont synchronisées sur tous vos appareils.',
+    step1:'<strong>Découverte</strong> — Calibrage de votre démo Procyo',
+    step2:'<strong>Contractualisation</strong> — Informations juridiques et référents',
+    step3:'<strong>Paramétrage</strong> — Configuration fine de votre agent Procyo IA',
+    step4:'<strong>Optimisation</strong> — L\'IA observe et propose des ajustements',
     // Topbar
     btn_admin:'Admin', btn_logout:'Déconnexion', btn_changepwd_title:'Changer mon mot de passe',
     // Home
@@ -866,18 +867,20 @@ const LANG = {
     tab_login:'Aanmelden', tab_register:'Account aanmaken',
     login_title:'Welkom terug 👋', login_sub:'Toegang tot uw vragenlijst vanaf elk apparaat',
     login_email:'E-mailadres', login_pwd:'Wachtwoord',
-    login_btn:'Aanmelden', login_forgot:'Wachtwoord vergeten? Stuur een e-mail naar',
-    login_no_account:'Nog geen account?', login_create:'Account aanmaken',
+    login_btn:'Aanmelden', login_forgot:'Wachtwoord vergeten? Stuur een e-mail naar <a href="mailto:cedric.jaumot@procyo.be" style="color:var(--blue);text-decoration:none">cedric.jaumot@procyo.be</a>',
+    login_no_account:'', login_create:'',
     register_title:'Account aanmaken', register_sub:'Uw antwoorden zijn toegankelijk vanaf al uw apparaten',
     register_email:'Professioneel e-mailadres', register_email_hint:'Gebruikt voor herinneringen en aanmelding',
     register_company:'Naam van uw kantoor (optioneel)', register_company_ph:'Kantoor Dupont Verzekeringen',
     register_pwd:'Wachtwoord', register_pwd_ph:'Min. 8 tekens',
     register_confirm:'Wachtwoord bevestigen', register_btn:'Account aanmaken',
     register_has_account:'Al een account?', register_login:'Aanmelden',
-    pitch_h2:'Uw gepersonaliseerde voorbereidingsruimte', pitch_p:'Beantwoord op uw eigen tempo, vanaf elk apparaat. Uw antwoorden voeden rechtstreeks de configuratie van uw AI.',
-    step1:'<strong>Ontdekkingsmodule</strong> — kalibreer uw demo',
-    step2:'<strong>Contractualisatiemodule</strong> — bereid uw contract voor',
-    step3:'<strong>Configuratiemodule</strong> — configureer uw AI',
+    pitch_h2:'Configureer uw Procyo IA-agent in enkele stappen',
+    pitch_p:'Deze vragenlijst stelt ons in staat uw Procyo-omgeving te personaliseren. Vul in op uw eigen tempo — uw antwoorden worden gesynchroniseerd op al uw apparaten.',
+    step1:'<strong>Ontdekking</strong> — Kalibratie van uw Procyo-demo',
+    step2:'<strong>Contractualisatie</strong> — Juridische informatie en referenten',
+    step3:'<strong>Configuratie</strong> — Fijnafstelling van uw Procyo IA-agent',
+    step4:'<strong>Optimalisatie</strong> — De AI observeert en stelt aanpassingen voor',
     btn_admin:'Admin', btn_logout:'Afmelden', btn_changepwd_title:'Wachtwoord wijzigen',
     home_title:'Uw Procyo-ruimte', home_sub:'Vul elke module op uw eigen tempo in. Uw antwoorden worden automatisch gesynchroniseerd op al uw apparaten.',
     pc_answered:'Beantwoord', pc_questions:'Vragen', pc_progress:'Globale voortgang',
@@ -945,18 +948,20 @@ const LANG = {
     tab_login:'Anmelden', tab_register:'Konto erstellen',
     login_title:'Willkommen zurück 👋', login_sub:'Greifen Sie von jedem Gerät auf Ihren Fragebogen zu',
     login_email:'E-Mail-Adresse', login_pwd:'Passwort',
-    login_btn:'Anmelden', login_forgot:'Passwort vergessen? Senden Sie eine E-Mail an',
-    login_no_account:'Noch kein Konto?', login_create:'Konto erstellen',
+    login_btn:'Anmelden', login_forgot:'Passwort vergessen? Senden Sie eine E-Mail an <a href="mailto:cedric.jaumot@procyo.be" style="color:var(--blue);text-decoration:none">cedric.jaumot@procyo.be</a>',
+    login_no_account:'', login_create:'',
     register_title:'Ihr Konto erstellen', register_sub:'Ihre Antworten sind auf allen Geräten zugänglich',
     register_email:'Professionelle E-Mail-Adresse', register_email_hint:'Wird für Erinnerungen und Anmeldung verwendet',
     register_company:'Name Ihres Büros (optional)', register_company_ph:'Büro Dupont Versicherungen',
     register_pwd:'Passwort', register_pwd_ph:'Mind. 8 Zeichen',
     register_confirm:'Passwort bestätigen', register_btn:'Konto erstellen',
     register_has_account:'Bereits ein Konto?', register_login:'Anmelden',
-    pitch_h2:'Ihr persönlicher Vorbereitungsbereich', pitch_p:'Antworten Sie in Ihrem eigenen Tempo, von jedem Gerät aus. Ihre Antworten fließen direkt in die Konfiguration Ihrer KI ein.',
-    step1:'<strong>Entdeckungsmodul</strong> — kalibrieren Sie Ihre Demo',
-    step2:'<strong>Vertragsmodul</strong> — bereiten Sie Ihren Vertrag vor',
-    step3:'<strong>Konfigurationsmodul</strong> — konfigurieren Sie Ihre KI',
+    pitch_h2:'Konfigurieren Sie Ihren Procyo IA-Agenten in wenigen Schritten',
+    pitch_p:'Dieser Fragebogen ermöglicht es uns, Ihre Procyo-Umgebung zu personalisieren. Füllen Sie ihn in Ihrem eigenen Tempo aus — Ihre Antworten werden auf allen Geräten synchronisiert.',
+    step1:'<strong>Entdeckung</strong> — Kalibrierung Ihrer Procyo-Demo',
+    step2:'<strong>Vertragsabschluss</strong> — Rechtliche Informationen und Ansprechpartner',
+    step3:'<strong>Konfiguration</strong> — Feineinstellung Ihres Procyo IA-Agenten',
+    step4:'<strong>Optimierung</strong> — Die KI beobachtet und schlägt Anpassungen vor',
     btn_admin:'Admin', btn_logout:'Abmelden', btn_changepwd_title:'Passwort ändern',
     home_title:'Ihr Procyo-Bereich', home_sub:'Füllen Sie jedes Modul in Ihrem eigenen Tempo aus. Ihre Antworten werden automatisch auf allen Geräten synchronisiert.',
     pc_answered:'Beantwortet', pc_questions:'Fragen', pc_progress:'Gesamtfortschritt',
@@ -1024,18 +1029,20 @@ const LANG = {
     tab_login:'Log in', tab_register:'Create account',
     login_title:'Welcome back 👋', login_sub:'Access your questionnaire from any device',
     login_email:'Email address', login_pwd:'Password',
-    login_btn:'Log in', login_forgot:'Forgot your password? Send an email to',
-    login_no_account:'No account yet?', login_create:'Create access',
+    login_btn:'Log in', login_forgot:'Forgot your password? Send an email to <a href="mailto:cedric.jaumot@procyo.be" style="color:var(--blue);text-decoration:none">cedric.jaumot@procyo.be</a>',
+    login_no_account:'', login_create:'',
     register_title:'Create your access', register_sub:'Your answers will be accessible from all your devices',
     register_email:'Professional email address', register_email_hint:'Used for reminders and login',
     register_company:'Your firm name (optional)', register_company_ph:'Dupont Insurance Brokers',
     register_pwd:'Password', register_pwd_ph:'Min. 8 characters',
     register_confirm:'Confirm password', register_btn:'Create my access',
     register_has_account:'Already have an account?', register_login:'Log in',
-    pitch_h2:'Your personalised preparation space', pitch_p:'Answer at your own pace, from any device. Your answers directly feed your AI configuration.',
-    step1:'<strong>Discovery module</strong> — calibrate your demo',
-    step2:'<strong>Contractualisation module</strong> — prepare your contract',
-    step3:'<strong>Configuration module</strong> — set up your AI',
+    pitch_h2:'Configure your Procyo IA agent in a few steps',
+    pitch_p:'This questionnaire allows us to personalise your Procyo environment. Complete it at your own pace — your answers are synchronised across all your devices.',
+    step1:'<strong>Discovery</strong> — Calibrate your Procyo demo',
+    step2:'<strong>Contractualisation</strong> — Legal information and key contacts',
+    step3:'<strong>Configuration</strong> — Fine-tune your Procyo IA agent',
+    step4:'<strong>Optimisation</strong> — The AI observes and suggests adjustments',
     btn_admin:'Admin', btn_logout:'Log out', btn_changepwd_title:'Change my password',
     home_title:'Your Procyo space', home_sub:'Complete each module at your own pace. Your answers are automatically synchronised across all your devices.',
     pc_answered:'Answered', pc_questions:'Questions', pc_progress:'Overall progress',
@@ -1117,7 +1124,14 @@ function applyLang(){
   const setT = (id, key) => { const el=document.getElementById(id); if(el) el.textContent=t(key); };
   const setH = (id, key) => { const el=document.getElementById(id); if(el) el.innerHTML=t(key); };
   const setPH = (id, key) => { const el=document.getElementById(id); if(el) el.placeholder=t(key); };
-  const setLbl = (id, key) => { const el=document.getElementById(id); if(el) el.textContent=t(key); };
+
+  // Auth-left pitch
+  setH('pitch-h2-el', 'pitch_h2');
+  setT('pitch-p-el', 'pitch_p');
+  setH('step1-el', 'step1');
+  setH('step2-el', 'step2');
+  setH('step3-el', 'step3');
+  setH('step4-el', 'step4');
 
   // Tabs
   document.querySelectorAll('.auth-tab')[0]?.childNodes.forEach((n,i)=>{ if(n.nodeType===3) n.textContent=t('tab_login'); });
@@ -1131,7 +1145,6 @@ function applyLang(){
   setT('login-pwd-lbl', 'login_pwd');
   setT('login-btn-el', 'login_btn');
   setH('login-forgot-el', 'login_forgot');
-  setH('login-no-account-el', 'login_no_account');
 
   // Register form
   setH('reg-title-el', 'register_title');
