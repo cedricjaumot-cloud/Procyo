@@ -2563,7 +2563,6 @@ async function saveAll(){
   try{
     await saveBatch();
     if(currentMod!==null)updateQProgress(getModules()[currentMod]);
-    renderNotif(currentMod);
     btn.classList.remove('saving');
     btn.disabled=false;
     lbl.textContent=t('save_status_saved');
@@ -2628,32 +2627,14 @@ async function updateQProgress(mod){
     const status=currentUser[mod.id+'_status']||'locked';
     console.log('Completion check:', mod.id, 'status=', status, 'ans=', ans, 'tot=', tot);
     if(status==='active'){
-      // Enregistrer la date de complétion (toujours, indépendamment de l'envoi mail)
-      const modIdL=mod.id.toLowerCase();
+    // Enregistrer la date de complétion → déclenche l'Edge Function qui notifie Odoo
+      
       const completedKey=mod.id+'_completed_at'; // ex: module1_completed_at
       if(!currentUser[completedKey]){
         const completedAt=new Date().toISOString();
         await sbUpdate('brokers','id=eq.'+currentUser.id,{[completedKey]:completedAt});
-        currentUser[completedKey]=completedAt;
-        // Notifier Odoo que le module est complété
-        const modNum=mod.id.replace('module','');
-        if(currentUser.odoo_id){
-          try{
-            await fetch('https://procyo2.odoo.com/web/hook/b2afcdca-64ff-411b-b3fe-8b420b2c13ab',{
-              method:'POST',
-              headers:{'Content-Type':'application/json'},
-              body:JSON.stringify({
-                _model:'crm.lead',
-                _id:parseInt(currentUser.odoo_id),
-                odoo_id:parseInt(currentUser.odoo_id),
-                module:modNum
-              })
-            });
-          }catch(e){console.warn('Odoo notify failed:',e);}
-        }
+        currentUser[completedKey]=completedAt;  
       }
-      // Envoyer la notification si pas encore fait
-      sendModuleNotification(mod.id);
     }
   }
 }
