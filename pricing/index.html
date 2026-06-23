@@ -465,44 +465,58 @@ header img.logo{height:34px}
       </div>
     </div>
 
-    <!-- SECTION 2 : CONFIGURATION -->
-    <div class="card">
-      <div class="section-title"><span class="icon">⚙️</span> Module 2 — Configuration & licences</div>
-      <div class="form-grid">
-        <div class="field">
-          <label>M2Q1 — Nombre d'adresses email (Inboxia)</label>
-          <input type="number" id="f-m2q1" min="1" max="100" placeholder="Ex: 5" oninput="cFieldChanged('M2Q1',this.value)"/>
-        </div>
-      </div>
-      <div style="margin-top:1rem">
-        <div class="field">
-          <label style="margin-bottom:.5rem">M2Q3 — Modules complémentaires</label>
-          <div class="modules-grid">
-            <div class="mod-check" id="mod-regulia" onclick="cToggleMod('regulia')">
-              <div class="mod-check-box"><svg viewBox="0 0 12 10" fill="none" stroke="white" stroke-width="2.5"><polyline points="1,5 4,8 11,1"/></svg></div>
-              <div>
-                <div class="mod-check-label">Assistant Conformité</div>
-                <div class="mod-check-sub">KYC / AML / IDD</div>
-              </div>
-            </div>
-            <div class="mod-check" id="mod-portfolia" onclick="cToggleMod('portfolia')">
-              <div class="mod-check-box"><svg viewBox="0 0 12 10" fill="none" stroke="white" stroke-width="2.5"><polyline points="1,5 4,8 11,1"/></svg></div>
-              <div>
-                <div class="mod-check-label">Assistant Portefeuille</div>
-                <div class="mod-check-sub">Analyse & tableaux de bord</div>
-              </div>
-            </div>
-            <div class="mod-check" id="mod-relancia" onclick="cToggleMod('relancia')">
-              <div class="mod-check-box"><svg viewBox="0 0 12 10" fill="none" stroke="white" stroke-width="2.5"><polyline points="1,5 4,8 11,1"/></svg></div>
-              <div>
-                <div class="mod-check-label">Assistant Commercial</div>
-                <div class="mod-check-sub">Opportunités & campagnes</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+   <!-- SECTION 2 : CONFIGURATION -->
+<div class="card">
+  <div class="section-title"><span class="icon">⚙️</span> Module 2 — Configuration & licences</div>
+  <div class="form-grid">
+    <div class="field">
+      <label>M2Q1 — Nombre d'adresses email (Inboxia)</label>
+      <input type="number" id="f-m2q1" min="1" max="100" placeholder="Ex: 5" oninput="cFieldChanged('M2Q1',this.value)"/>
     </div>
+  </div>
+  <div style="margin-top:1rem">
+    <div class="field">
+      <label style="margin-bottom:.625rem;display:block">M2Q3 — Modules complémentaires</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem">
+
+        <div id="mod-regulia" onclick="cToggleMod('regulia')" style="border:1.5px solid var(--border);border-radius:var(--r);padding:.875rem;cursor:pointer;transition:all .18s;user-select:none;background:var(--white)">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem">
+            <div id="mod-regulia-box" style="width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:white;transition:all .15s">
+              <svg width="10" height="10" viewBox="0 0 12 10" fill="none" stroke="white" stroke-width="2.5" id="mod-regulia-check" style="display:none"><polyline points="1,5 4,8 11,1"/></svg>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--navy)">Assistant Conformité</span>
+          </div>
+          <div style="font-size:11px;color:var(--gray2);line-height:1.4">KYC / AML / IDD</div>
+          <div style="font-size:11px;color:var(--teal);font-weight:600;margin-top:.375rem">10 € × nb adr. / mois</div>
+        </div>
+
+        <div id="mod-portfolia" onclick="cToggleMod('portfolia')" style="border:1.5px solid var(--border);border-radius:var(--r);padding:.875rem;cursor:pointer;transition:all .18s;user-select:none;background:var(--white)">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem">
+            <div id="mod-portfolia-box" style="width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:white;transition:all .15s">
+              <svg width="10" height="10" viewBox="0 0 12 10" fill="none" stroke="white" stroke-width="2.5" id="mod-portfolia-check" style="display:none"><polyline points="1,5 4,8 11,1"/></svg>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--navy)">Assistant Portefeuille</span>
+          </div>
+          <div style="font-size:11px;color:var(--gray2);line-height:1.4">Analyse & tableaux de bord</div>
+          <div style="font-size:11px;color:var(--teal);font-weight:600;margin-top:.375rem">10 % base / mois</div>
+        </div>
+
+        <div id="mod-relancia" onclick="cToggleMod('relancia')" style="border:1.5px solid var(--border);border-radius:var(--r);padding:.875rem;cursor:pointer;transition:all .18s;user-select:none;background:var(--white)">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem">
+            <div id="mod-relancia-box" style="width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:white;transition:all .15s">
+              <svg width="10" height="10" viewBox="0 0 12 10" fill="none" stroke="white" stroke-width="2.5" id="mod-relancia-check" style="display:none"><polyline points="1,5 4,8 11,1"/></svg>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--navy)">Assistant Commercial</span>
+          </div>
+          <div style="font-size:11px;color:var(--gray2);line-height:1.4">Opportunités & campagnes</div>
+          <div style="font-size:11px;color:var(--teal);font-weight:600;margin-top:.375rem">10 € × nb adr. / mois</div>
+        </div>
+
+      </div>
+      <div id="m2q3-summary" style="font-size:11px;color:var(--gray2);margin-top:.5rem;min-height:16px;font-style:italic"></div>
+    </div>
+  </div>
+</div>
 
     <!-- SECTION 3 : IDENTIFICATION JURIDIQUE -->
     <div class="card">
@@ -1358,22 +1372,39 @@ function cFillFields(map){
 }
 
 function cRenderMods(){
-  ['regulia','portfolia','relancia'].forEach(m=>{
-    const el=document.getElementById('mod-'+m);
-    if(el)el.classList.toggle('active',cMods[m]);
+  ['regulia','portfolia','relancia'].forEach(function(m){
+    var card=document.getElementById('mod-'+m);
+    var box=document.getElementById('mod-'+m+'-box');
+    var check=document.getElementById('mod-'+m+'-check');
+    if(!card)return;
+    if(cMods[m]){
+      card.style.borderColor='var(--teal)';
+      card.style.background='var(--teal-bg)';
+      if(box){box.style.background='var(--teal)';box.style.borderColor='var(--teal)';}
+      if(check)check.style.display='block';
+    } else {
+      card.style.borderColor='var(--border)';
+      card.style.background='var(--white)';
+      if(box){box.style.background='white';box.style.borderColor='var(--border)';}
+      if(check)check.style.display='none';
+    }
   });
 }
 
 function cToggleMod(m){
   cMods[m]=!cMods[m];
   cRenderMods();
-  // Build array
-  const arr=[];
+  var arr=[];
   if(cMods.regulia)arr.push('Assistant conformité (Regulia) — KYC / AML / IDD');
   if(cMods.portfolia)arr.push('Assistant portefeuille (Portfolia) — analyse et tableaux de bord');
   if(cMods.relancia)arr.push('Assistant commercial (Relancia) — opportunités et campagnes');
   if(!arr.length)arr.push("Aucun pour l'instant — uniquement l'Assistant mail");
   cFieldChanged('M2Q3',JSON.stringify(arr));
+  var summary=document.getElementById('m2q3-summary');
+  if(summary){
+    var actifs=['regulia','portfolia','relancia'].filter(function(k){return cMods[k];}).map(function(k){return{regulia:'Conformité',portfolia:'Portefeuille',relancia:'Commercial'}[k];});
+    summary.textContent=actifs.length?'✓ Modules actifs : '+actifs.join(', '):'Aucun module sélectionné';
+  }
   cUpdateSidebar();
 }
 
