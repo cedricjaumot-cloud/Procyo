@@ -77,6 +77,12 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .topbar-btn:hover{color:white;border-color:rgba(255,255,255,.3)}
 .topbar-btn.admin-btn{color:#E8A020;border-color:rgba(232,160,32,.3)}
 
+/* LANG SWITCHER */
+.lang-switcher{display:flex;gap:3px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:3px}
+.lang-btn{font-size:11px;font-weight:600;padding:3px 8px;border-radius:5px;border:none;background:transparent;color:rgba(255,255,255,.4);cursor:pointer;font-family:var(--font);letter-spacing:.04em;transition:all .15s}
+.lang-btn:hover{color:white;background:rgba(255,255,255,.1)}
+.lang-btn.active{background:rgba(255,255,255,.15);color:white}
+
 /* HOME */
 #screen-home{display:none;min-height:calc(100vh - 60px)}
 .home-wrap{max-width:860px;margin:0 auto;padding:44px 28px 80px}
@@ -521,7 +527,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-step"><div class="step-dot">4</div><div class="step-text"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.68</span></div>
+    <div class="auth-foot">© 2025 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.69</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -530,25 +536,25 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-tab" onclick="switchTab('register')">Créer un compte</div>
       </div>
       <div class="auth-form on" id="form-login">
-        <h3>Bon retour 👋</h3>
-        <p class="auth-sub">Accédez à votre questionnaire depuis n'importe quel appareil</p>
+        <h3 id="login-title-el">Bon retour 👋</h3>
+        <p class="auth-sub" id="login-sub-el">Accédez à votre questionnaire depuis n'importe quel appareil</p>
         <div class="msg-error" id="login-err"></div>
-        <div class="field"><label>Adresse email</label><input type="email" id="login-email" placeholder="vous@cabinet.be" autocomplete="email"></div>
-        <div class="field"><label>Mot de passe</label><input type="password" id="login-pwd" placeholder="••••••••" autocomplete="current-password"></div>
-        <button class="btn btn-primary" onclick="doLogin()">Se connecter</button>
-        <p style="margin-top:12px;font-size:12px;color:var(--g400);text-align:center">Mot de passe oublié ? Envoyez un email à <a href="mailto:cedric.jaumot@procyo.be" style="color:var(--blue);text-decoration:none">cedric.jaumot@procyo.be</a></p>
-        <p style="margin-top:8px;font-size:13px;color:var(--g400);text-align:center">Pas encore de compte ? <a href="#" onclick="switchTab('register');return false" style="color:var(--blue)">Créer un accès</a></p>
+        <div class="field"><label id="login-email-lbl">Adresse email</label><input type="email" id="login-email" placeholder="vous@cabinet.be" autocomplete="email"></div>
+        <div class="field"><label id="login-pwd-lbl">Mot de passe</label><input type="password" id="login-pwd" placeholder="••••••••" autocomplete="current-password"></div>
+        <button class="btn btn-primary" id="login-btn-el" onclick="doLogin()">Se connecter</button>
+        <p style="margin-top:12px;font-size:12px;color:var(--g400);text-align:center" id="login-forgot-el">Mot de passe oublié ? Envoyez un email à <a href="mailto:cedric.jaumot@procyo.be" style="color:var(--blue);text-decoration:none">cedric.jaumot@procyo.be</a></p>
+        <p style="margin-top:8px;font-size:13px;color:var(--g400);text-align:center" id="login-no-account-el">Pas encore de compte ? <a href="#" onclick="switchTab('register');return false" style="color:var(--blue)">Créer un accès</a></p>
       </div>
       <div class="auth-form" id="form-register">
-        <h3>Créer votre accès</h3>
-        <p class="auth-sub">Vos réponses seront accessibles depuis tous vos appareils</p>
+        <h3 id="reg-title-el">Créer votre accès</h3>
+        <p class="auth-sub" id="reg-sub-el">Vos réponses seront accessibles depuis tous vos appareils</p>
         <div class="msg-error" id="reg-err"></div>
         <div class="msg-ok" id="reg-ok"></div>
-        <div class="field"><label>Adresse email professionnelle</label><input type="email" id="reg-email" placeholder="vous@cabinet.be"><div class="field-hint">Utilisée pour les rappels et la connexion</div></div>
-        <div class="field"><label>Nom de votre cabinet (optionnel)</label><input type="text" id="reg-company" placeholder="Cabinet Dupont Assurances"></div>
-        <div class="field"><label>Mot de passe</label><input type="password" id="reg-pwd" placeholder="Min. 8 caractères"></div>
-        <div class="field"><label>Confirmer le mot de passe</label><input type="password" id="reg-pwd2" placeholder="••••••••"></div>
-        <button class="btn btn-primary" onclick="doRegister()">Créer mon accès</button>
+        <div class="field"><label id="reg-email-lbl">Adresse email professionnelle</label><input type="email" id="reg-email" placeholder="vous@cabinet.be"><div class="field-hint" id="reg-email-hint-el">Utilisée pour les rappels et la connexion</div></div>
+        <div class="field"><label id="reg-company-lbl">Nom de votre cabinet (optionnel)</label><input type="text" id="reg-company" placeholder="Cabinet Dupont Assurances"></div>
+        <div class="field"><label id="reg-pwd-lbl">Mot de passe</label><input type="password" id="reg-pwd" placeholder="Min. 8 caractères"></div>
+        <div class="field"><label id="reg-confirm-lbl">Confirmer le mot de passe</label><input type="password" id="reg-pwd2" placeholder="••••••••"></div>
+        <button class="btn btn-primary" id="reg-btn-el" onclick="doRegister()">Créer mon accès</button>
         <p style="margin-top:16px;font-size:13px;color:var(--g400);text-align:center">Déjà un compte ? <a href="#" onclick="switchTab('login');return false" style="color:var(--blue)">Se connecter</a></p>
       </div>
     </div>
@@ -564,6 +570,12 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
     </div>
     <div class="topbar-right">
       <span class="topbar-email" id="tb-email"></span>
+      <div class="lang-switcher" id="lang-switcher">
+        <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" data-lang="nl" onclick="setLang('nl')">NL</button>
+        <button class="lang-btn" data-lang="de" onclick="setLang('de')">DE</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+      </div>
       <button class="topbar-btn admin-btn hidden" id="btn-admin" onclick="showAdmin()">Admin</button>
       <button class="topbar-btn" onclick="openChangePwd()" title="Changer mon mot de passe">🔑</button>
       <button class="topbar-btn" onclick="doLogout()">Déconnexion</button>
@@ -575,15 +587,15 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
     <div class="home-wrap">
       <div class="home-head">
         <h1 id="greeting">Votre espace Procyo</h1>
-        <p>Complétez chaque module à votre rythme. Vos réponses sont synchronisées automatiquement sur tous vos appareils.</p>
+        <p id="home-sub-el">Complétez chaque module à votre rythme. Vos réponses sont synchronisées automatiquement sur tous vos appareils.</p>
       </div>
       <div class="progress-card">
-        <div class="pc-stat"><div class="pc-num" id="pc-ans">0</div><div class="pc-label">Répondues</div></div>
+        <div class="pc-stat"><div class="pc-num" id="pc-ans">0</div><div class="pc-label" id="pc-label-ans">Répondues</div></div>
         <div class="pc-div"></div>
-        <div class="pc-stat"><div class="pc-num" id="pc-tot">0</div><div class="pc-label">Questions</div></div>
+        <div class="pc-stat"><div class="pc-num" id="pc-tot">0</div><div class="pc-label" id="pc-label-tot">Questions</div></div>
         <div class="pc-div"></div>
         <div class="pc-bar-wrap">
-          <div class="pc-bar-label"><span>Progression globale</span><span id="pc-pct">0%</span></div>
+          <div class="pc-bar-label"><span id="pc-prog-lbl">Progression globale</span><span id="pc-pct">0%</span></div>
           <div class="pc-bar"><div class="pc-fill" id="pc-fill" style="width:0%"></div></div>
         </div>
       </div>
@@ -594,7 +606,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
   <!-- QUESTIONS -->
   <div id="screen-questions">
     <div class="q-wrap">
-      <button class="back-btn" onclick="showHome()">
+      <button class="back-btn" id="back-btn-questions" onclick="showHome()">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour au tableau de bord
       </button>
@@ -612,7 +624,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       <div style="height:80px"></div>
       <div class="sticky-bar" id="sticky-bar">
         <span class="save-st" id="save-st">Synchronisé sur tous vos appareils</span>
-        <button class="btn-save" id="btn-save" onclick="saveAll()"><span class="spin"></span><span class="btn-save-lbl">Sauvegarder</span></button>
+        <button class="btn-save" id="btn-save" onclick="saveAll()"><span class="spin"></span><span class="btn-save-lbl" id="btn-save-lbl-el">Sauvegarder</span></button>
       </div>
     </div>
   </div>
@@ -624,22 +636,22 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.68</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.69</span></h2>
       <div class="admin-tabs">
-        <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')">Courtiers inscrits</button>
-        <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')">Export réponses</button>
+        <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')"><span id="admin-tab-brokers-el">Courtiers inscrits</span></button>
+        <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')"><span id="admin-tab-export-el">Export réponses</span></button>
       </div>
       <div id="admin-tab-courtiers">
-        <p class="admin-sub">Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.</p>
+        <p class="admin-sub" id="admin-sub-brokers-el">Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.</p>
         <div id="admin-list"></div>
       </div>
       <div id="admin-tab-export" style="display:none">
-        <p class="admin-sub">Tableau croisé — une ligne par question, une colonne par courtier.</p>
-        <div id="pivot-status" style="font-size:13px;color:var(--g500);padding:10px 14px;background:var(--g100);border-radius:8px;margin-bottom:16px;border-left:3px solid var(--blue)">Cliquez sur "Charger" pour générer le tableau.</div>
+        <p class="admin-sub" id="admin-sub-export-el">Tableau croisé — une ligne par question, une colonne par courtier.</p>
+        <div id="pivot-status" id="pivot-hint-el" style="font-size:13px;color:var(--g500);padding:10px 14px;background:var(--g100);border-radius:8px;margin-bottom:16px;border-left:3px solid var(--blue)">Cliquez sur "Charger" pour générer le tableau.</div>
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-          <button class="btn btn-primary" id="pivot-load-btn" onclick="loadPivot()">&#8635; Charger les données</button>
-          <button class="btn btn-primary" id="pivot-xlsx-btn" onclick="exportPivotXLSX()" disabled style="opacity:.4">&#8595; Télécharger .xlsx</button>
-          <button class="btn" id="pivot-csv-btn" onclick="exportPivotCSV()" disabled style="opacity:.4">&#8595; Télécharger .csv</button>
+          <button class="btn btn-primary" id="pivot-load-btn" onclick="loadPivot()">↻ Charger les données</button>
+          <button class="btn btn-primary" id="pivot-xlsx-btn" onclick="exportPivotXLSX()" disabled style="opacity:.4">↓ Télécharger .xlsx</button>
+          <button class="btn" id="pivot-csv-btn" onclick="exportPivotCSV()" disabled style="opacity:.4">↓ Télécharger .csv</button>
         </div>
         <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--g200)">
           <table id="pivot-table" style="border-collapse:collapse;background:white;font-size:12px;width:100%"></table>
@@ -652,7 +664,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
   <div id="screen-dossier" style="display:none">
     <div class="dossier-wrap" id="dossier-content">
       <div class="dossier-topbar no-print">
-        <button class="back-btn" onclick="closeDossier()">
+        <button class="back-btn" id="back-dossier-btn" onclick="closeDossier()">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
           Retour à la liste
         </button>
@@ -669,8 +681,8 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 <!-- MODAL OBSERVATION -->
 <div class="modal-overlay hidden" id="obs-modal">
   <div class="modal">
-    <h3>➕ Ajouter une observation M4</h3>
-    <p>L'IA a observé un pattern. Formulez la notification qui sera présentée au courtier.</p>
+    <h3 id="obs-modal-title">➕ Ajouter une observation M4</h3>
+    <p id="obs-modal-p">L'IA a observé un pattern. Formulez la notification qui sera présentée au courtier.</p>
     <select id="obs-type">
       <option value="Ton de communication">Ton de communication</option>
       <option value="Compagnie non listée">Compagnie non listée</option>
@@ -681,8 +693,8 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
     </select>
     <textarea id="obs-text" placeholder="Nous avons observé que… Voulez-vous… ?"></textarea>
     <div class="modal-actions">
-      <button class="modal-btn cancel" onclick="closeObsModal()">Annuler</button>
-      <button class="modal-btn confirm" onclick="submitObservation()">Ajouter l'observation</button>
+      <button class="modal-btn cancel" id="obs-cancel-btn" onclick="closeObsModal()">Annuler</button>
+      <button class="modal-btn confirm" id="obs-confirm-btn" onclick="submitObservation()">Ajouter l'observation</button>
     </div>
   </div>
 </div>
@@ -690,13 +702,13 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 <!-- MODAL CHANGER MOT DE PASSE -->
 <div class="modal-overlay hidden" id="modal-change-pwd">
   <div class="modal">
-    <h3>🔑 Changer mon mot de passe</h3>
-    <p>Saisissez votre mot de passe actuel puis choisissez un nouveau mot de passe.</p>
+    <h3 id="chpwd-title-el">🔑 Changer mon mot de passe</h3>
+    <p id="chpwd-p-el">Saisissez votre mot de passe actuel puis choisissez un nouveau mot de passe.</p>
     <div class="chpwd-err" id="chpwd-err"></div>
     <div class="chpwd-ok" id="chpwd-ok"></div>
-    <div class="field"><label>Mot de passe actuel</label><input type="password" id="chpwd-current" placeholder="••••••••"></div>
-    <div class="field"><label>Nouveau mot de passe</label><input type="password" id="chpwd-new1" placeholder="Minimum 8 caractères"></div>
-    <div class="field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="chpwd-new2" placeholder="Répétez le nouveau mot de passe"></div>
+    <div class="field"><label id="chpwd-current-lbl">Mot de passe actuel</label><input type="password" id="chpwd-current" placeholder="••••••••"></div>
+    <div class="field"><label id="chpwd-new1-lbl">Nouveau mot de passe</label><input type="password" id="chpwd-new1" placeholder="Minimum 8 caractères"></div>
+    <div class="field"><label id="chpwd-new2-lbl">Confirmer le nouveau mot de passe</label><input type="password" id="chpwd-new2" placeholder="Répétez le nouveau mot de passe"></div>
     <div class="modal-actions">
       <button class="modal-btn cancel" onclick="closeChangePwd()">Annuler</button>
       <button class="modal-btn confirm" id="chpwd-submit-btn" onclick="doChangePwd()">Changer le mot de passe</button>
@@ -707,9 +719,9 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 <!-- MODAL SUPPRESSION COURTIER -->
 <div class="modal-overlay hidden" id="modal-delete-broker">
   <div class="modal">
-    <h3 style="color:var(--red)">🗑️ Supprimer ce courtier</h3>
-    <p>Vous êtes sur le point de supprimer <strong id="delete-broker-name"></strong> et l'ensemble de ses données (réponses, observations). <strong>Cette action est irréversible.</strong></p>
-    <div style="background:var(--red-pale);border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:20px">
+    <h3 id="delete-modal-title" style="color:var(--red)">🗑️ Supprimer ce courtier</h3>
+    <p><span id="delete-p-el">Vous êtes sur le point de supprimer</span> <strong id="delete-broker-name"></strong> <span id="delete-p2-el">et l'ensemble de ses données (réponses, observations). <strong>Cette action est irréversible.</strong></span></p>
+    <div id="delete-warn-el" style="background:var(--red-pale);border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:20px">
       ⚠️ Toutes les réponses et observations associées seront définitivement supprimées de Supabase.
     </div>
     <div class="modal-actions">
@@ -719,19 +731,19 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
   </div>
 </div>
 
-<!-- MODAL RESET PASSWORD ADMIN — affichage du mot de passe temporaire -->
+<!-- MODAL RESET PASSWORD ADMIN -->
 <div class="modal-overlay hidden" id="modal-reset-pwd">
   <div class="modal">
-    <h3>🔑 Mot de passe temporaire généré</h3>
-    <p id="modal-reset-desc">Communiquez ce mot de passe au courtier par email ou téléphone. Il pourra le modifier depuis son espace via le bouton 🔑 en haut à droite.</p>
+    <h3 id="reset-modal-title">🔑 Mot de passe temporaire généré</h3>
+    <p id="reset-modal-p">Communiquez ce mot de passe au courtier par email ou téléphone. Il pourra le modifier depuis son espace via le bouton 🔑 en haut à droite.</p>
     <div style="background:var(--g50);border:2px solid var(--blue-mid);border-radius:10px;padding:18px 24px;text-align:center;margin:8px 0 20px">
-      <div style="font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Mot de passe temporaire</div>
+      <div id="reset-label-el" style="font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Mot de passe temporaire</div>
       <div id="modal-reset-pwd-value" style="font-size:28px;font-weight:700;color:var(--navy);letter-spacing:.12em;font-family:monospace"></div>
-      <div style="font-size:11px;color:var(--g400);margin-top:6px">pour <span id="modal-reset-email" style="color:var(--g600)"></span></div>
+      <div style="font-size:11px;color:var(--g400);margin-top:6px"><span id="reset-pour-el">pour</span> <span id="modal-reset-email" style="color:var(--g600)"></span></div>
     </div>
     <button onclick="copyTempPwd()" id="copy-pwd-btn" style="width:100%;padding:10px;background:var(--blue-pale);color:var(--blue);border:1.5px solid var(--blue-mid);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);margin-bottom:16px;transition:all .15s">📋 Copier le mot de passe</button>
     <div class="modal-actions">
-      <button class="modal-btn confirm" onclick="closeResetPwdModal()" style="background:var(--navy)">Fermer</button>
+      <button class="modal-btn confirm" id="reset-close-btn" onclick="closeResetPwdModal()" style="background:var(--navy)">Fermer</button>
     </div>
   </div>
 </div>
@@ -745,40 +757,750 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const ADMIN_EMAILS = ['cedric@auditassur.be','admin@procyo.com','admin@procyo.be'];
 
 // ══════════════════════════════════════════════════════════════
+// LANGUE
+// ══════════════════════════════════════════════════════════════
+let currentLang = localStorage.getItem('procyo_lang_launchpad') || 'fr';
+
+const LANG = {
+  fr: {
+    // Auth
+    tab_login:'Connexion', tab_register:'Créer un compte',
+    login_title:'Bon retour 👋', login_sub:'Accédez à votre questionnaire depuis n\'importe quel appareil',
+    login_email:'Adresse email', login_pwd:'Mot de passe',
+    login_btn:'Se connecter', login_forgot:'Mot de passe oublié ? Envoyez un email à',
+    login_no_account:'Pas encore de compte ?', login_create:'Créer un accès',
+    register_title:'Créer votre accès', register_sub:'Vos réponses seront accessibles depuis tous vos appareils',
+    register_email:'Adresse email professionnelle', register_email_hint:'Utilisée pour les rappels et la connexion',
+    register_company:'Nom de votre cabinet (optionnel)', register_company_ph:'Cabinet Dupont Assurances',
+    register_pwd:'Mot de passe', register_pwd_ph:'Min. 8 caractères',
+    register_confirm:'Confirmer le mot de passe', register_btn:'Créer mon accès',
+    register_has_account:'Déjà un compte ?', register_login:'Se connecter',
+    // Auth pitch
+    pitch_h2:'Votre espace de préparation personnalisé', pitch_p:'Répondez à votre rythme, depuis n\'importe quel appareil. Vos réponses alimentent directement la configuration de votre IA.',
+    step1:'<strong>Module Découverte</strong> — calibrez votre démo',
+    step2:'<strong>Module Contractualisation</strong> — préparez votre contrat',
+    step3:'<strong>Module Paramétrage</strong> — configurez votre IA',
+    // Topbar
+    btn_admin:'Admin', btn_logout:'Déconnexion', btn_changepwd_title:'Changer mon mot de passe',
+    // Home
+    home_title:'Votre espace Procyo', home_sub:'Complétez chaque module à votre rythme. Vos réponses sont synchronisées automatiquement sur tous vos appareils.',
+    pc_answered:'Répondues', pc_questions:'Questions', pc_progress:'Progression globale',
+    mod_status_locked:'Verrouillé', mod_status_active:'En cours', mod_status_completed:'Complété',
+    mod_questions:'questions', mod_start:'Commencer', mod_continue:'Continuer', mod_review:'Consulter',
+    mod_observations:'observations',
+    // Questions screen
+    back_dashboard:'Retour au tableau de bord',
+    save_status_sync:'Synchronisé sur tous vos appareils', save_status_saving:'Enregistrement…', save_status_saved:'Sauvegardé ✓', save_status_error:'Erreur de sauvegarde',
+    btn_save:'Sauvegarder',
+    notif_reminder:'<strong>Rappel quotidien actif.</strong> Tant que ce module n\'est pas clôturé, vous recevez un email de rappel chaque jour. Vos réponses sont synchronisées sur tous vos appareils.',
+    notif_readonly:'Ce module est <strong>clôturé</strong>. Vos réponses sont en lecture seule.',
+    btn_cest_moi:'👤 C\'est moi',
+    no_files:'Pas de templates',
+    hint_label:'💡',
+    other_label:'Autre…', other_ph:'Précisez…',
+    total_pct:'Total',
+    ok_default:'OK (comportement par défaut)',
+    custom_ph:'Décrivez votre préférence…',
+    upload_drag:'Glissez vos fichiers ici ou',
+    upload_browse:'parcourir',
+    upload_hint_a:'max',
+    upload_hint_b:'fichiers,',
+    upload_hint_c:'Mo chacun',
+    // Admin
+    back_admin:'Retour',
+    admin_title:'Administration',
+    admin_tab_brokers:'Courtiers inscrits', admin_tab_export:'Export réponses',
+    admin_sub_brokers:'Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.',
+    admin_sub_export:'Tableau croisé — une ligne par question, une colonne par courtier.',
+    pivot_hint:'Cliquez sur "Charger" pour générer le tableau.',
+    pivot_load:'↻ Charger les données', pivot_xlsx:'↓ Télécharger .xlsx', pivot_csv:'↓ Télécharger .csv',
+    admin_sales:'Sales en charge',
+    btn_unlock:'🔓 Débloquer', btn_obs:'➕ Observation M4', btn_dossier:'📋 Voir le dossier',
+    btn_reset_pwd:'🔑 Réinitialiser le mot de passe', btn_delete:'🗑️ Supprimer',
+    registered_on:'inscrit le',
+    mod_accessible:'Accessible', mod_locked_s:'Verrouillé', mod_obs:'obs.',
+    // Dossier
+    back_list:'Retour à la liste', btn_print:'Imprimer / Exporter PDF',
+    dossier_generated:'Dossier généré le', dossier_sales:'Sales :',
+    // Modals
+    obs_title:'➕ Ajouter une observation M4', obs_p:'L\'IA a observé un pattern. Formulez la notification qui sera présentée au courtier.',
+    obs_types:['Ton de communication','Compagnie non listée','Refus d\'automatisation','Workflow émergent','Frontière IA à ajuster','Opportunité d\'extension'],
+    obs_ph:'Nous avons observé que… Voulez-vous… ?',
+    btn_cancel:'Annuler', btn_confirm:'Ajouter l\'observation',
+    chpwd_title:'🔑 Changer mon mot de passe', chpwd_p:'Saisissez votre mot de passe actuel puis choisissez un nouveau mot de passe.',
+    chpwd_current:'Mot de passe actuel', chpwd_new1:'Nouveau mot de passe', chpwd_new2:'Confirmer le nouveau mot de passe',
+    chpwd_ph1:'••••••••', chpwd_ph2:'Minimum 8 caractères', chpwd_ph3:'Répétez le nouveau mot de passe',
+    chpwd_btn:'Changer le mot de passe', chpwd_ok:'✓ Mot de passe modifié avec succès.',
+    delete_title:'🗑️ Supprimer ce courtier', delete_p:'Vous êtes sur le point de supprimer',
+    delete_p2:'et l\'ensemble de ses données (réponses, observations). <strong>Cette action est irréversible.</strong>',
+    delete_warn:'⚠️ Toutes les réponses et observations associées seront définitivement supprimées de Supabase.',
+    delete_btn:'Supprimer définitivement',
+    reset_title:'🔑 Mot de passe temporaire généré',
+    reset_p:'Communiquez ce mot de passe au courtier par email ou téléphone. Il pourra le modifier depuis son espace via le bouton 🔑 en haut à droite.',
+    reset_label:'Mot de passe temporaire', reset_pour:'pour',
+    reset_copy:'📋 Copier le mot de passe', reset_copied:'✓ Copié !', btn_close:'Fermer',
+    // Errors
+    err_email_invalid:'Adresse email invalide.',
+    err_email_exists:'Un compte existe déjà avec cet email.',
+    err_pwd_short:'Le mot de passe doit contenir au moins 8 caractères.',
+    err_pwd_match:'Les mots de passe ne correspondent pas.',
+    err_login_failed:'Email ou mot de passe incorrect.',
+    err_fields_required:'Veuillez remplir tous les champs.',
+    err_current_pwd:'Mot de passe actuel incorrect.',
+    err_same_pwd:'Le nouveau mot de passe doit être différent de l\'actuel.',
+    ok_account_created:'Compte créé ! Vous pouvez maintenant vous connecter.',
+  },
+  nl: {
+    tab_login:'Aanmelden', tab_register:'Account aanmaken',
+    login_title:'Welkom terug 👋', login_sub:'Toegang tot uw vragenlijst vanaf elk apparaat',
+    login_email:'E-mailadres', login_pwd:'Wachtwoord',
+    login_btn:'Aanmelden', login_forgot:'Wachtwoord vergeten? Stuur een e-mail naar',
+    login_no_account:'Nog geen account?', login_create:'Account aanmaken',
+    register_title:'Account aanmaken', register_sub:'Uw antwoorden zijn toegankelijk vanaf al uw apparaten',
+    register_email:'Professioneel e-mailadres', register_email_hint:'Gebruikt voor herinneringen en aanmelding',
+    register_company:'Naam van uw kantoor (optioneel)', register_company_ph:'Kantoor Dupont Verzekeringen',
+    register_pwd:'Wachtwoord', register_pwd_ph:'Min. 8 tekens',
+    register_confirm:'Wachtwoord bevestigen', register_btn:'Account aanmaken',
+    register_has_account:'Al een account?', register_login:'Aanmelden',
+    pitch_h2:'Uw gepersonaliseerde voorbereidingsruimte', pitch_p:'Beantwoord op uw eigen tempo, vanaf elk apparaat. Uw antwoorden voeden rechtstreeks de configuratie van uw AI.',
+    step1:'<strong>Ontdekkingsmodule</strong> — kalibreer uw demo',
+    step2:'<strong>Contractualisatiemodule</strong> — bereid uw contract voor',
+    step3:'<strong>Configuratiemodule</strong> — configureer uw AI',
+    btn_admin:'Admin', btn_logout:'Afmelden', btn_changepwd_title:'Wachtwoord wijzigen',
+    home_title:'Uw Procyo-ruimte', home_sub:'Vul elke module op uw eigen tempo in. Uw antwoorden worden automatisch gesynchroniseerd op al uw apparaten.',
+    pc_answered:'Beantwoord', pc_questions:'Vragen', pc_progress:'Globale voortgang',
+    mod_status_locked:'Vergrendeld', mod_status_active:'Bezig', mod_status_completed:'Voltooid',
+    mod_questions:'vragen', mod_start:'Starten', mod_continue:'Verdergaan', mod_review:'Raadplegen',
+    mod_observations:'observaties',
+    back_dashboard:'Terug naar dashboard',
+    save_status_sync:'Gesynchroniseerd op al uw apparaten', save_status_saving:'Opslaan…', save_status_saved:'Opgeslagen ✓', save_status_error:'Fout bij opslaan',
+    btn_save:'Opslaan',
+    notif_reminder:'<strong>Dagelijkse herinnering actief.</strong> Zolang deze module niet afgesloten is, ontvangt u elke dag een herinneringsmail. Uw antwoorden worden gesynchroniseerd op al uw apparaten.',
+    notif_readonly:'Deze module is <strong>afgesloten</strong>. Uw antwoorden zijn alleen-lezen.',
+    btn_cest_moi:'👤 Dat ben ik',
+    no_files:'Geen sjablonen',
+    hint_label:'💡',
+    other_label:'Andere…', other_ph:'Preciseer…',
+    total_pct:'Totaal',
+    ok_default:'OK (standaardgedrag)',
+    custom_ph:'Beschrijf uw voorkeur…',
+    upload_drag:'Sleep uw bestanden hier of',
+    upload_browse:'bladeren',
+    upload_hint_a:'max',
+    upload_hint_b:'bestanden,',
+    upload_hint_c:'MB elk',
+    back_admin:'Terug',
+    admin_title:'Beheer',
+    admin_tab_brokers:'Ingeschreven makelaars', admin_tab_export:'Antwoorden exporteren',
+    admin_sub_brokers:'Beheer de toegang tot modules en voeg M4-observaties toe per makelaar.',
+    admin_sub_export:'Kruistabel — één rij per vraag, één kolom per makelaar.',
+    pivot_hint:'Klik op "Laden" om de tabel te genereren.',
+    pivot_load:'↻ Gegevens laden', pivot_xlsx:'↓ Downloaden .xlsx', pivot_csv:'↓ Downloaden .csv',
+    admin_sales:'Verantwoordelijke sales',
+    btn_unlock:'🔓 Deblokkeren', btn_obs:'➕ Observatie M4', btn_dossier:'📋 Dossier bekijken',
+    btn_reset_pwd:'🔑 Wachtwoord resetten', btn_delete:'🗑️ Verwijderen',
+    registered_on:'ingeschreven op',
+    mod_accessible:'Toegankelijk', mod_locked_s:'Vergrendeld', mod_obs:'obs.',
+    back_list:'Terug naar lijst', btn_print:'Afdrukken / Exporteren PDF',
+    dossier_generated:'Dossier gegenereerd op', dossier_sales:'Sales:',
+    obs_title:'➕ Observatie M4 toevoegen', obs_p:'De AI heeft een patroon waargenomen. Formuleer de melding die aan de makelaar wordt gepresenteerd.',
+    obs_types:['Communicatietoon','Niet-genoteerd bedrijf','Weigering automatisering','Opkomende workflow','AI-grens aanpassen','Uitbreidingskans'],
+    obs_ph:'We hebben waargenomen dat… Wilt u… ?',
+    btn_cancel:'Annuleren', btn_confirm:'Observatie toevoegen',
+    chpwd_title:'🔑 Wachtwoord wijzigen', chpwd_p:'Voer uw huidige wachtwoord in en kies een nieuw wachtwoord.',
+    chpwd_current:'Huidig wachtwoord', chpwd_new1:'Nieuw wachtwoord', chpwd_new2:'Nieuw wachtwoord bevestigen',
+    chpwd_ph1:'••••••••', chpwd_ph2:'Minimaal 8 tekens', chpwd_ph3:'Herhaal het nieuwe wachtwoord',
+    chpwd_btn:'Wachtwoord wijzigen', chpwd_ok:'✓ Wachtwoord succesvol gewijzigd.',
+    delete_title:'🗑️ Makelaar verwijderen', delete_p:'U staat op het punt om te verwijderen',
+    delete_p2:'en al hun gegevens (antwoorden, observaties). <strong>Deze actie is onomkeerbaar.</strong>',
+    delete_warn:'⚠️ Alle bijbehorende antwoorden en observaties worden definitief verwijderd uit Supabase.',
+    delete_btn:'Definitief verwijderen',
+    reset_title:'🔑 Tijdelijk wachtwoord gegenereerd',
+    reset_p:'Communiceer dit wachtwoord aan de makelaar per e-mail of telefoon. Ze kunnen het wijzigen via de 🔑 knop rechtsboven.',
+    reset_label:'Tijdelijk wachtwoord', reset_pour:'voor',
+    reset_copy:'📋 Wachtwoord kopiëren', reset_copied:'✓ Gekopieerd!', btn_close:'Sluiten',
+    err_email_invalid:'Ongeldig e-mailadres.',
+    err_email_exists:'Er bestaat al een account met dit e-mailadres.',
+    err_pwd_short:'Het wachtwoord moet minimaal 8 tekens bevatten.',
+    err_pwd_match:'De wachtwoorden komen niet overeen.',
+    err_login_failed:'Onjuist e-mailadres of wachtwoord.',
+    err_fields_required:'Vul alle velden in.',
+    err_current_pwd:'Huidig wachtwoord onjuist.',
+    err_same_pwd:'Het nieuwe wachtwoord moet anders zijn dan het huidige.',
+    ok_account_created:'Account aangemaakt! U kunt nu aanmelden.',
+  },
+  de: {
+    tab_login:'Anmelden', tab_register:'Konto erstellen',
+    login_title:'Willkommen zurück 👋', login_sub:'Greifen Sie von jedem Gerät auf Ihren Fragebogen zu',
+    login_email:'E-Mail-Adresse', login_pwd:'Passwort',
+    login_btn:'Anmelden', login_forgot:'Passwort vergessen? Senden Sie eine E-Mail an',
+    login_no_account:'Noch kein Konto?', login_create:'Konto erstellen',
+    register_title:'Ihr Konto erstellen', register_sub:'Ihre Antworten sind auf allen Geräten zugänglich',
+    register_email:'Professionelle E-Mail-Adresse', register_email_hint:'Wird für Erinnerungen und Anmeldung verwendet',
+    register_company:'Name Ihres Büros (optional)', register_company_ph:'Büro Dupont Versicherungen',
+    register_pwd:'Passwort', register_pwd_ph:'Mind. 8 Zeichen',
+    register_confirm:'Passwort bestätigen', register_btn:'Konto erstellen',
+    register_has_account:'Bereits ein Konto?', register_login:'Anmelden',
+    pitch_h2:'Ihr persönlicher Vorbereitungsbereich', pitch_p:'Antworten Sie in Ihrem eigenen Tempo, von jedem Gerät aus. Ihre Antworten fließen direkt in die Konfiguration Ihrer KI ein.',
+    step1:'<strong>Entdeckungsmodul</strong> — kalibrieren Sie Ihre Demo',
+    step2:'<strong>Vertragsmodul</strong> — bereiten Sie Ihren Vertrag vor',
+    step3:'<strong>Konfigurationsmodul</strong> — konfigurieren Sie Ihre KI',
+    btn_admin:'Admin', btn_logout:'Abmelden', btn_changepwd_title:'Passwort ändern',
+    home_title:'Ihr Procyo-Bereich', home_sub:'Füllen Sie jedes Modul in Ihrem eigenen Tempo aus. Ihre Antworten werden automatisch auf allen Geräten synchronisiert.',
+    pc_answered:'Beantwortet', pc_questions:'Fragen', pc_progress:'Gesamtfortschritt',
+    mod_status_locked:'Gesperrt', mod_status_active:'In Bearbeitung', mod_status_completed:'Abgeschlossen',
+    mod_questions:'Fragen', mod_start:'Starten', mod_continue:'Fortsetzen', mod_review:'Ansehen',
+    mod_observations:'Beobachtungen',
+    back_dashboard:'Zurück zum Dashboard',
+    save_status_sync:'Auf allen Geräten synchronisiert', save_status_saving:'Speichern…', save_status_saved:'Gespeichert ✓', save_status_error:'Speicherfehler',
+    btn_save:'Speichern',
+    notif_reminder:'<strong>Tägliche Erinnerung aktiv.</strong> Solange dieses Modul nicht abgeschlossen ist, erhalten Sie täglich eine Erinnerungs-E-Mail. Ihre Antworten werden auf allen Geräten synchronisiert.',
+    notif_readonly:'Dieses Modul ist <strong>abgeschlossen</strong>. Ihre Antworten sind schreibgeschützt.',
+    btn_cest_moi:'👤 Das bin ich',
+    no_files:'Keine Vorlagen',
+    hint_label:'💡',
+    other_label:'Sonstiges…', other_ph:'Präzisieren…',
+    total_pct:'Gesamt',
+    ok_default:'OK (Standardverhalten)',
+    custom_ph:'Beschreiben Sie Ihre Präferenz…',
+    upload_drag:'Dateien hier ablegen oder',
+    upload_browse:'durchsuchen',
+    upload_hint_a:'max',
+    upload_hint_b:'Dateien,',
+    upload_hint_c:'MB pro Datei',
+    back_admin:'Zurück',
+    admin_title:'Verwaltung',
+    admin_tab_brokers:'Registrierte Makler', admin_tab_export:'Antworten exportieren',
+    admin_sub_brokers:'Verwalten Sie den Modulzugang und fügen Sie M4-Beobachtungen pro Makler hinzu.',
+    admin_sub_export:'Kreuztabelle — eine Zeile pro Frage, eine Spalte pro Makler.',
+    pivot_hint:'Klicken Sie auf "Laden", um die Tabelle zu generieren.',
+    pivot_load:'↻ Daten laden', pivot_xlsx:'↓ Herunterladen .xlsx', pivot_csv:'↓ Herunterladen .csv',
+    admin_sales:'Zuständiger Sales',
+    btn_unlock:'🔓 Entsperren', btn_obs:'➕ Beobachtung M4', btn_dossier:'📋 Akte ansehen',
+    btn_reset_pwd:'🔑 Passwort zurücksetzen', btn_delete:'🗑️ Löschen',
+    registered_on:'registriert am',
+    mod_accessible:'Zugänglich', mod_locked_s:'Gesperrt', mod_obs:'Beob.',
+    back_list:'Zurück zur Liste', btn_print:'Drucken / PDF exportieren',
+    dossier_generated:'Akte erstellt am', dossier_sales:'Sales:',
+    obs_title:'➕ M4-Beobachtung hinzufügen', obs_p:'Die KI hat ein Muster erkannt. Formulieren Sie die Benachrichtigung für den Makler.',
+    obs_types:['Kommunikationston','Nicht gelistetes Unternehmen','Verweigerung der Automatisierung','Aufkommender Workflow','KI-Grenze anpassen','Erweiterungsmöglichkeit'],
+    obs_ph:'Wir haben beobachtet, dass… Möchten Sie… ?',
+    btn_cancel:'Abbrechen', btn_confirm:'Beobachtung hinzufügen',
+    chpwd_title:'🔑 Passwort ändern', chpwd_p:'Geben Sie Ihr aktuelles Passwort ein und wählen Sie ein neues.',
+    chpwd_current:'Aktuelles Passwort', chpwd_new1:'Neues Passwort', chpwd_new2:'Neues Passwort bestätigen',
+    chpwd_ph1:'••••••••', chpwd_ph2:'Mindestens 8 Zeichen', chpwd_ph3:'Neues Passwort wiederholen',
+    chpwd_btn:'Passwort ändern', chpwd_ok:'✓ Passwort erfolgreich geändert.',
+    delete_title:'🗑️ Makler löschen', delete_p:'Sie sind dabei zu löschen',
+    delete_p2:'und alle zugehörigen Daten (Antworten, Beobachtungen). <strong>Diese Aktion ist unwiderruflich.</strong>',
+    delete_warn:'⚠️ Alle zugehörigen Antworten und Beobachtungen werden dauerhaft aus Supabase gelöscht.',
+    delete_btn:'Endgültig löschen',
+    reset_title:'🔑 Temporäres Passwort generiert',
+    reset_p:'Teilen Sie dieses Passwort dem Makler per E-Mail oder Telefon mit. Es kann über die 🔑 Schaltfläche oben rechts geändert werden.',
+    reset_label:'Temporäres Passwort', reset_pour:'für',
+    reset_copy:'📋 Passwort kopieren', reset_copied:'✓ Kopiert!', btn_close:'Schließen',
+    err_email_invalid:'Ungültige E-Mail-Adresse.',
+    err_email_exists:'Ein Konto mit dieser E-Mail-Adresse existiert bereits.',
+    err_pwd_short:'Das Passwort muss mindestens 8 Zeichen enthalten.',
+    err_pwd_match:'Die Passwörter stimmen nicht überein.',
+    err_login_failed:'Falsche E-Mail-Adresse oder falsches Passwort.',
+    err_fields_required:'Bitte füllen Sie alle Felder aus.',
+    err_current_pwd:'Aktuelles Passwort ist falsch.',
+    err_same_pwd:'Das neue Passwort muss sich vom aktuellen unterscheiden.',
+    ok_account_created:'Konto erstellt! Sie können sich jetzt anmelden.',
+  },
+  en: {
+    tab_login:'Log in', tab_register:'Create account',
+    login_title:'Welcome back 👋', login_sub:'Access your questionnaire from any device',
+    login_email:'Email address', login_pwd:'Password',
+    login_btn:'Log in', login_forgot:'Forgot your password? Send an email to',
+    login_no_account:'No account yet?', login_create:'Create access',
+    register_title:'Create your access', register_sub:'Your answers will be accessible from all your devices',
+    register_email:'Professional email address', register_email_hint:'Used for reminders and login',
+    register_company:'Your firm name (optional)', register_company_ph:'Dupont Insurance Brokers',
+    register_pwd:'Password', register_pwd_ph:'Min. 8 characters',
+    register_confirm:'Confirm password', register_btn:'Create my access',
+    register_has_account:'Already have an account?', register_login:'Log in',
+    pitch_h2:'Your personalised preparation space', pitch_p:'Answer at your own pace, from any device. Your answers directly feed your AI configuration.',
+    step1:'<strong>Discovery module</strong> — calibrate your demo',
+    step2:'<strong>Contractualisation module</strong> — prepare your contract',
+    step3:'<strong>Configuration module</strong> — set up your AI',
+    btn_admin:'Admin', btn_logout:'Log out', btn_changepwd_title:'Change my password',
+    home_title:'Your Procyo space', home_sub:'Complete each module at your own pace. Your answers are automatically synchronised across all your devices.',
+    pc_answered:'Answered', pc_questions:'Questions', pc_progress:'Overall progress',
+    mod_status_locked:'Locked', mod_status_active:'In progress', mod_status_completed:'Completed',
+    mod_questions:'questions', mod_start:'Start', mod_continue:'Continue', mod_review:'Review',
+    mod_observations:'observations',
+    back_dashboard:'Back to dashboard',
+    save_status_sync:'Synced across all your devices', save_status_saving:'Saving…', save_status_saved:'Saved ✓', save_status_error:'Save error',
+    btn_save:'Save',
+    notif_reminder:'<strong>Daily reminder active.</strong> Until this module is completed, you will receive a daily reminder email. Your answers are synchronised across all your devices.',
+    notif_readonly:'This module is <strong>completed</strong>. Your answers are read-only.',
+    btn_cest_moi:'👤 That\'s me',
+    no_files:'No templates',
+    hint_label:'💡',
+    other_label:'Other…', other_ph:'Please specify…',
+    total_pct:'Total',
+    ok_default:'OK (default behaviour)',
+    custom_ph:'Describe your preference…',
+    upload_drag:'Drag your files here or',
+    upload_browse:'browse',
+    upload_hint_a:'max',
+    upload_hint_b:'files,',
+    upload_hint_c:'MB each',
+    back_admin:'Back',
+    admin_title:'Administration',
+    admin_tab_brokers:'Registered brokers', admin_tab_export:'Export answers',
+    admin_sub_brokers:'Manage module access and add M4 observations for each broker.',
+    admin_sub_export:'Pivot table — one row per question, one column per broker.',
+    pivot_hint:'Click "Load" to generate the table.',
+    pivot_load:'↻ Load data', pivot_xlsx:'↓ Download .xlsx', pivot_csv:'↓ Download .csv',
+    admin_sales:'Sales in charge',
+    btn_unlock:'🔓 Unlock', btn_obs:'➕ M4 Observation', btn_dossier:'📋 View file',
+    btn_reset_pwd:'🔑 Reset password', btn_delete:'🗑️ Delete',
+    registered_on:'registered on',
+    mod_accessible:'Accessible', mod_locked_s:'Locked', mod_obs:'obs.',
+    back_list:'Back to list', btn_print:'Print / Export PDF',
+    dossier_generated:'File generated on', dossier_sales:'Sales:',
+    obs_title:'➕ Add M4 observation', obs_p:'The AI has observed a pattern. Formulate the notification to be presented to the broker.',
+    obs_types:['Communication tone','Unlisted company','Refusal of automation','Emerging workflow','AI boundary adjustment','Extension opportunity'],
+    obs_ph:'We have observed that… Would you like… ?',
+    btn_cancel:'Cancel', btn_confirm:'Add observation',
+    chpwd_title:'🔑 Change my password', chpwd_p:'Enter your current password then choose a new one.',
+    chpwd_current:'Current password', chpwd_new1:'New password', chpwd_new2:'Confirm new password',
+    chpwd_ph1:'••••••••', chpwd_ph2:'Minimum 8 characters', chpwd_ph3:'Repeat the new password',
+    chpwd_btn:'Change password', chpwd_ok:'✓ Password changed successfully.',
+    delete_title:'🗑️ Delete broker', delete_p:'You are about to delete',
+    delete_p2:'and all their data (answers, observations). <strong>This action is irreversible.</strong>',
+    delete_warn:'⚠️ All associated answers and observations will be permanently deleted from Supabase.',
+    delete_btn:'Delete permanently',
+    reset_title:'🔑 Temporary password generated',
+    reset_p:'Share this password with the broker by email or phone. They can change it via the 🔑 button at the top right.',
+    reset_label:'Temporary password', reset_pour:'for',
+    reset_copy:'📋 Copy password', reset_copied:'✓ Copied!', btn_close:'Close',
+    err_email_invalid:'Invalid email address.',
+    err_email_exists:'An account already exists with this email.',
+    err_pwd_short:'Password must be at least 8 characters.',
+    err_pwd_match:'Passwords do not match.',
+    err_login_failed:'Incorrect email or password.',
+    err_fields_required:'Please fill in all fields.',
+    err_current_pwd:'Current password is incorrect.',
+    err_same_pwd:'The new password must be different from the current one.',
+    ok_account_created:'Account created! You can now log in.',
+  }
+};
+
+function t(key){ return (LANG[currentLang]||LANG.fr)[key] || LANG.fr[key] || key; }
+
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem('procyo_lang_launchpad', lang);
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
+  applyLang();
+  // Re-render si on est dans un module
+  if(currentMod!==null) renderModule(MODULES[currentMod]);
+}
+
+function applyLang(){
+  // Auth screen
+  const setT = (id, key) => { const el=document.getElementById(id); if(el) el.textContent=t(key); };
+  const setH = (id, key) => { const el=document.getElementById(id); if(el) el.innerHTML=t(key); };
+  const setPH = (id, key) => { const el=document.getElementById(id); if(el) el.placeholder=t(key); };
+  const setLbl = (id, key) => { const el=document.getElementById(id); if(el) el.textContent=t(key); };
+
+  // Tabs
+  document.querySelectorAll('.auth-tab')[0]?.childNodes.forEach((n,i)=>{ if(n.nodeType===3) n.textContent=t('tab_login'); });
+  document.querySelectorAll('.auth-tab')[1]?.childNodes.forEach((n,i)=>{ if(n.nodeType===3) n.textContent=t('tab_register'); });
+
+  // Login form
+  setH('login-title-el', 'login_title');
+  setT('login-sub-el', 'login_sub');
+  setT('login-email-lbl', 'login_email');
+  setPH('login-email', 'login_email');
+  setT('login-pwd-lbl', 'login_pwd');
+  setT('login-btn-el', 'login_btn');
+  setH('login-forgot-el', 'login_forgot');
+  setH('login-no-account-el', 'login_no_account');
+
+  // Register form
+  setH('reg-title-el', 'register_title');
+  setT('reg-sub-el', 'register_sub');
+  setT('reg-email-lbl', 'register_email');
+  setPH('reg-email', 'login_email');
+  setT('reg-email-hint-el', 'register_email_hint');
+  setT('reg-company-lbl', 'register_company');
+  setPH('reg-company', 'register_company_ph');
+  setT('reg-pwd-lbl', 'register_pwd');
+  setPH('reg-pwd', 'register_pwd_ph');
+  setT('reg-confirm-lbl', 'register_confirm');
+  setT('reg-btn-el', 'register_btn');
+
+  // Topbar
+  const btnLogout = document.getElementById('btn-logout');
+  if(btnLogout) btnLogout.textContent = t('btn_logout');
+  const btnAdmin = document.getElementById('btn-admin');
+  if(btnAdmin) btnAdmin.textContent = t('btn_admin');
+
+  // Home
+  setT('greeting', 'home_title');
+  setT('home-sub-el', 'home_sub');
+  setT('pc-label-ans', 'pc_answered');
+  setT('pc-label-tot', 'pc_questions');
+  setT('pc-prog-lbl', 'pc_progress');
+  setT('back-btn-questions', 'back_dashboard');
+  setT('save-st', 'save_status_sync');
+  setT('btn-save-lbl-el', 'btn_save');
+
+  // Admin
+  setT('admin-tab-brokers-el', 'admin_tab_brokers');
+  setT('admin-tab-export-el', 'admin_tab_export');
+  setT('admin-sub-brokers-el', 'admin_sub_brokers');
+  setT('admin-sub-export-el', 'admin_sub_export');
+  setT('pivot-hint-el', 'pivot_hint');
+  setT('pivot-load-btn', 'pivot_load');
+  setT('pivot-xlsx-btn', 'pivot_xlsx');
+  setT('pivot-csv-btn', 'pivot_csv');
+
+  // Dossier
+  setT('back-dossier-btn', 'back_list');
+
+  // Modals
+  setT('obs-modal-title', 'obs_title');
+  setT('obs-modal-p', 'obs_p');
+  setT('obs-cancel-btn', 'btn_cancel');
+  setT('obs-confirm-btn', 'btn_confirm');
+  setT('chpwd-title-el', 'chpwd_title');
+  setT('chpwd-p-el', 'chpwd_p');
+  setT('chpwd-current-lbl', 'chpwd_current');
+  setT('chpwd-new1-lbl', 'chpwd_new1');
+  setT('chpwd-new2-lbl', 'chpwd_new2');
+  setPH('chpwd-current', 'chpwd_ph1');
+  setPH('chpwd-new1', 'chpwd_ph2');
+  setPH('chpwd-new2', 'chpwd_ph3');
+  setT('chpwd-submit-btn', 'chpwd_btn');
+  setT('delete-modal-title', 'delete_title');
+  setT('delete-confirm-btn', 'delete_btn');
+  setT('reset-modal-title', 'reset_title');
+  setT('reset-modal-p', 'reset_p');
+  setT('reset-label-el', 'reset_label');
+  setT('copy-pwd-btn', 'reset_copy');
+  setT('reset-close-btn', 'btn_close');
+
+  // Rebuild mod list if on home
+  if(document.getElementById('screen-home')?.style.display!=='none') renderHome();
+  // Rebuild admin if visible
+  if(document.getElementById('screen-admin')?.style.display!=='none') showAdmin();
+
+  // Observation types select
+  const sel = document.getElementById('obs-type');
+  if(sel){
+    const types = t('obs_types');
+    sel.innerHTML = types.map(v=>`<option value="${v}">${v}</option>`).join('');
+  }
+  const obsPh = document.getElementById('obs-text');
+  if(obsPh) obsPh.placeholder = t('obs_ph');
+}
+
+// ══════════════════════════════════════════════════════════════
 // QUESTIONS DATA
 // ══════════════════════════════════════════════════════════════
-const MODULES = [
-  {id:'module1',title:'Découverte',desc:'Questions de découverte pour préparer votre démo Procyo et calibrer la présentation à votre réalité.',icon:'🔍',sections:[
-    {id:'M1',name:'Votre bureau & priorités',questions:[
-      {id:'M1Q1',type:'radio',label:'Combien de personnes travaillent dans votre bureau ?',required:true,options:['1 à 3','4 à 10','11 à 30','31 à 50','Plus de 50'],hint:'Détermine le palier tarifaire présenté en démo.'},
-      {id:'M1Q2',type:'radio-other',label:'Quelle version de Brio utilisez-vous ?',required:true,options:['Brio First','Brio Confort','Brio Premium','Je ne suis pas certain·e'],otherLabel:'Précisez votre logiciel…'},
-      {id:'M1Q3',type:'percent-split',label:'Quelle activité pratiquez-vous et dans quelle proportion approximative ?',required:true,rows:['IARD particulier','IARD entreprise','Assurance-vie et placements','Crédits (prêts hypothécaires et PAT)','Autres']},
-      {id:'M1Q4',type:'radio-other',label:'Quelle est votre plateforme email principale ?',required:true,options:['Microsoft 365','Google Workspace','Exchange','Je ne sais pas'],otherLabel:'Précisez votre plateforme…'},
-      {id:'M1Q5',type:'radio',label:'Combien d\'emails clients entrants par adresse traitez-vous par jour ?',required:true,options:['Moins de 20','20 à 50','50 à 100','Plus de 100'],hint:'Calibre l\'argumentaire ROI Inboxia pour la démo.'},
-      {id:'M1Q6',type:'checkbox-other',label:'Parmi ces sujets, lesquels sont prioritaires pour vous ?',required:true,options:['Traiter plus vite les emails entrants (Assistant mail)','Sécuriser la conformité réglementaire — KYC, AML, IDD (Assistant conformité)','Mieux comprendre et piloter mon portefeuille (Assistant portefeuille)','Détecter des opportunités commerciales — cross-sell, relance (Assistant commercial)'],otherLabel:'Précisez…'},
-      {id:'M1Q7',type:'radio-other',label:'Qui prendra la décision finale ?',required:true,options:['Moi seul·e','Moi + un·e associé·e','Comité de direction / CA'],otherLabel:'Précisez…'},
-      {id:'M1Q8',type:'radio',label:'Avez-vous déjà été en contact avec PROCYO ou un partenaire ?',required:false,options:['Oui — précisez','Non, premier contact'],hint:'Évite les redondances, trace les apporteurs.'},
-      {id:'M1Q9',type:'radio',label:'Sur une échelle de 1 à 5, à quel point êtes-vous à l\'aise avec les outils d\'IA aujourd\'hui ?',required:false,options:['1 — jamais utilisé','2','3','4','5 — utilisateur quotidien'],hint:'Adapte le niveau technique de la démo.'},
-      {id:'M1Q10',type:'textarea',label:'Y a-t-il un point précis que vous aimeriez voir abordé pendant la démo ?',required:false,placeholder:'Si rien de particulier, écrire NA'},
-    ]}
-  ]},
-  {id:'module2',title:'Contractualisation',desc:'Informations nécessaires à la préparation du contrat et à l\'identification des référents.',icon:'📋',sections:[
-    {id:'M2A',name:'Configuration & licences',questions:[
-      {id:'M2Q1',type:'slider',label:'Combien d\'adresses email à activer dans l\'Assistant mail (Inboxia) ?',required:true,min:1,max:20,default:3,dynamicRange:'M1Q1'},
-      {id:'M2Q3',type:'checkbox',label:'Quels assistants complémentaires souhaitez-vous activer ?',required:false,options:['Assistant conformité (Regulia) — KYC / AML / IDD','Assistant portefeuille (Portfolia) — analyse et tableaux de bord','Assistant commercial (Relancia) — opportunités et campagnes','Aucun pour l\'instant — uniquement l\'Assistant mail']},
+const MODULES_DATA = {
+  fr: [
+    {id:'module1',title:'Découverte',desc:'Questions de découverte pour préparer votre démo Procyo et calibrer la présentation à votre réalité.',icon:'🔍',sections:[
+      {id:'M1',name:'Votre bureau & priorités',questions:[
+        {id:'M1Q1',type:'radio',label:'Combien de personnes travaillent dans votre bureau ?',required:true,options:['1 à 3','4 à 10','11 à 30','31 à 50','Plus de 50'],hint:'Détermine le palier tarifaire présenté en démo.'},
+        {id:'M1Q2',type:'radio-other',label:'Quelle version de Brio utilisez-vous ?',required:true,options:['Brio First','Brio Confort','Brio Premium','Je ne suis pas certain·e'],otherLabel:'Précisez votre logiciel…'},
+        {id:'M1Q3',type:'percent-split',label:'Quelle activité pratiquez-vous et dans quelle proportion approximative ?',required:true,rows:['IARD particulier','IARD entreprise','Assurance-vie et placements','Crédits (prêts hypothécaires et PAT)','Autres']},
+        {id:'M1Q4',type:'radio-other',label:'Quelle est votre plateforme email principale ?',required:true,options:['Microsoft 365','Google Workspace','Exchange','Je ne sais pas'],otherLabel:'Précisez votre plateforme…'},
+        {id:'M1Q5',type:'radio',label:'Combien d\'emails clients entrants par adresse traitez-vous par jour ?',required:true,options:['Moins de 20','20 à 50','50 à 100','Plus de 100'],hint:'Calibre l\'argumentaire ROI Inboxia pour la démo.'},
+        {id:'M1Q6',type:'checkbox-other',label:'Parmi ces sujets, lesquels sont prioritaires pour vous ?',required:true,options:['Traiter plus vite les emails entrants (Assistant mail)','Sécuriser la conformité réglementaire — KYC, AML, IDD (Assistant conformité)','Mieux comprendre et piloter mon portefeuille (Assistant portefeuille)','Détecter des opportunités commerciales — cross-sell, relance (Assistant commercial)'],otherLabel:'Précisez…'},
+        {id:'M1Q7',type:'radio-other',label:'Qui prendra la décision finale ?',required:true,options:['Moi seul·e','Moi + un·e associé·e','Comité de direction / CA'],otherLabel:'Précisez…'},
+        {id:'M1Q8',type:'radio',label:'Avez-vous déjà été en contact avec PROCYO ou un partenaire ?',required:false,options:['Oui — précisez','Non, premier contact'],hint:'Évite les redondances, trace les apporteurs.'},
+        {id:'M1Q9',type:'radio',label:'Sur une échelle de 1 à 5, à quel point êtes-vous à l\'aise avec les outils d\'IA aujourd\'hui ?',required:false,options:['1 — jamais utilisé','2','3','4','5 — utilisateur quotidien'],hint:'Adapte le niveau technique de la démo.'},
+        {id:'M1Q10',type:'textarea',label:'Y a-t-il un point précis que vous aimeriez voir abordé pendant la démo ?',required:false,placeholder:'Si rien de particulier, écrire NA'},
+      ]}
     ]},
+    {id:'module2',title:'Contractualisation',desc:'Informations nécessaires à la préparation du contrat et à l\'identification des référents.',icon:'📋',sections:[
+      {id:'M2A',name:'Configuration & licences',questions:[
+        {id:'M2Q1',type:'slider',label:'Combien d\'adresses email à activer dans l\'Assistant mail (Inboxia) ?',required:true,min:1,max:20,default:3,dynamicRange:'M1Q1'},
+        {id:'M2Q3',type:'checkbox',label:'Quels assistants complémentaires souhaitez-vous activer ?',required:false,options:['Assistant conformité (Regulia) — KYC / AML / IDD','Assistant portefeuille (Portfolia) — analyse et tableaux de bord','Assistant commercial (Relancia) — opportunités et campagnes','Aucun pour l\'instant — uniquement l\'Assistant mail']},
+      ]},
+      {id:'M2B',name:'Identification juridique',questions:[
+        {id:'M2Q4',type:'text',label:'Dénomination sociale',required:true},
+        {id:'M2Q5',type:'text',label:'Numéro BCE',required:true,placeholder:'BE 0xxx.xxx.xxx'},
+        {id:'M2Q6',type:'text',label:'Adresse du siège social',required:true},
+        {id:'M2Q7',type:'text',label:'Numéro d\'agrément FSMA',required:true,placeholder:'Ex. : 12345A'},
+        {id:'M2Q8',type:'radio',label:'Forme juridique',required:true,options:['SRL','SA','SNC','SPRL','Personne physique','Autre']},
+        {id:'M2Q9',type:'text',label:'Responsable légal (administrateur)',required:true,placeholder:'Prénom Nom'},
+        {id:'M2Q10',type:'text',label:'Email de facturation',required:true},
+      ]},
+      {id:'M2C',name:'Référents',questions:[
+        {id:'M2Q11',type:'contact-fields',label:'Interlocuteur principal (signataire)',required:true},
+        {id:'M2Q12',type:'contact-fields',label:'Responsable technique / IT',required:true},
+        {id:'M2Q13',type:'contact-fields',label:'Référent compliance / DPO',required:true},
+        {id:'M2Q14',type:'textarea',label:'Modalités contractuelles particulières ?',required:false},
+        {id:'M2Q15',type:'radio',label:'Mode de facturation souhaité',required:false,options:['Mensuel','Trimestriel','Annuel']},
+      ]},
+    ]},
+    {id:'module3',title:'Paramétrage',desc:'Configuration fine de votre agent IA Inboxia : ton, compagnies, filtres, sinistres, BRIO.',icon:'⚙️',sections:[
+      {id:'M3A',name:'Bloc 1 — Signature et ton',questions:[
+        {id:'M3Q1',type:'textarea',label:'Signature standard à apposer en fin de chaque mail',required:true,placeholder:'Texte exact, ligne par ligne…',hint:'Sera utilisé par défaut pour tous les brouillons générés.'},
+        {id:'M3Q2',type:'radio',label:'Forme par défaut',required:true,options:['Vouvoiement','Tutoiement','Miroir (s\'aligne sur la forme employée par l\'interlocuteur)']},
+        {id:'M3Q3',type:'radio',label:'Ton souhaité',required:true,options:['Sobre','Chaleureux','Technique','Formel','Familier','Miroir (s\'aligne sur le ton de l\'interlocuteur)']},
+        {id:'M3Q5',type:'text',label:'Formule de politesse préférée',required:false,placeholder:'Ex: Cordialement, Bien à vous…'},
+      ]},
+      {id:'M3B',name:'Bloc 2 — Compagnies partenaires',questions:[
+        {id:'M3Q6',type:'company-matrix',label:'Compagnies partenaires et branches',required:true,
+          companies:['AG Insurance','AXA Belgium','Allianz','Baloise','DKV','Foyer','NN Insurance','Vivium','Athora','La Patronale','Baloise Luxembourg','Wealins','OneLife','Vitis Life','Lombard','AXA Wealth','Cardif','Aviza','AfiEsca','Ethias','Federale Assurance','HDI','AIG','Zurich','Chubb','Hiscox','Legal Village','ARAG','Providis','DAS','Euromex','Axa Partners','Allianz Partners','Europ Assistance','Atradius','Coface','TVM','Aedes','Avise','Ibis Insurance','Vander Haeghen','Jean Verheyen','Elitis Insurance','April'],
+          branches:['Habitation','Auto','Hospi','PJ','Assistance','Entreprise','Vie','Prior','Délégation Sinistre']},
+        {id:'M3Q6b',type:'radio',label:'Convention RDR (auto) appliquée',required:false,options:['Systématiquement','Cas par cas','Pas appliquée']},
+      ]},
+      {id:'M3C',name:'Bloc 3 — Filtres et catégories sensibles',questions:[
+        {id:'M3Q10',type:'checkbox-other',label:'Ne JAMAIS préparer de brouillon si le mail vient de',required:true,options:['Client','Assurance','Expert','Autorité de régulation','Notaire','Prestataire et fournisseur','Consultant externe','Mail interne','Réclamation','Publicité','Banque'],otherLabel:'Précisez…'},
+        {id:'M3Q12',type:'text',label:'Boîte mail principale à surveiller',required:true},
+        {id:'M3Q13',type:'textarea',label:'Organigramme des boîtes mails secondaires',required:true,placeholder:'sinistres@ : gestionnaire X, règles…\ninfo@ : gestionnaire Y, règles…',hint:'Pour chaque boîte : intitulé, gestionnaire référent, règles de tri.'},
+      ]},
+      {id:'M3D',name:'Bloc 4 — Documentation interne',questions:[
+        {id:'M3Q14',type:'file-upload',label:'Templates et formulaires à transmettre à Procyo',required:false,accept:'.pdf,.doc,.docx',maxFiles:10,maxSizeMb:5,noFilesOption:'Pas de templates'},
+      ]},
+      {id:'M3E',name:'Bloc 5 — Actions BRIO',questions:[
+        {id:'M3Q15',type:'behavior-matrix',label:'Validation des comportements',required:false,
+          intro:'Voici le comportement par défaut de l\'IA sur les principales actions Brio. Ces règles s\'appliquent automatiquement et sont ajustables par les questions qui suivent.',
+          behaviors:[
+            {key:'production',title:'Production',text:'Lors d\'une production initiée par Procyo, l\'IA crée systématiquement un objet de risque (OR) en y rattachant les documents pertinents et en complétant les informations issues du mail.'},
+            {key:'sinistre',title:'Sinistre',text:'À la déclaration d\'un sinistre, l\'IA crée automatiquement le dossier sinistre, le rattache à l\'OR concerné, et y associe les documents et informations qu\'elle a pu détecter.'},
+            {key:'document',title:'Document',text:'Chaque document peut être renommé selon vos règles propres. Par défaut, l\'IA applique une nomenclature claire pour faciliter la recherche.'},
+            {key:'mail',title:'Mail',text:'Si le mail est en lien avec un sinistre, il est ajouté au sinistre concerné. Si le mail concerne une question sur un OR ou un contrat, il est rattaché à l\'OR.'},
+            {key:'autre',title:'Autre',text:''},
+          ]},
+      ]},
+    ]},
+    {id:'module4',title:'Optimisation continue',desc:'Après le go-live, l\'IA observe vos habitudes et vous propose des ajustements en un clic.',icon:'🔬',isObservation:true,sections:[{id:'M4',name:'Observations',questions:[]}]},
+  ],
+  nl: [
+    {id:'module1',title:'Ontdekking',desc:'Ontdekkingsvragen om uw Procyo-demo voor te bereiden en de presentatie op uw realiteit af te stemmen.',icon:'🔍',sections:[
+      {id:'M1',name:'Uw kantoor & prioriteiten',questions:[
+        {id:'M1Q1',type:'radio',label:'Hoeveel personen werken er in uw kantoor?',required:true,options:['1 tot 3','4 tot 10','11 tot 30','31 tot 50','Meer dan 50'],hint:'Bepaalt de tariefdrempel die in de demo wordt gepresenteerd.'},
+        {id:'M1Q2',type:'radio-other',label:'Welke versie van Brio gebruikt u?',required:true,options:['Brio First','Brio Confort','Brio Premium','Ik weet het niet zeker'],otherLabel:'Preciseer uw software…'},
+        {id:'M1Q3',type:'percent-split',label:'Welke activiteiten oefent u uit en in welke verhouding?',required:true,rows:['Particuliere BOAR','Zakelijke BOAR','Leven en beleggingen','Kredieten (hypotheken en PAT)','Andere']},
+        {id:'M1Q4',type:'radio-other',label:'Wat is uw primaire e-mailplatform?',required:true,options:['Microsoft 365','Google Workspace','Exchange','Weet ik niet'],otherLabel:'Preciseer uw platform…'},
+        {id:'M1Q5',type:'radio',label:'Hoeveel inkomende klanten-e-mails per adres verwerkt u per dag?',required:true,options:['Minder dan 20','20 tot 50','50 tot 100','Meer dan 100'],hint:'Kalibreert het ROI-argument voor de demo.'},
+        {id:'M1Q6',type:'checkbox-other',label:'Welke onderwerpen zijn prioritair voor u?',required:true,options:['Inkomende e-mails sneller verwerken (E-mailassistent)','Wettelijke conformiteit beveiligen — KYC, AML, IDD (Conformiteitsassistent)','Mijn portefeuille beter begrijpen en beheren (Portefeuilleassistent)','Commerciële kansen detecteren — cross-sell, opvolging (Commerciële assistent)'],otherLabel:'Preciseer…'},
+        {id:'M1Q7',type:'radio-other',label:'Wie neemt de uiteindelijke beslissing?',required:true,options:['Ik alleen','Ik + een vennoot','Directiecomité / RvB'],otherLabel:'Preciseer…'},
+        {id:'M1Q8',type:'radio',label:'Heeft u al contact gehad met PROCYO of een partner?',required:false,options:['Ja — preciseer','Nee, eerste contact'],hint:'Vermijdt herhalingen, traceert introducers.'},
+        {id:'M1Q9',type:'radio',label:'Op een schaal van 1 tot 5, hoe vertrouwd bent u met AI-tools vandaag?',required:false,options:['1 — nooit gebruikt','2','3','4','5 — dagelijkse gebruiker'],hint:'Past het technisch niveau van de demo aan.'},
+        {id:'M1Q10',type:'textarea',label:'Is er een specifiek punt dat u tijdens de demo wilt bespreken?',required:false,placeholder:'Als er niets specifieks is, schrijf NA'},
+      ]}
+    ]},
+    {id:'module2',title:'Contractualisatie',desc:'Informatie nodig voor de voorbereiding van het contract en de identificatie van de referenten.',icon:'📋',sections:[
+      {id:'M2A',name:'Configuratie & licenties',questions:[
+        {id:'M2Q1',type:'slider',label:'Hoeveel e-mailadressen activeren in de E-mailassistent (Inboxia)?',required:true,min:1,max:20,default:3,dynamicRange:'M1Q1'},
+        {id:'M2Q3',type:'checkbox',label:'Welke aanvullende assistenten wilt u activeren?',required:false,options:['Conformiteitsassistent (Regulia) — KYC / AML / IDD','Portefeuilleassistent (Portfolia) — analyse en dashboards','Commerciële assistent (Relancia) — kansen en campagnes','Geen voor nu — alleen de E-mailassistent']},
+      ]},
+      {id:'M2B',name:'Juridische identificatie',questions:[
+        {id:'M2Q4',type:'text',label:'Maatschappelijke benaming',required:true},
+        {id:'M2Q5',type:'text',label:'KBO-nummer',required:true,placeholder:'BE 0xxx.xxx.xxx'},
+        {id:'M2Q6',type:'text',label:'Adres van de maatschappelijke zetel',required:true},
+        {id:'M2Q7',type:'text',label:'FSMA-erkenningsnummer',required:true,placeholder:'Bijv. : 12345A'},
+        {id:'M2Q8',type:'radio',label:'Rechtsvorm',required:true,options:['BV','NV','VOF','BVBA','Natuurlijk persoon','Andere']},
+        {id:'M2Q9',type:'text',label:'Wettelijk vertegenwoordiger (bestuurder)',required:true,placeholder:'Voornaam Naam'},
+        {id:'M2Q10',type:'text',label:'Facturatie-e-mail',required:true},
+      ]},
+      {id:'M2C',name:'Referenten',questions:[
+        {id:'M2Q11',type:'contact-fields',label:'Hoofdcontactpersoon (ondertekenaar)',required:true},
+        {id:'M2Q12',type:'contact-fields',label:'Technisch verantwoordelijke / IT',required:true},
+        {id:'M2Q13',type:'contact-fields',label:'Compliance referent / DPO',required:true},
+        {id:'M2Q14',type:'textarea',label:'Bijzondere contractuele modaliteiten?',required:false},
+        {id:'M2Q15',type:'radio',label:'Gewenste facturatiewijze',required:false,options:['Maandelijks','Driemaandelijks','Jaarlijks']},
+      ]},
+    ]},
+    {id:'module3',title:'Configuratie',desc:'Fijnafstemming van uw Inboxia AI-agent: toon, bedrijven, filters, schades, BRIO.',icon:'⚙️',sections:[
+      {id:'M3A',name:'Blok 1 — Handtekening en toon',questions:[
+        {id:'M3Q1',type:'textarea',label:'Standaardhandtekening aan het einde van elke e-mail',required:true,placeholder:'Exacte tekst, regel per regel…',hint:'Wordt standaard gebruikt voor alle gegenereerde concepten.'},
+        {id:'M3Q2',type:'radio',label:'Standaard aanspreking',required:true,options:['U-vorm','Je-vorm','Spiegel (past zich aan op de gebruikte vorm)']},
+        {id:'M3Q3',type:'radio',label:'Gewenste toon',required:true,options:['Sober','Hartelijk','Technisch','Formeel','Informeel','Spiegel (past zich aan op de toon)']},
+        {id:'M3Q5',type:'text',label:'Voorkeur beleefdheidsvorm',required:false,placeholder:'Bijv: Met vriendelijke groeten…'},
+      ]},
+      {id:'M3B',name:'Blok 2 — Partnermaatschappijen',questions:[
+        {id:'M3Q6',type:'company-matrix',label:'Partnermaatschappijen en takken',required:true,
+          companies:['AG Insurance','AXA Belgium','Allianz','Baloise','DKV','Foyer','NN Insurance','Vivium','Athora','La Patronale','Baloise Luxembourg','Wealins','OneLife','Vitis Life','Lombard','AXA Wealth','Cardif','Aviza','AfiEsca','Ethias','Federale Assurance','HDI','AIG','Zurich','Chubb','Hiscox','Legal Village','ARAG','Providis','DAS','Euromex','Axa Partners','Allianz Partners','Europ Assistance','Atradius','Coface','TVM','Aedes','Avise','Ibis Insurance','Vander Haeghen','Jean Verheyen','Elitis Insurance','April'],
+          branches:['Woning','Auto','Hospi','RB','Bijstand','Onderneming','Leven','Prior','Schadedelegatie']},
+        {id:'M3Q6b',type:'radio',label:'RDR-overeenkomst (auto) toegepast',required:false,options:['Systematisch','Geval per geval','Niet toegepast']},
+      ]},
+      {id:'M3C',name:'Blok 3 — Filters en gevoelige categorieën',questions:[
+        {id:'M3Q10',type:'checkbox-other',label:'NOOIT een concept voorbereiden als de e-mail komt van',required:true,options:['Klant','Verzekering','Expert','Regelgevende autoriteit','Notaris','Dienstverlener en leverancier','Externe consultant','Interne mail','Klacht','Reclame','Bank'],otherLabel:'Preciseer…'},
+        {id:'M3Q12',type:'text',label:'Primaire mailbox om te bewaken',required:true},
+        {id:'M3Q13',type:'textarea',label:'Organogram van secundaire mailboxen',required:true,placeholder:'schades@ : beheerder X, regels…\ninfo@ : beheerder Y, regels…',hint:'Per mailbox: naam, referentiebeheerder, sorteerregels.'},
+      ]},
+      {id:'M3D',name:'Blok 4 — Interne documentatie',questions:[
+        {id:'M3Q14',type:'file-upload',label:'Sjablonen en formulieren door te sturen naar Procyo',required:false,accept:'.pdf,.doc,.docx',maxFiles:10,maxSizeMb:5,noFilesOption:'Geen sjablonen'},
+      ]},
+      {id:'M3E',name:'Blok 5 — BRIO-acties',questions:[
+        {id:'M3Q15',type:'behavior-matrix',label:'Validatie van gedragingen',required:false,
+          intro:'Dit is het standaardgedrag van de AI voor de belangrijkste Brio-acties. Deze regels worden automatisch toegepast en zijn aanpasbaar.',
+          behaviors:[
+            {key:'production',title:'Productie',text:'Bij een door Procyo geïnitieerde productie maakt de AI systematisch een risicoobject (RO) aan en koppelt relevante documenten.'},
+            {key:'sinistre',title:'Schade',text:'Bij een schadeaangifte maakt de AI automatisch het schadedossier aan en koppelt het aan het betrokken RO.'},
+            {key:'document',title:'Document',text:'Elk document kan hernoemd worden volgens uw eigen regels. Standaard past de AI een duidelijke nomenclatuur toe.'},
+            {key:'mail',title:'Mail',text:'Als de e-mail verband houdt met een schade, wordt deze toegevoegd aan het betrokken schadedossier.'},
+            {key:'autre',title:'Andere',text:''},
+          ]},
+      ]},
+    ]},
+    {id:'module4',title:'Voortdurende optimalisatie',desc:'Na de go-live observeert de AI uw gewoonten en stelt aanpassingen voor met één klik.',icon:'🔬',isObservation:true,sections:[{id:'M4',name:'Observaties',questions:[]}]},
+  ],
+  de: [
+    {id:'module1',title:'Entdeckung',desc:'Entdeckungsfragen zur Vorbereitung Ihrer Procyo-Demo und Kalibrierung der Präsentation auf Ihre Realität.',icon:'🔍',sections:[
+      {id:'M1',name:'Ihr Büro & Prioritäten',questions:[
+        {id:'M1Q1',type:'radio',label:'Wie viele Personen arbeiten in Ihrem Büro?',required:true,options:['1 bis 3','4 bis 10','11 bis 30','31 bis 50','Mehr als 50'],hint:'Bestimmt die in der Demo präsentierte Tarifstufe.'},
+        {id:'M1Q2',type:'radio-other',label:'Welche Version von Brio verwenden Sie?',required:true,options:['Brio First','Brio Confort','Brio Premium','Ich bin nicht sicher'],otherLabel:'Präzisieren Sie Ihre Software…'},
+        {id:'M1Q3',type:'percent-split',label:'Welche Aktivitäten üben Sie aus und in welchem Verhältnis?',required:true,rows:['Privat-Sach','Gewerblich-Sach','Leben und Anlagen','Kredite (Hypotheken und PAT)','Sonstiges']},
+        {id:'M1Q4',type:'radio-other',label:'Was ist Ihre primäre E-Mail-Plattform?',required:true,options:['Microsoft 365','Google Workspace','Exchange','Weiß nicht'],otherLabel:'Präzisieren Sie Ihre Plattform…'},
+        {id:'M1Q5',type:'radio',label:'Wie viele eingehende Kunden-E-Mails pro Adresse bearbeiten Sie täglich?',required:true,options:['Weniger als 20','20 bis 50','50 bis 100','Mehr als 100'],hint:'Kalibriert das ROI-Argument für die Demo.'},
+        {id:'M1Q6',type:'checkbox-other',label:'Welche Themen haben für Sie Priorität?',required:true,options:['Eingehende E-Mails schneller bearbeiten (E-Mail-Assistent)','Regulatorische Compliance sichern — KYC, AML, IDD (Compliance-Assistent)','Mein Portfolio besser verstehen und steuern (Portfolio-Assistent)','Geschäftliche Chancen erkennen — Cross-Selling, Nachverfolgung (Vertriebsassistent)'],otherLabel:'Präzisieren…'},
+        {id:'M1Q7',type:'radio-other',label:'Wer trifft die endgültige Entscheidung?',required:true,options:['Ich allein','Ich + ein Gesellschafter','Geschäftsführung / Vorstand'],otherLabel:'Präzisieren…'},
+        {id:'M1Q8',type:'radio',label:'Hatten Sie bereits Kontakt mit PROCYO oder einem Partner?',required:false,options:['Ja — präzisieren','Nein, erstes Gespräch'],hint:'Vermeidet Redundanzen, verfolgt Einbringer.'},
+        {id:'M1Q9',type:'radio',label:'Auf einer Skala von 1 bis 5: Wie vertraut sind Sie mit KI-Tools?',required:false,options:['1 — noch nie benutzt','2','3','4','5 — täglicher Nutzer'],hint:'Passt das technische Niveau der Demo an.'},
+        {id:'M1Q10',type:'textarea',label:'Gibt es einen bestimmten Punkt, den Sie in der Demo ansprechen möchten?',required:false,placeholder:'Falls nichts Besonderes, NA schreiben'},
+      ]}
+    ]},
+    {id:'module2',title:'Vertragsabschluss',desc:'Für die Vertragsvorbereitung und Identifizierung der Ansprechpartner erforderliche Informationen.',icon:'📋',sections:[
+      {id:'M2A',name:'Konfiguration & Lizenzen',questions:[
+        {id:'M2Q1',type:'slider',label:'Wie viele E-Mail-Adressen im E-Mail-Assistenten (Inboxia) aktivieren?',required:true,min:1,max:20,default:3,dynamicRange:'M1Q1'},
+        {id:'M2Q3',type:'checkbox',label:'Welche zusätzlichen Assistenten möchten Sie aktivieren?',required:false,options:['Compliance-Assistent (Regulia) — KYC / AML / IDD','Portfolio-Assistent (Portfolia) — Analyse und Dashboards','Vertriebsassistent (Relancia) — Chancen und Kampagnen','Keiner für jetzt — nur der E-Mail-Assistent']},
+      ]},
+      {id:'M2B',name:'Rechtliche Identifizierung',questions:[
+        {id:'M2Q4',type:'text',label:'Firmenname',required:true},
+        {id:'M2Q5',type:'text',label:'Unternehmensnummer (KBO/BCE)',required:true,placeholder:'BE 0xxx.xxx.xxx'},
+        {id:'M2Q6',type:'text',label:'Anschrift des Firmensitzes',required:true},
+        {id:'M2Q7',type:'text',label:'FSMA-Zulassungsnummer',required:true,placeholder:'z.B.: 12345A'},
+        {id:'M2Q8',type:'radio',label:'Rechtsform',required:true,options:['GmbH','AG','OHG','SARL','Natürliche Person','Andere']},
+        {id:'M2Q9',type:'text',label:'Gesetzlicher Vertreter (Geschäftsführer)',required:true,placeholder:'Vorname Nachname'},
+        {id:'M2Q10',type:'text',label:'Rechnungs-E-Mail',required:true},
+      ]},
+      {id:'M2B',name:'Ansprechpartner',questions:[
+        {id:'M2Q11',type:'contact-fields',label:'Hauptansprechpartner (Unterzeichner)',required:true},
+        {id:'M2Q12',type:'contact-fields',label:'Technischer Verantwortlicher / IT',required:true},
+        {id:'M2Q13',type:'contact-fields',label:'Compliance-Referent / DPO',required:true},
+        {id:'M2Q14',type:'textarea',label:'Besondere Vertragsbedingungen?',required:false},
+        {id:'M2Q15',type:'radio',label:'Gewünschte Abrechnungsweise',required:false,options:['Monatlich','Vierteljährlich','Jährlich']},
+      ]},
+    ]},
+    {id:'module3',title:'Konfiguration',desc:'Feineinstellung Ihres Inboxia KI-Agenten: Ton, Unternehmen, Filter, Schäden, BRIO.',icon:'⚙️',sections:[
+      {id:'M3A',name:'Block 1 — Signatur und Ton',questions:[
+        {id:'M3Q1',type:'textarea',label:'Standardsignatur am Ende jeder E-Mail',required:true,placeholder:'Exakter Text, Zeile für Zeile…',hint:'Wird standardmäßig für alle generierten Entwürfe verwendet.'},
+        {id:'M3Q2',type:'radio',label:'Standardanrede',required:true,options:['Sie-Form','Du-Form','Spiegel (passt sich der verwendeten Form an)']},
+        {id:'M3Q3',type:'radio',label:'Gewünschter Ton',required:true,options:['Sachlich','Herzlich','Technisch','Förmlich','Vertraut','Spiegel (passt sich dem Ton an)']},
+        {id:'M3Q5',type:'text',label:'Bevorzugte Schlussformel',required:false,placeholder:'z.B.: Mit freundlichen Grüßen…'},
+      ]},
+      {id:'M3B',name:'Block 2 — Partnerunternehmen',questions:[
+        {id:'M3Q6',type:'company-matrix',label:'Partnerunternehmen und Sparten',required:true,
+          companies:['AG Insurance','AXA Belgium','Allianz','Baloise','DKV','Foyer','NN Insurance','Vivium','Athora','La Patronale','Baloise Luxembourg','Wealins','OneLife','Vitis Life','Lombard','AXA Wealth','Cardif','Aviza','AfiEsca','Ethias','Federale Assurance','HDI','AIG','Zurich','Chubb','Hiscox','Legal Village','ARAG','Providis','DAS','Euromex','Axa Partners','Allianz Partners','Europ Assistance','Atradius','Coface','TVM','Aedes','Avise','Ibis Insurance','Vander Haeghen','Jean Verheyen','Elitis Insurance','April'],
+          branches:['Wohnen','Auto','Kranken','Rechtsschutz','Beistand','Unternehmen','Leben','Prior','Schadenregulierung']},
+        {id:'M3Q6b',type:'radio',label:'RDR-Vereinbarung (Auto) angewandt',required:false,options:['Systematisch','Fall für Fall','Nicht angewandt']},
+      ]},
+      {id:'M3C',name:'Block 3 — Filter und sensible Kategorien',questions:[
+        {id:'M3Q10',type:'checkbox-other',label:'NIEMALS einen Entwurf vorbereiten, wenn die E-Mail kommt von',required:true,options:['Kunde','Versicherung','Experte','Regulierungsbehörde','Notar','Dienstleister und Lieferant','Externer Berater','Interne Mail','Beschwerde','Werbung','Bank'],otherLabel:'Präzisieren…'},
+        {id:'M3Q12',type:'text',label:'Primäres zu überwachendes Postfach',required:true},
+        {id:'M3Q13',type:'textarea',label:'Organigramm der sekundären Postfächer',required:true,placeholder:'schaden@ : Manager X, Regeln…\ninfo@ : Manager Y, Regeln…',hint:'Pro Postfach: Bezeichnung, Referenzmanager, Sortierregeln.'},
+      ]},
+      {id:'M3D',name:'Block 4 — Interne Dokumentation',questions:[
+        {id:'M3Q14',type:'file-upload',label:'Vorlagen und Formulare an Procyo zu übermitteln',required:false,accept:'.pdf,.doc,.docx',maxFiles:10,maxSizeMb:5,noFilesOption:'Keine Vorlagen'},
+      ]},
+      {id:'M3E',name:'Block 5 — BRIO-Aktionen',questions:[
+        {id:'M3Q15',type:'behavior-matrix',label:'Verhaltensvalidierung',required:false,
+          intro:'Dies ist das Standardverhalten der KI für die wichtigsten Brio-Aktionen. Diese Regeln werden automatisch angewendet und sind anpassbar.',
+          behaviors:[
+            {key:'production',title:'Produktion',text:'Bei einer von Procyo initiierten Produktion erstellt die KI systematisch ein Risikoobjekt (RO) und verknüpft relevante Dokumente.'},
+            {key:'sinistre',title:'Schaden',text:'Bei einer Schadenanmeldung erstellt die KI automatisch die Schadensakte und verknüpft sie mit dem betreffenden RO.'},
+            {key:'document',title:'Dokument',text:'Jedes Dokument kann nach Ihren eigenen Regeln umbenannt werden. Standardmäßig wendet die KI eine klare Nomenklatur an.'},
+            {key:'mail',title:'Mail',text:'Wenn die E-Mail mit einem Schaden zusammenhängt, wird sie dem betreffenden Schaden hinzugefügt.'},
+            {key:'autre',title:'Sonstiges',text:''},
+          ]},
+      ]},
+    ]},
+    {id:'module4',title:'Kontinuierliche Optimierung',desc:'Nach dem Go-Live beobachtet die KI Ihre Gewohnheiten und schlägt Anpassungen mit einem Klick vor.',icon:'🔬',isObservation:true,sections:[{id:'M4',name:'Beobachtungen',questions:[]}]},
+  ],
+  en: [
+    {id:'module1',title:'Discovery',desc:'Discovery questions to prepare your Procyo demo and calibrate the presentation to your reality.',icon:'🔍',sections:[
+      {id:'M1',name:'Your firm & priorities',questions:[
+        {id:'M1Q1',type:'radio',label:'How many people work in your firm?',required:true,options:['1 to 3','4 to 10','11 to 30','31 to 50','More than 50'],hint:'Determines the pricing tier presented in the demo.'},
+        {id:'M1Q2',type:'radio-other',label:'Which version of Brio do you use?',required:true,options:['Brio First','Brio Confort','Brio Premium','I\'m not sure'],otherLabel:'Specify your software…'},
+        {id:'M1Q3',type:'percent-split',label:'What activities do you carry out and in what approximate proportion?',required:true,rows:['Personal P&C','Commercial P&C','Life and investments','Credits (mortgages and PAT)','Other']},
+        {id:'M1Q4',type:'radio-other',label:'What is your primary email platform?',required:true,options:['Microsoft 365','Google Workspace','Exchange','I don\'t know'],otherLabel:'Specify your platform…'},
+        {id:'M1Q5',type:'radio',label:'How many inbound client emails per address do you handle per day?',required:true,options:['Fewer than 20','20 to 50','50 to 100','More than 100'],hint:'Calibrates the ROI argument for the demo.'},
+        {id:'M1Q6',type:'checkbox-other',label:'Which of these topics are priorities for you?',required:true,options:['Handle inbound emails faster (Mail assistant)','Secure regulatory compliance — KYC, AML, IDD (Compliance assistant)','Better understand and manage my portfolio (Portfolio assistant)','Detect commercial opportunities — cross-sell, follow-up (Commercial assistant)'],otherLabel:'Specify…'},
+        {id:'M1Q7',type:'radio-other',label:'Who will make the final decision?',required:true,options:['Me alone','Me + a partner','Board of directors'],otherLabel:'Specify…'},
+        {id:'M1Q8',type:'radio',label:'Have you already been in contact with PROCYO or a partner?',required:false,options:['Yes — specify','No, first contact'],hint:'Avoids redundancy, tracks introducers.'},
+        {id:'M1Q9',type:'radio',label:'On a scale of 1 to 5, how comfortable are you with AI tools today?',required:false,options:['1 — never used','2','3','4','5 — daily user'],hint:'Adapts the technical level of the demo.'},
+        {id:'M1Q10',type:'textarea',label:'Is there a specific point you would like to see addressed during the demo?',required:false,placeholder:'If nothing specific, write NA'},
+      ]}
+    ]},
+    {id:'module2',title:'Contractualisation',desc:'Information needed to prepare the contract and identify the key contacts.',icon:'📋',sections:[
+      {id:'M2A',name:'Configuration & licences',questions:[
+        {id:'M2Q1',type:'slider',label:'How many email addresses to activate in the Mail assistant (Inboxia)?',required:true,min:1,max:20,default:3,dynamicRange:'M1Q1'},
+        {id:'M2Q3',type:'checkbox',label:'Which additional assistants would you like to activate?',required:false,options:['Compliance assistant (Regulia) — KYC / AML / IDD','Portfolio assistant (Portfolia) — analysis and dashboards','Commercial assistant (Relancia) — opportunities and campaigns','None for now — Mail assistant only']},
+      ]},
+      {id:'M2B',name:'Legal identification',questions:[
+        {id:'M2Q4',type:'text',label:'Company name',required:true},
+        {id:'M2Q5',type:'text',label:'Company registration number',required:true,placeholder:'BE 0xxx.xxx.xxx'},
+        {id:'M2Q6',type:'text',label:'Registered office address',required:true},
+        {id:'M2Q7',type:'text',label:'FSMA approval number',required:true,placeholder:'e.g.: 12345A'},
+        {id:'M2Q8',type:'radio',label:'Legal form',required:true,options:['SRL/BV','SA/NV','SNC','SPRL','Natural person','Other']},
+        {id:'M2Q9',type:'text',label:'Legal representative (director)',required:true,placeholder:'First Last'},
+        {id:'M2Q10',type:'text',label:'Billing email',required:true},
+      ]},
+      {id:'M2C',name:'Key contacts',questions:[
+        {id:'M2Q11',type:'contact-fields',label:'Main contact (signatory)',required:true},
+        {id:'M2Q12',type:'contact-fields',label:'Technical contact / IT',required:true},
+        {id:'M2Q13',type:'contact-fields',label:'Compliance contact / DPO',required:true},
+        {id:'M2Q14',type:'textarea',label:'Special contractual terms?',required:false},
+        {id:'M2Q15',type:'radio',label:'Preferred billing frequency',required:false,options:['Monthly','Quarterly','Annually']},
+      ]},
+    ]},
+    {id:'module3',title:'Configuration',desc:'Fine-tuning your Inboxia AI agent: tone, companies, filters, claims, BRIO.',icon:'⚙️',sections:[
+      {id:'M3A',name:'Block 1 — Signature and tone',questions:[
+        {id:'M3Q1',type:'textarea',label:'Standard signature to add at the end of each email',required:true,placeholder:'Exact text, line by line…',hint:'Will be used by default for all generated drafts.'},
+        {id:'M3Q2',type:'radio',label:'Default form of address',required:true,options:['Formal (vous/Sie/u)','Informal (tu/du/je)','Mirror (matches the style used by the correspondent)']},
+        {id:'M3Q3',type:'radio',label:'Desired tone',required:true,options:['Sober','Warm','Technical','Formal','Familiar','Mirror (matches the correspondent\'s tone)']},
+        {id:'M3Q5',type:'text',label:'Preferred closing formula',required:false,placeholder:'e.g.: Kind regards, Best wishes…'},
+      ]},
+      {id:'M3B',name:'Block 2 — Partner companies',questions:[
+        {id:'M3Q6',type:'company-matrix',label:'Partner companies and lines of business',required:true,
+          companies:['AG Insurance','AXA Belgium','Allianz','Baloise','DKV','Foyer','NN Insurance','Vivium','Athora','La Patronale','Baloise Luxembourg','Wealins','OneLife','Vitis Life','Lombard','AXA Wealth','Cardif','Aviza','AfiEsca','Ethias','Federale Assurance','HDI','AIG','Zurich','Chubb','Hiscox','Legal Village','ARAG','Providis','DAS','Euromex','Axa Partners','Allianz Partners','Europ Assistance','Atradius','Coface','TVM','Aedes','Avise','Ibis Insurance','Vander Haeghen','Jean Verheyen','Elitis Insurance','April'],
+          branches:['Home','Motor','Health','Legal','Assistance','Commercial','Life','Prior','Claims delegation']},
+        {id:'M3Q6b',type:'radio',label:'RDR convention (motor) applied',required:false,options:['Systematically','Case by case','Not applied']},
+      ]},
+      {id:'M3C',name:'Block 3 — Filters and sensitive categories',questions:[
+        {id:'M3Q10',type:'checkbox-other',label:'NEVER prepare a draft if the email comes from',required:true,options:['Client','Insurance company','Expert','Regulatory authority','Notary','Service provider and supplier','External consultant','Internal mail','Complaint','Advertising','Bank'],otherLabel:'Specify…'},
+        {id:'M3Q12',type:'text',label:'Main mailbox to monitor',required:true},
+        {id:'M3Q13',type:'textarea',label:'Secondary mailboxes organogram',required:true,placeholder:'claims@ : manager X, rules…\ninfo@ : manager Y, rules…',hint:'For each mailbox: name, reference manager, sorting rules.'},
+      ]},
+      {id:'M3D',name:'Block 4 — Internal documentation',questions:[
+        {id:'M3Q14',type:'file-upload',label:'Templates and forms to send to Procyo',required:false,accept:'.pdf,.doc,.docx',maxFiles:10,maxSizeMb:5,noFilesOption:'No templates'},
+      ]},
+      {id:'M3E',name:'Block 5 — BRIO actions',questions:[
+        {id:'M3Q15',type:'behavior-matrix',label:'Behaviour validation',required:false,
+          intro:'Here is the AI\'s default behaviour for the main Brio actions. These rules apply automatically and can be adjusted.',
+          behaviors:[
+            {key:'production',title:'Production',text:'When a production is initiated by Procyo, the AI systematically creates a risk object (RO) and attaches relevant documents.'},
+            {key:'sinistre',title:'Claim',text:'When a claim is reported, the AI automatically creates the claim file and links it to the relevant RO.'},
+            {key:'document',title:'Document',text:'Each document can be renamed according to your own rules. By default, the AI applies a clear naming convention.'},
+            {key:'mail',title:'Email',text:'If the email relates to a claim, it is added to the relevant claim. If it relates to a question about an RO or contract, it is linked to the RO.'},
+            {key:'autre',title:'Other',text:''},
+          ]},
+      ]},
+    ]},
+    {id:'module4',title:'Continuous optimisation',desc:'After go-live, the AI observes your habits and suggests adjustments in one click.',icon:'🔬',isObservation:true,sections:[{id:'M4',name:'Observations',questions:[]}]},
+  ],
+};
+
+function getModules(){ return MODULES_DATA[currentLang] || MODULES_DATA.fr; }
+// Compatibilité avec le code existant qui utilise MODULES directement
+Object.defineProperty(window, 'MODULES', { get: () => getModules() });
     {id:'M2B',name:'Identification juridique',questions:[
       {id:'M2Q4',type:'text',label:'Raison sociale complète',required:true,hint:'Telle qu\'inscrite au registre BCE.'},
       {id:'M2Q5',type:'radio',label:'Forme juridique',required:true,options:['SRL','SA','SCRL','Indépendant','Autre']},
-      {id:'M2Q6',type:'contact-fields',label:'Adresse du siège social',required:true,
-  fields:[
-    {key:'rue',         label:'Rue',         type:'text', placeholder:'Rue de la Loi'},
-    {key:'numero',      label:'Numéro',      type:'text', placeholder:'16'},
-    {key:'code_postal', label:'Code postal', type:'text', placeholder:'1000'},
-    {key:'ville',       label:'Ville',       type:'text', placeholder:'Bruxelles'},
-    {key:'pays',        label:'Pays',        type:'text', placeholder:'Belgique'},
-  ]
-},
+      {id:'M2Q6',type:'textarea',label:'Adresse du siège social',required:true,placeholder:'Rue, numéro, code postal, ville, pays'},
       {id:'M2Q7',type:'text',label:'Numéro BCE',required:true},
       {id:'M2Q8',type:'text',label:'Numéro d\'agrément FSMA',required:true},
       {id:'M2Q9',type:'text',label:'Nom et qualité du signataire du contrat',required:true,hint:'La personne qui signera électroniquement.'},
@@ -878,13 +1600,13 @@ async function doLogin(){
   const pwd=document.getElementById('login-pwd').value;
   const errEl=document.getElementById('login-err');
   errEl.style.display='none';
-  if(!email||!pwd){showMsg(errEl,'Veuillez remplir tous les champs.');return;}
-  setLoading(true,'Connexion en cours…');
+  if(!email||!pwd){showMsg(errEl,t('err_fields_required'));return;}
+  setLoading(true,'…');
   try{
     const hash=await hashPassword(pwd);
     const rows=await sbGet('brokers','email=eq.'+encodeURIComponent(email)+'&select=*');
-    if(!rows||rows.length===0){showMsg(errEl,'Aucun compte trouvé pour cet email.');return;}
-    if(rows[0].password_hash!==hash){showMsg(errEl,'Mot de passe incorrect.');return;}
+    if(!rows||rows.length===0){showMsg(errEl,t('err_login_failed'));return;}
+    if(rows[0].password_hash!==hash){showMsg(errEl,t('err_login_failed'));return;}
     currentUser=rows[0];
     localStorage.setItem('procyo_session',JSON.stringify({id:currentUser.id,email:currentUser.email}));
     await loadAnswersCache();
@@ -901,19 +1623,19 @@ async function doRegister(){
   const errEl=document.getElementById('reg-err');
   const okEl=document.getElementById('reg-ok');
   errEl.style.display='none';okEl.style.display='none';
-  if(!email||!pwd){showMsg(errEl,'Email et mot de passe requis.');return;}
-  if(!/\S+@\S+\.\S+/.test(email)){showMsg(errEl,'Adresse email invalide.');return;}
-  if(pwd.length<8){showMsg(errEl,'Le mot de passe doit faire au moins 8 caractères.');return;}
-  if(pwd!==pwd2){showMsg(errEl,'Les mots de passe ne correspondent pas.');return;}
-  setLoading(true,'Création du compte…');
+  if(!email||!pwd){showMsg(errEl,t('err_fields_required'));return;}
+  if(!/\S+@\S+\.\S+/.test(email)){showMsg(errEl,t('err_email_invalid'));return;}
+  if(pwd.length<8){showMsg(errEl,t('err_pwd_short'));return;}
+  if(pwd!==pwd2){showMsg(errEl,t('err_pwd_match'));return;}
+  setLoading(true,'…');
   try{
     const existing=await sbGet('brokers','email=eq.'+encodeURIComponent(email)+'&select=id');
-    if(existing&&existing.length>0){showMsg(errEl,'Un compte existe déjà pour cet email.');return;}
+    if(existing&&existing.length>0){showMsg(errEl,t('err_email_exists'));return;}
     const hash=await hashPassword(pwd);
     const rows=await sbInsert('brokers',{email,password_hash:hash,company_name:company||null});
     currentUser=rows[0];
     localStorage.setItem('procyo_session',JSON.stringify({id:currentUser.id,email:currentUser.email}));
-    showMsg(okEl,'✓ Compte créé ! Connexion en cours…');
+    showMsg(okEl,'✓ '+t('ok_account_created'));
     setTimeout(()=>enterApp(),800);
   }catch(e){showMsg(errEl,'Erreur : '+e.message);}
   finally{setLoading(false);}
@@ -1091,8 +1813,8 @@ function getProgress(mid){
       else if(Array.isArray(v)&&v.length>0) ans++;
       else ans++; // optionnel — ne bloque pas
     } else if(q.type==='contact-fields'){
-      const requiredFields = q.fields ? q.fields : [{key:'nom'}];
-      if(v&&typeof v==='object'&&requiredFields.every(f=>v[f.key]&&String(v[f.key]).trim()))ans++;
+      // answered if au moins nom rempli
+      if(v&&typeof v==='object'&&v.nom&&v.nom.trim())ans++;
     } else if(q.type==='company-matrix'){
       if(v&&typeof v==='object'&&Object.values(v).some(arr=>Array.isArray(arr)&&arr.length>0))ans++;
     } else if(q.type==='percent-split'){
@@ -1128,9 +1850,9 @@ function renderModules(){
     card.className='mod-card '+(status==='locked'?'locked':isObs?'obs-card':es==='completed'?'completed':'active-card');
     let badge='';
     if(isObs&&status!=='locked') badge='<div class="mod-badge mb-obs"><span class="bdot"></span>Post go-live</div>';
-    else if(es==='completed') badge='<div class="mod-badge mb-done"><span class="bdot"></span>Clôturé</div>';
-    else if(status==='active') badge='<div class="mod-badge mb-active"><span class="bdot"></span>Accessible</div>';
-    else badge='<div class="mod-badge mb-locked"><span class="bdot"></span>Non disponible</div>';
+    else if(es==='completed') badge=`<div class="mod-badge mb-done"><span class="bdot"></span>${t('mod_status_completed')}</div>`;
+    else if(status==='active') badge=`<div class="mod-badge mb-active"><span class="bdot"></span>${t('mod_status_active')}</div>`;
+    else badge=`<div class="mod-badge mb-locked"><span class="bdot"></span>${t('mod_status_locked')}</div>`;
     card.innerHTML=`
       <div class="mod-icon ${status==='locked'?'locked':isObs?'obs-card':es==='completed'?'completed':'active-card'}">${mod.icon}</div>
       <div class="mod-body">
@@ -1140,9 +1862,9 @@ function renderModules(){
       </div>
       <div class="mod-prog">
         ${status==='locked'?'<div class="lock-icon">🔒</div>':
-          isObs?'<div style="font-size:12px;color:var(--purple);text-align:right">Observations<br>de l\'IA</div>':
+          isObs?`<div style="font-size:12px;color:var(--purple);text-align:right">${currentLang==='nl'?'Observaties<br>AI':currentLang==='de'?'KI-<br>Beobachtungen':currentLang==='en'?'AI<br>Observations':'Observations<br>de l\'IA'}</div>`:
           `<div class="prog-bar"><div class="prog-fill${es==='completed'?' done-fill':''}" style="width:${pct}%"></div></div>
-           <div class="prog-txt">${ans}/${tot} questions</div>`}
+           <div class="prog-txt">${ans}/${tot} ${t('mod_questions')}</div>`}
       </div>`;
     if(status!=='locked')card.addEventListener('click',()=>openModule(i));
     list.appendChild(card);
@@ -1193,10 +1915,10 @@ function openModule(idx){
           el.style.opacity = '0.7';
           el.style.cursor = 'not-allowed';
         });
-        document.querySelectorAll('#screen-questions .rbtn, #screen-questions .citem, #screen-questions .bm-ok, #screen-questions .cm-box, #screen-questions .fu-btn, #screen-questions .fu-del, #screen-questions .btn-cest-moi, #screen-questions .cm-add-btn').forEach(function(el){
-  el.style.pointerEvents = 'none';
-  el.style.opacity = '0.7';
-});
+        document.querySelectorAll('#screen-questions .opt-btn, #screen-questions .chip').forEach(function(el){
+          el.style.pointerEvents = 'none';
+          el.style.opacity = '0.7';
+        });
       }, 100);
     }
   }
@@ -1205,8 +1927,8 @@ function openModule(idx){
 function renderNotif(idx){
   const {ans,tot}=getProgress(MODULES[idx].id);
   const n=document.getElementById('q-notif');
-  if(ans>=tot&&tot>0) n.innerHTML='<div class="done-bar"><h3>🎉 Module complété !</h3><p>Toutes les questions ont été répondues. Votre équipe Procyo a été notifiée.</p></div>';
-  else n.innerHTML='<div class="notif-bar"><span>📧</span><span><strong>Rappel quotidien actif.</strong> Tant que ce module n\'est pas clôturé, vous recevez un email de rappel chaque jour. Vos réponses sont synchronisées sur tous vos appareils.</span></div>';
+  if(ans>=tot&&tot>0) n.innerHTML=`<div class="done-bar"><h3>🎉 ${currentLang==='nl'?'Module voltooid!':currentLang==='de'?'Modul abgeschlossen!':currentLang==='en'?'Module completed!':'Module complété !'}</h3><p>${t('notif_readonly')}</p></div>`;
+  else n.innerHTML=`<div class="notif-bar"><span>📧</span><span>${t('notif_reminder')}</span></div>`;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1371,13 +2093,13 @@ function buildQuestion(q,saved){
   else if(q.type==='contact-fields'){
     // saved is object {nom, fonction, email, tel}
     const sv=saved&&typeof saved==='object'?saved:{};
-    const fields = q.fields || [
+    const fields=[
       {key:'nom',    label:'Nom',      type:'text',  placeholder:'Prénom Nom'},
       {key:'fonction',label:'Fonction',type:'text',  placeholder:'Ex. : Directeur administratif'},
       {key:'email',  label:'Email',    type:'email', placeholder:'prenom.nom@cabinet.be'},
       {key:'tel',    label:'Téléphone',type:'tel',   placeholder:'+32 …'},
     ];
-    inp = q.id === 'M2Q6' ? '' : `<button type="button" class="btn-cest-moi" onclick="fillCestMoi('${q.id}')">👤 C'est moi</button>`;
+    inp=`<button type="button" class="btn-cest-moi" onclick="fillCestMoi('${q.id}')">${t('btn_cest_moi')}</button>`;
     inp+=`<div class="contact-grid">`;
     fields.forEach(f=>{
       const v=sv[f.key]||'';
@@ -1861,29 +2583,66 @@ async function saveAll(){
   const st=document.getElementById('save-st');
   const btn=document.getElementById('btn-save');
   const lbl=btn.querySelector('.btn-save-lbl');
-  // Start spinner
   btn.classList.add('saving');
   btn.disabled=true;
-  lbl.textContent='Sauvegarde…';
+  lbl.textContent=t('save_status_saving');
   st.textContent='';st.className='save-st';
   try{
     await saveBatch();
     if(currentMod!==null)updateQProgress(MODULES[currentMod]);
+    renderNotif(currentMod);
     btn.classList.remove('saving');
     btn.disabled=false;
-    lbl.textContent='✓ Sauvegardé';
-    st.textContent='Synchronisé sur tous vos appareils';st.className='save-st ok';
+    lbl.textContent=t('save_status_saved');
+    st.textContent=t('save_status_sync');st.className='save-st ok';
     setTimeout(()=>{
-      lbl.textContent='Sauvegarder';
+      lbl.textContent=t('btn_save');
       st.textContent='';st.className='save-st';
     },2500);
   }catch(e){
     btn.classList.remove('saving');
     btn.disabled=false;
-    lbl.textContent='Sauvegarder';
-    st.textContent='Erreur — réessayez';st.className='save-st err';
+    lbl.textContent=t('btn_save');
+    st.textContent=t('save_status_error');st.className='save-st err';
     console.error(e);
   }
+}
+
+// ── NOTIFICATIONS BREVO ─────────────────────────────────────────
+const NOTIF_FIXED = {
+  M1: [],
+  M2: [{email:'gianni.luyckx@procyo.be',name:'Gianni'},{email:'support@procyo.be',name:'Anne'}],
+  M3: [{email:'maxime.dejean@procyo.be',name:'Maxime'}],
+};
+
+async function sendModuleNotification(modId){
+  // Check not already sent
+  const modIdL=modId.toLowerCase();
+  const alreadySent=currentUser[modIdL+'_notif_sent'];
+  if(alreadySent)return;
+  // Build recipients
+  const to=[];
+  const salesEmail=currentUser.sales_email;
+  if(salesEmail)to.push({email:salesEmail,name:'Sales'});
+  (NOTIF_FIXED[modId]||[]).forEach(r=>to.push(r));
+  if(to.length===0)return;
+  const modNum=modId.replace('M','').replace(/[A-Z].*/,'');
+  const company=currentUser.company_name||currentUser.email;
+  const subject=`Module ${modNum} complété — ${company}`;
+  const html=`<p>Bonjour,</p>
+<p>Le <strong>Module ${modNum}</strong> de <strong>${company}</strong> vient d'être complété dans la webapp Procyo.</p>
+<p>Vous pouvez consulter les réponses et débloquer la suite depuis l'interface admin.</p>
+<br><p>— Procyo Onboarding</p>`;
+  try{
+    await fetch(SB_URL+'/functions/v1/send-notification',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY},
+      body:JSON.stringify({to,subject,html,senderName:'Procyo',senderEmail:'noreply@procyo.be'}),
+    });
+    // Mark as sent in DB so we don't resend
+    await sbUpdate('brokers','id=eq.'+currentUser.id,{[modIdL+'_notif_sent']:true});
+    currentUser[modIdL+'_notif_sent']=true;
+  }catch(e){console.warn('Notif failed:',e);}
 }
 
 async function updateQProgress(mod){
@@ -1896,13 +2655,32 @@ async function updateQProgress(mod){
     const status=currentUser[mod.id+'_status']||'locked';
     console.log('Completion check:', mod.id, 'status=', status, 'ans=', ans, 'tot=', tot);
     if(status==='active'){
-      // Enregistrer la date de complétion → déclenche l'Edge Function qui notifie Odoo
+      // Enregistrer la date de complétion (toujours, indépendamment de l'envoi mail)
+      const modIdL=mod.id.toLowerCase();
       const completedKey=mod.id+'_completed_at'; // ex: module1_completed_at
       if(!currentUser[completedKey]){
         const completedAt=new Date().toISOString();
         await sbUpdate('brokers','id=eq.'+currentUser.id,{[completedKey]:completedAt});
         currentUser[completedKey]=completedAt;
+        // Notifier Odoo que le module est complété
+        const modNum=mod.id.replace('module','');
+        if(currentUser.odoo_id){
+          try{
+            await fetch('https://procyo2.odoo.com/web/hook/b2afcdca-64ff-411b-b3fe-8b420b2c13ab',{
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body:JSON.stringify({
+                _model:'crm.lead',
+                _id:parseInt(currentUser.odoo_id),
+                odoo_id:parseInt(currentUser.odoo_id),
+                module:modNum
+              })
+            });
+          }catch(e){console.warn('Odoo notify failed:',e);}
+        }
       }
+      // Envoyer la notification si pas encore fait
+      sendModuleNotification(mod.id);
     }
   }
 }
@@ -1960,7 +2738,7 @@ async function showAdmin(){
         } else {
           progHTML=`<div class="bmod-count">${(obsRows||[]).length} obs.</div>`;
         }
-        const stLabel=st==='completed'?'✓ Clôturé':st==='active'?'● Accessible':'○ Verrouillé';
+        const stLabel=st==='completed'?'✓ '+t('mod_accessible'):st==='active'?'● '+t('mod_accessible'):'○ '+t('mod_locked_s');
         return `<div class="bmod">
           <div class="bmod-title">M${i+1} — ${mod.title}</div>
           <div class="bmod-status ${st}">${stLabel}</div>
@@ -1970,14 +2748,14 @@ async function showAdmin(){
       // Unlock buttons
       const unlockBtns=MODULES.map((mod,i)=>{
         const st=b[mod.id+'_status']||'locked';
-        if(st==='locked')return`<button class="unlock-btn" onclick="adminUnlock('${b.id}','${mod.id}',this)">🔓 Débloquer M${i+1}</button>`;
+        if(st==='locked')return`<button class="unlock-btn" onclick="adminUnlock('${b.id}','${mod.id}',this)">${t('btn_unlock')} M${i+1}</button>`;
         return '';
       }).join('');
       card.innerHTML=`
         <h3>${escH(b.company_name||b.email)}</h3>
-        <div class="broker-meta">${b.email} — inscrit le ${new Date(b.created_at).toLocaleDateString('fr-BE')}</div>
+        <div class="broker-meta">${b.email} — ${t('registered_on')} ${new Date(b.created_at).toLocaleDateString(currentLang==='en'?'en-GB':currentLang==='de'?'de-DE':currentLang==='nl'?'nl-BE':'fr-BE')}</div>
         <div class="broker-sales-wrap">
-          <label class="broker-sales-lbl">Sales en charge</label>
+          <label class="broker-sales-lbl">${t('admin_sales')}</label>
           <input type="email" class="broker-sales-inp" placeholder="sales@procyo.be"
             value="${escA(b.sales_email||'')}"
             onchange="adminSetSales('${b.id}',this.value)">
@@ -1985,10 +2763,10 @@ async function showAdmin(){
         <div class="broker-modules">${modHTML}</div>
         <div class="broker-actions">
           ${unlockBtns}
-          <button class="add-obs-btn" onclick="openObsModal('${b.id}')">➕ Observation M4</button>
-          <button class="dossier-btn" onclick="showDossier('${b.id}')">📋 Voir le dossier</button>
-          <button class="unlock-btn" style="border-color:#f97316;color:#ea580c" onclick="adminResetPassword('${b.id}','${escA(b.email)}',this)">🔑 Réinitialiser le mot de passe</button>
-          <button class="unlock-btn" style="border-color:var(--red);color:var(--red)" onclick="adminDeleteBroker('${b.id}','${escA(b.company_name||b.email)}',this)">🗑️ Supprimer</button>
+          <button class="add-obs-btn" onclick="openObsModal('${b.id}')">${t('btn_obs')}</button>
+          <button class="dossier-btn" onclick="showDossier('${b.id}')">${t('btn_dossier')}</button>
+          <button class="unlock-btn" style="border-color:#f97316;color:#ea580c" onclick="adminResetPassword('${b.id}','${escA(b.email)}',this)">${t('btn_reset_pwd')}</button>
+          <button class="unlock-btn" style="border-color:var(--red);color:var(--red)" onclick="adminDeleteBroker('${b.id}','${escA(b.company_name||b.email)}',this)">${t('btn_delete')}</button>
         </div>`;
       list.appendChild(card);
     }
@@ -2103,7 +2881,7 @@ async function adminUnlock(brokerId,mid,btn){
     btn.textContent='✓ Débloqué';btn.style.color='var(--green)';
     setTimeout(()=>showAdmin(),1000);
   }catch(e){
-    btn.disabled=false;btn.textContent='🔓 Débloquer';
+    btn.disabled=false;btn.textContent=t('btn_unlock');
     alert('Erreur déblocage : '+e.message);
     console.error('adminUnlock error:',e);
   }
@@ -2153,6 +2931,10 @@ function setLoading(show,msg='Chargement…'){
 // BOOT
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',async ()=>{
+  // Initialiser la langue
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===currentLang));
+  applyLang();
+
   document.getElementById('login-pwd').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin();});
   document.getElementById('reg-pwd2').addEventListener('keypress',e=>{if(e.key==='Enter')doRegister();});
   const hasToken = await checkToken();
@@ -2235,12 +3017,12 @@ function copyTempPwd(){
   const pwd = document.getElementById('modal-reset-pwd-value').textContent;
   navigator.clipboard.writeText(pwd).then(()=>{
     const btn = document.getElementById('copy-pwd-btn');
-    btn.textContent='✓ Copié !';
+    btn.textContent=t('reset_copied');
     btn.style.background='var(--green-pale)';
     btn.style.borderColor='var(--green-mid)';
     btn.style.color='var(--green)';
     setTimeout(()=>{
-      btn.textContent='📋 Copier le mot de passe';
+      btn.textContent=t('reset_copy');
       btn.style.background='var(--blue-pale)';
       btn.style.borderColor='var(--blue-mid)';
       btn.style.color='var(--blue)';
@@ -2273,33 +3055,32 @@ async function doChangePwd(){
   const errEl   = document.getElementById('chpwd-err');
   const okEl    = document.getElementById('chpwd-ok');
   errEl.style.display='none'; okEl.style.display='none';
-  if(!current){ errEl.textContent='Veuillez saisir votre mot de passe actuel.'; errEl.style.display='block'; return; }
-  if(new1.length<8){ errEl.textContent='Le nouveau mot de passe doit faire au moins 8 caractères.'; errEl.style.display='block'; return; }
-  if(new1!==new2){ errEl.textContent='Les nouveaux mots de passe ne correspondent pas.'; errEl.style.display='block'; return; }
-  if(current===new1){ errEl.textContent='Le nouveau mot de passe doit être différent de l\'actuel.'; errEl.style.display='block'; return; }
+  if(!current){ errEl.textContent=t('err_fields_required'); errEl.style.display='block'; return; }
+  if(new1.length<8){ errEl.textContent=t('err_pwd_short'); errEl.style.display='block'; return; }
+  if(new1!==new2){ errEl.textContent=t('err_pwd_match'); errEl.style.display='block'; return; }
+  if(current===new1){ errEl.textContent=t('err_same_pwd'); errEl.style.display='block'; return; }
   const btn = document.getElementById('chpwd-submit-btn');
-  btn.disabled=true; btn.textContent='Vérification…';
+  btn.disabled=true; btn.textContent='…';
   try{
-    // Vérifier le mot de passe actuel
     const currentHash = await hashPassword(current);
     if(currentUser.password_hash !== currentHash){
-      errEl.textContent='Mot de passe actuel incorrect.';
+      errEl.textContent=t('err_current_pwd');
       errEl.style.display='block';
-      btn.disabled=false; btn.textContent='Changer le mot de passe';
+      btn.disabled=false; btn.textContent=t('chpwd_btn');
       return;
     }
-    btn.textContent='Enregistrement…';
+    btn.textContent='…';
     const newHash = await hashPassword(new1);
     await sbUpdate('brokers','id=eq.'+currentUser.id,{password_hash:newHash});
     currentUser.password_hash = newHash;
-    okEl.textContent='✓ Mot de passe modifié avec succès.';
+    okEl.textContent=t('chpwd_ok');
     okEl.style.display='block';
-    btn.textContent='Modifié ✓';
+    btn.textContent='✓';
     setTimeout(()=>closeChangePwd(), 2000);
   }catch(e){
     errEl.textContent='Erreur : '+e.message;
     errEl.style.display='block';
-    btn.disabled=false; btn.textContent='Changer le mot de passe';
+    btn.disabled=false; btn.textContent=t('chpwd_btn');
   }
 }
 
