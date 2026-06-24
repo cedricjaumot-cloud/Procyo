@@ -1112,7 +1112,8 @@ function genererPDF(){
   var doc = construirePDF();
   if(!doc) return;
   var odooId = document.getElementById('codoo').value;
-  if(!odooId) {
+  var nomVal = document.getElementById('cnom').value;
+  if(!odooId && !nomVal) {
     document.getElementById('broker-warning').style.display='block';
     return;
   }
@@ -1132,7 +1133,6 @@ function genererPDF(){
   var broker = allBrokers.find(b => b.odoo_id == odooId);
 
   if(broker) {
-    // Détecter la langue de la valeur M1Q1 existante pour réécrire dans la même langue
     var langRanges = {
       fr: ['1 à 3','4 à 10','11 à 30','31 à 50','Plus de 50'],
       en: ['1 to 3','4 to 10','11 to 30','31 to 50','More than 50'],
@@ -1238,7 +1238,8 @@ document.getElementById("cond-toggle").addEventListener("click",function(){
 document.getElementById("validite").addEventListener("input",function(){S.validite=Math.max(1,parseInt(this.value)||30);render();});
 document.getElementById("prevbtn").addEventListener("click",function(){
   var odooId = document.getElementById('codoo').value;
-  if(!odooId) {
+  var nomVal = document.getElementById('cnom').value;
+  if(!odooId && !nomVal) {
     document.getElementById('broker-warning').style.display='block';
     return;
   }
