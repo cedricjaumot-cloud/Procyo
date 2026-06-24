@@ -735,7 +735,7 @@ async function selectBroker(name, email, odooId) {
   document.getElementById('broker-dropdown').style.display='none';
   resetSignBtn();
 
-  // Chercher réponse M1Q1 pour ce broker
+ // Chercher réponse M1Q1 pour ce broker
   try {
     const broker = allBrokers.find(b => b.odoo_id == odooId);
     if(broker) {
@@ -745,12 +745,12 @@ async function selectBroker(name, email, odooId) {
       const data = await r.json();
       if(data && data[0]) {
         window._m1q1 = data[0].answer_value;
+        console.log('M1Q1 value:', window._m1q1, typeof window._m1q1);
       } else {
         window._m1q1 = null;
       }
     }
   } catch(e) { window._m1q1 = null; }
-
   render();
 }
 document.addEventListener('click', function(e) {
