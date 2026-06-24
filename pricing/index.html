@@ -873,10 +873,13 @@ function render(){
   if(etpWarn) {
     if(window._m1q1 && S.nbEtp) {
       var ranges = {
-        '1 à 3': [1,3], '4 à 10': [4,10], '11 à 30': [11,30],
-        '31 à 50': [31,50], 'Plus de 50': [51,9999]
+        '1 à 3':[1,3], '4 à 10':[4,10], '11 à 30':[11,30], '31 à 50':[31,50], 'Plus de 50':[51,9999],
+        '1 to 3':[1,3], '4 to 10':[4,10], '11 to 30':[11,30], '31 to 50':[31,50], 'More than 50':[51,9999],
+        '1 tot 3':[1,3], '4 tot 10':[4,10], '11 tot 30':[11,30], '31 tot 50':[31,50], 'Meer dan 50':[51,9999],
+        '1 bis 3':[1,3], '4 bis 10':[4,10], '11 bis 30':[11,30], '31 bis 50':[31,50], 'Mehr als 50':[51,9999]
       };
-      var range = ranges[window._m1q1];
+      var trimmed = (window._m1q1 + '').trim();
+      var range = ranges[trimmed];
       if(range && (S.nbEtp < range[0] || S.nbEtp > range[1])) {
         etpWarn.style.display = 'block';
       } else {
@@ -886,8 +889,7 @@ function render(){
       etpWarn.style.display = 'none';
     }
   }
-
- var abo=c.abo;
+  var abo=c.abo;
   var subStr=money(abo.palier.base*TVA)+" base";
   if(abo.suppl>0) subStr+=" + "+abo.suppl+" suppl. \u00d7 "+money(abo.palier.prixSuppl*TVA);
   document.getElementById("addr-result").innerHTML=
@@ -1129,74 +1131,81 @@ function genererPDF(){
   // Mettre à jour / créer réponses dans Supabase
   var broker = allBrokers.find(b => b.odoo_id == odooId);
 
-if (broker) {
-  var newRange = S.nbEtp <= 3 ? '1 à 3' :
-                 S.nbEtp <= 10 ? '4 à 10' :
-                 S.nbEtp <= 30 ? '11 à 30' :
-                 S.nbEtp <= 50 ? '31 à 50' :
-                 'Plus de 50';
+  if(broker) {
+    // Détecter la langue de la valeur M1Q1 existante pour réécrire dans la même langue
+    var langRanges = {
+      fr: ['1 à 3','4 à 10','11 à 30','31 à 50','Plus de 50'],
+      en: ['1 to 3','4 to 10','11 to 30','31 to 50','More than 50'],
+      nl: ['1 tot 3','4 tot 10','11 tot 30','31 tot 50','Meer dan 50'],
+      de: ['1 bis 3','4 bis 10','11 bis 30','31 bis 50','Mehr als 50']
+    };
+    var currentLang = 'fr';
+    var m1q1val = (window._m1q1 + '').trim();
+    if(langRanges.en.includes(m1q1val)) currentLang = 'en';
+    else if(langRanges.nl.includes(m1q1val)) currentLang = 'nl';
+    else if(langRanges.de.includes(m1q1val)) currentLang = 'de';
 
-  fetch(SB_URL + '/rest/v1/answers?on_conflict=broker_id,question_id', {
-    method: 'POST',
-    headers: {
-      apikey: SB_KEY,
-      Authorization: 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates'
-    },
-    body: JSON.stringify({
-      broker_id: broker.id,
-      question_id: 'M1Q1',
-      answer_value: newRange
-    })
-  });
+    var rangesForLang = langRanges[currentLang];
+    var newRange = S.nbEtp <= 3  ? rangesForLang[0] :
+                   S.nbEtp <= 10 ? rangesForLang[1] :
+                   S.nbEtp <= 30 ? rangesForLang[2] :
+                   S.nbEtp <= 50 ? rangesForLang[3] :
+                                   rangesForLang[4];
 
-  window._m1q1 = newRange;
+    fetch(SB_URL + '/rest/v1/answers?on_conflict=broker_id,question_id', {
+      method: 'POST',
+      headers: {
+        apikey: SB_KEY,
+        Authorization: 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        broker_id: broker.id,
+        question_id: 'M1Q1',
+        answer_value: newRange
+      })
+    });
 
-  fetch(SB_URL + '/rest/v1/answers?on_conflict=broker_id,question_id', {
-    method: 'POST',
-    headers: {
-      apikey: SB_KEY,
-      Authorization: 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates'
-    },
-    body: JSON.stringify({
-      broker_id: broker.id,
-      question_id: 'M2Q1',
-      answer_value: String(S.nbAddr)
-    })
-  });
+    window._m1q1 = newRange;
 
-  var modulesM2 = [];
+    fetch(SB_URL + '/rest/v1/answers?on_conflict=broker_id,question_id', {
+      method: 'POST',
+      headers: {
+        apikey: SB_KEY,
+        Authorization: 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        broker_id: broker.id,
+        question_id: 'M2Q1',
+        answer_value: String(S.nbAddr)
+      })
+    });
 
-  if (S.modules.regulia)
-    modulesM2.push('Assistant conformité (Regulia) — KYC / AML / IDD');
+    var modulesM2 = [];
+    if(S.modules.regulia)  modulesM2.push('Assistant conformité (Regulia) — KYC / AML / IDD');
+    if(S.modules.portfolia) modulesM2.push('Assistant portefeuille (Portfolia) — analyse et tableaux de bord');
+    if(S.modules.relancia) modulesM2.push('Assistant commercial (Relancia) — opportunités et campagnes');
+    if(modulesM2.length === 0) modulesM2.push('Aucun pour l\'instant — uniquement l\'Assistant mail');
 
-  if (S.modules.portfolia)
-    modulesM2.push('Assistant portefeuille (Portfolia) — analyse et tableaux de bord');
+    fetch(SB_URL + '/rest/v1/answers?on_conflict=broker_id,question_id', {
+      method: 'POST',
+      headers: {
+        apikey: SB_KEY,
+        Authorization: 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        broker_id: broker.id,
+        question_id: 'M2Q3',
+        answer_value: JSON.stringify(modulesM2)
+      })
+    });
+  }
 
-  if (S.modules.relancia)
-    modulesM2.push('Assistant commercial (Relancia) — opportunités et campagnes');
-
-  if (modulesM2.length === 0)
-    modulesM2.push('Aucun pour l\'instant — uniquement l\'Assistant mail');
-
-  fetch(SB_URL + '/rest/v1/answers?on_conflict=broker_id,question_id', {
-    method: 'POST',
-    headers: {
-      apikey: SB_KEY,
-      Authorization: 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates'
-    },
-    body: JSON.stringify({
-      broker_id: broker.id,
-      question_id: 'M2Q3',
-      answer_value: JSON.stringify(modulesM2)
-    })
-  });
-}
   fetch('https://rzeequxjvsoqvbetxmev.supabase.co/functions/v1/send-pdf-odoo', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
