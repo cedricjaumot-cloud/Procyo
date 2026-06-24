@@ -720,7 +720,7 @@ function searchBroker(q) {
   ).slice(0,8);
   if(!matches.length) { dd.style.display='none'; return; }
   dd.innerHTML = matches.map(b => `
-    <div class="broker-item" onclick="selectBroker('${escapeStr(b.company_name||'')}','${escapeStr(b.email||'')}','${b.odoo_id||''}')">
+    <div class="broker-item" onclick="selectBroker('${escapeStr(b.company_name||'')}','${escapeStr(b.email||'')}','${b.odoo_id||''}','${b.id||''}')">
       <div class="broker-name">${b.company_name||'—'}</div>
       <div class="broker-email">${b.email}</div>
     </div>
@@ -728,28 +728,27 @@ function searchBroker(q) {
   dd.style.display='block';
 }
 function escapeStr(s) { return s.replace(/'/g,"\'").replace(/"/g,'&quot;'); }
-async function selectBroker(name, email, odooId) {
+async function selectBroker(name, email, odooId, brokerId) {
   document.getElementById('cnom').value = name;
   document.getElementById('ccont').value = email;
   document.getElementById('codoo').value = odooId;
   document.getElementById('broker-dropdown').style.display='none';
   resetSignBtn();
+  window._m1q1 = null;
 
-  // Chercher réponse M1Q1 pour ce broker
-  try {
-    const broker = allBrokers.find(b => b.odoo_id == odooId);
-    if(broker) {
-      const r = await fetch(SB_URL+'/rest/v1/answers?broker_id=eq.'+broker.id+'&question_id=eq.M1Q1&select=answer_value', {
-        headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY}
-      });
+  // brokerId passé directement depuis le dropdown — plus de find()
+  if(brokerId) {
+    try {
+      const r = await fetch(
+        SB_URL+'/rest/v1/answers?broker_id=eq.'+brokerId+'&question_id=eq.M1Q1&select=answer_value',
+        { headers: {apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY} }
+      );
       const data = await r.json();
       if(data && data[0]) {
-        window._m1q1 = data[0].answer_value;
-      } else {
-        window._m1q1 = null;
+        window._m1q1 = (data[0].answer_value + '').trim();
       }
-    }
-  } catch(e) { window._m1q1 = null; }
+    } catch(e) { window._m1q1 = null; }
+  }
 
   render();
 }
