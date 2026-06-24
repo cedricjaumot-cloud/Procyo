@@ -1132,6 +1132,7 @@ function genererPDF(){
   var broker = allBrokers.find(b => b.odoo_id == odooId);
 
   if(broker) {
+    // Détecter la langue via M1Q1
     var langRanges = {
       fr: ['1 à 3','4 à 10','11 à 30','31 à 50','Plus de 50'],
       en: ['1 to 3','4 to 10','11 to 30','31 to 50','More than 50'],
@@ -1183,11 +1184,29 @@ function genererPDF(){
       })
     });
 
+    // M2Q3 dans la même langue que M1Q1
     var modulesM2 = [];
-    if(S.modules.regulia)  modulesM2.push('Assistant conformité (Regulia) — KYC / AML / IDD');
-    if(S.modules.portfolia) modulesM2.push('Assistant portefeuille (Portfolia) — analyse et tableaux de bord');
-    if(S.modules.relancia) modulesM2.push('Assistant commercial (Relancia) — opportunités et campagnes');
-    if(modulesM2.length === 0) modulesM2.push('Aucun pour l\'instant — uniquement l\'Assistant mail');
+    if(currentLang === 'fr') {
+      if(S.modules.regulia)   modulesM2.push('Assistant conformité (Regulia) — KYC / AML / IDD');
+      if(S.modules.portfolia) modulesM2.push('Assistant portefeuille (Portfolia) — analyse et tableaux de bord');
+      if(S.modules.relancia)  modulesM2.push('Assistant commercial (Relancia) — opportunités et campagnes');
+      if(modulesM2.length === 0) modulesM2.push('Aucun pour l\'instant — uniquement l\'Assistant mail');
+    } else if(currentLang === 'en') {
+      if(S.modules.regulia)   modulesM2.push('Compliance assistant (Regulia) — KYC / AML / IDD');
+      if(S.modules.portfolia) modulesM2.push('Portfolio assistant (Portfolia) — analysis and dashboards');
+      if(S.modules.relancia)  modulesM2.push('Commercial assistant (Relancia) — opportunities and campaigns');
+      if(modulesM2.length === 0) modulesM2.push('None for now — Mail assistant only');
+    } else if(currentLang === 'nl') {
+      if(S.modules.regulia)   modulesM2.push('Conformiteitsassistent (Regulia) — KYC / AML / IDD');
+      if(S.modules.portfolia) modulesM2.push('Portefeuilleassistent (Portfolia) — analyse en dashboards');
+      if(S.modules.relancia)  modulesM2.push('Commerciële assistent (Relancia) — kansen en campagnes');
+      if(modulesM2.length === 0) modulesM2.push('Geen voor nu — alleen de E-mailassistent');
+    } else if(currentLang === 'de') {
+      if(S.modules.regulia)   modulesM2.push('Compliance-Assistent (Regulia) — KYC / AML / IDD');
+      if(S.modules.portfolia) modulesM2.push('Portfolio-Assistent (Portfolia) — Analyse und Dashboards');
+      if(S.modules.relancia)  modulesM2.push('Kommerzieller Assistent (Relancia) — Chancen und Kampagnen');
+      if(modulesM2.length === 0) modulesM2.push('Keiner für jetzt — nur der E-Mail-Assistent');
+    }
 
     fetch(SB_URL + '/rest/v1/answers?on_conflict=broker_id,question_id', {
       method: 'POST',
