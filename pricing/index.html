@@ -281,7 +281,7 @@ header img.logo{height:34px}
 </div>
       <div class="frow"><label>Contact</label><input type="text" id="ccont" placeholder="Prénom Nom" readonly style="background:#F7F9F8;color:#8B9794"/></div>
 <div class="frow" style="display:none"><label>Odoo ID</label><input type="text" id="codoo" readonly/></div>
-<div id="broker-warning" style="display:none;color:#E85D04;font-size:12px;padding:6px 2px">⚠ Veuillez sélectionner un courtier avant d'envoyer l'offre.</div>
+<div id="broker-warning" style="display:none;color:#E85D04;font-size:12px;padding:6px 2px">⚠ Ce courtier n'a pas d'ID Odoo — veuillez en sélectionner un autre ou compléter sa fiche dans Supabase.</div>
     </div>
   </div>
 
@@ -1112,8 +1112,7 @@ function genererPDF(){
   var doc = construirePDF();
   if(!doc) return;
   var odooId = document.getElementById('codoo').value;
-  var nomVal = document.getElementById('cnom').value;
-  if(!odooId && !nomVal) {
+  if(!odooId) {
     document.getElementById('broker-warning').style.display='block';
     return;
   }
@@ -1238,8 +1237,7 @@ document.getElementById("cond-toggle").addEventListener("click",function(){
 document.getElementById("validite").addEventListener("input",function(){S.validite=Math.max(1,parseInt(this.value)||30);render();});
 document.getElementById("prevbtn").addEventListener("click",function(){
   var odooId = document.getElementById('codoo').value;
-  var nomVal = document.getElementById('cnom').value;
-  if(!odooId && !nomVal) {
+  if(!odooId) {
     document.getElementById('broker-warning').style.display='block';
     return;
   }
