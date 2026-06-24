@@ -868,14 +868,15 @@ function render(){
   document.getElementById("etp-result").innerHTML=
     "<div class=\"res-top\"><span class=\"res-name\">Setup "+sp.label+"</span><span class=\"res-price\">"+money(sp.setup*TVA)+"</span><span class=\"res-unit\">unique TVAC</span></div>"+
     "<div class=\"res-sub\">"+sp.etpMin+(sp.etpMax<9999?"-"+sp.etpMax:"+")+" ETP \u00b7 installation & formation incluses</div>";
-
   // Validation ETP vs M1Q1
   var etpWarn = document.getElementById('etp-warning');
   if(etpWarn) {
     if(window._m1q1 && S.nbEtp) {
       var ranges = {
-        '1 à 3': [1,3], '4 à 10': [4,10], '11 à 30': [11,30],
-        '31 à 50': [31,50], 'Plus de 50': [51,9999]
+        '1 à 3': [1,3], '4 à 10': [4,10], '11 à 30': [11,30], '31 à 50': [31,50], 'Plus de 50': [51,9999],
+        '1 to 3': [1,3], '4 to 10': [4,10], '11 to 30': [11,30], '31 to 50': [31,50], 'More than 50': [51,9999],
+        '1 bis 3': [1,3], '4 bis 10': [4,10], '11 bis 30': [11,30], '31 bis 50': [31,50], 'Mehr als 50': [51,9999],
+        '1 tot 3': [1,3], '4 tot 10': [4,10], '11 tot 30': [11,30], '31 tot 50': [31,50], 'Meer dan 50': [51,9999],
       };
       var range = ranges[window._m1q1];
       if(range && (S.nbEtp < range[0] || S.nbEtp > range[1])) {
@@ -1126,17 +1127,19 @@ function genererPDF(){
   if(S.modules.relancia) modsArr.push("Assistant Commercial");
   if(S.modules.portfolia) modsArr.push("Assistant Portefeuille");
   var pdfBase64 = doc.output('datauristring').split(',')[1];
-
   // Mettre à jour / créer réponses dans Supabase
   var broker = allBrokers.find(b => b.odoo_id == odooId);
-
 if (broker) {
-  var newRange = S.nbEtp <= 3 ? '1 à 3' :
-                 S.nbEtp <= 10 ? '4 à 10' :
-                 S.nbEtp <= 30 ? '11 à 30' :
-                 S.nbEtp <= 50 ? '31 à 50' :
-                 'Plus de 50';
-
+  var newRange;
+  if (window._m1q1 && ['1 tot 3','4 tot 10','11 tot 30','31 tot 50','Meer dan 50'].includes(window._m1q1)) {
+      newRange = S.nbEtp <= 3 ? '1 tot 3' : S.nbEtp <= 10 ? '4 tot 10' : S.nbEtp <= 30 ? '11 tot 30' : S.nbEtp <= 50 ? '31 tot 50' : 'Meer dan 50';
+  } else if (window._m1q1 && ['1 to 3','4 to 10','11 to 30','31 to 50','More than 50'].includes(window._m1q1)) {
+      newRange = S.nbEtp <= 3 ? '1 to 3' : S.nbEtp <= 10 ? '4 to 10' : S.nbEtp <= 30 ? '11 to 30' : S.nbEtp <= 50 ? '31 to 50' : 'More than 50';
+  } else if (window._m1q1 && ['1 bis 3','4 bis 10','11 bis 30','31 bis 50','Mehr als 50'].includes(window._m1q1)) {
+      newRange = S.nbEtp <= 3 ? '1 bis 3' : S.nbEtp <= 10 ? '4 bis 10' : S.nbEtp <= 30 ? '11 bis 30' : S.nbEtp <= 50 ? '31 bis 50' : 'Mehr als 50';
+  } else {
+      newRange = S.nbEtp <= 3 ? '1 à 3' : S.nbEtp <= 10 ? '4 à 10' : S.nbEtp <= 30 ? '11 à 30' : S.nbEtp <= 50 ? '31 à 50' : 'Plus de 50';
+  }
   fetch(SB_URL + '/rest/v1/answers?on_conflict=broker_id,question_id', {
     method: 'POST',
     headers: {
