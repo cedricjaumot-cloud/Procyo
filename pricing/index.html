@@ -1269,6 +1269,9 @@ document.getElementById("prevbtn").addEventListener("click",function(){
   document.getElementById('dlbtn').style.cursor='pointer';
 });
 document.getElementById("dlbtn").addEventListener("click", function () {
+  this.disabled = true;
+  this.style.opacity = '0.4';
+  this.style.cursor = 'not-allowed';
   genererPDF();
   alert("Le document a été envoyé pour signature ✔");
 });
