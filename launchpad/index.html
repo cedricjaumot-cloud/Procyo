@@ -653,8 +653,8 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')"><span id="admin-tab-export-el">Export réponses</span></button>
       </div>
       <div style="display:flex;gap:10px;margin:-10px 0 24px">
-        <a href="../pricing/index.html" target="_blank" class="btn" style="text-decoration:none">💶 Pricing</a>
-        <a href="../workflow_COOP/index.html" target="_blank" class="btn" style="text-decoration:none">🗂️ Workflow COOP</a>
+        <a href="../pricing/index.html" target="_blank" class="btn btn-primary" style="text-decoration:none;width:auto;padding:10px 18px">💶 Pricing</a>
+        <a href="../workflow_COOP/index.html" target="_blank" class="btn btn-primary" style="text-decoration:none;width:auto;padding:10px 18px">🗂️ Workflow COOP</a>
       </div>
       <div id="admin-tab-courtiers">
         <p class="admin-sub" id="admin-sub-brokers-el">Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.</p>
@@ -2672,7 +2672,7 @@ async function showAdmin(){
   document.getElementById('screen-admin').style.display='block';
   setLoading(true,'Chargement des courtiers…');
   try{
-    const brokers=await sbGet('brokers','select=*&order=created_at.desc');
+    const brokers=(await sbGet('brokers','select=*&order=created_at.desc')).filter(b=>!ADMIN_EMAILS.includes((b.email||'').toLowerCase()));
     const list=document.getElementById('admin-list');
     list.innerHTML='';
     if(!brokers||brokers.length===0){list.innerHTML='<p style="color:var(--g400);font-size:14px">Aucun courtier inscrit.</p>';return;}
