@@ -203,7 +203,8 @@ header img.logo{height:34px}
 <div id="pwd-screen">
   <div class="pwd-box">
     <div class="pwd-logo">PROCYO</div>
-    <div class="pwd-sub">Simulateur de tarification<br><small style="font-size:11px;opacity:.6">Accès réservé à l'équipe Procyo</small></div>
+    <div class="pwd-sub">Simulateur de tarification<br><small style="font-size:11px;opacity:.6">Accès réservé aux administrateurs Procyo</small></div>
+    <input type="email" class="pwd-field" id="pwd-email" placeholder="Email administrateur" autocomplete="off" style="margin-bottom:10px">
     <input type="password" class="pwd-field" id="pwd-input" placeholder="Mot de passe" autocomplete="off">
     <button class="pwd-btn" onclick="checkPwd()">Accéder →</button>
     <div class="pwd-err" id="pwd-err"></div>
@@ -659,30 +660,52 @@ const SB_URL = 'https://rzeequxjvsoqvbetxmev.supabase.co';
 const SB_KEY = 'sb_publishable_Vb-s-OrOKfHjYDxDBmb2MA_ReHEBEQ5';
 const ODOO_WH = 'https://procyo2.odoo.com/web/hook/b2afcdca-64ff-411b-b3fe-8b420b2c13ab';
 
-// ── PASSWORD ────────────────────────────────────────────────
+// ── ADMIN AUTH ──────────────────────────────────────────────
+const ADMIN_EMAILS = ['cedric.jaumot@procyo.be','antoine.moriau@procyo.be','maxime.dejean@procyo.be','eric.vandoren@procyo.be','admin@procyo.be','luc.renard@procyo.be','procyo@procyo.be'];
 async function sha256(msg) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-async function checkPwd() {
-  const val = document.getElementById('pwd-input').value;
-  const h = await sha256(val);
-  const target = await sha256('Pr0cy0Tar!f');
-  if(h === target) {
-    sessionStorage.setItem('procyo_pricing','1');
-    document.getElementById('pwd-screen').style.display='none';
-    document.getElementById('choice-screen').style.display='flex';
-  } else {
-    document.getElementById('pwd-err').textContent = 'Mot de passe incorrect.';
-    document.getElementById('pwd-input').value='';
-    document.getElementById('pwd-input').focus();
-  }
-}
-document.getElementById('pwd-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPwd();});
-if(sessionStorage.getItem('procyo_pricing')==='1') {
+function grantAccess() {
   document.getElementById('pwd-screen').style.display='none';
   document.getElementById('choice-screen').style.display='flex';
 }
+async function checkPwd() {
+  const email = (document.getElementById('pwd-email').value||'').trim().toLowerCase();
+  const val = document.getElementById('pwd-input').value;
+  const errEl = document.getElementById('pwd-err');
+  if(!email || !val){ errEl.textContent='Email et mot de passe requis.'; return; }
+  if(!ADMIN_EMAILS.includes(email)){ errEl.textContent='Accès réservé aux administrateurs.'; return; }
+  try{
+    const h = await sha256(val);
+    const res = await fetch(SB_URL+'/rest/v1/brokers?email=eq.'+encodeURIComponent(email)+'&select=email,password_hash',{
+      headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
+    });
+    const rows = await res.json();
+    if(!rows || !rows.length || rows[0].password_hash !== h){
+      errEl.textContent='Mot de passe incorrect.';
+      document.getElementById('pwd-input').value='';
+      document.getElementById('pwd-input').focus();
+      return;
+    }
+    sessionStorage.setItem('procyo_pricing','1');
+    localStorage.setItem('procyo_session', JSON.stringify({email}));
+    grantAccess();
+  }catch(e){
+    errEl.textContent='Erreur de connexion : '+e.message;
+  }
+}
+document.getElementById('pwd-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPwd();});
+(function tryAutoSession(){
+  if(sessionStorage.getItem('procyo_pricing')==='1'){ grantAccess(); return; }
+  try{
+    const s = JSON.parse(localStorage.getItem('procyo_session')||'null');
+    if(s && s.email && ADMIN_EMAILS.includes(s.email.toLowerCase())){
+      sessionStorage.setItem('procyo_pricing','1');
+      grantAccess();
+    }
+  }catch(e){}
+})();
   
 function goTo(page) {
   document.getElementById('choice-screen').style.display='none';
