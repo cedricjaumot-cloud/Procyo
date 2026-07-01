@@ -1389,11 +1389,29 @@ document.getElementById("prevbtn").addEventListener("click",function(){
   document.getElementById('dlbtn').style.cursor='pointer';
 });
 document.getElementById("dlbtn").addEventListener("click", function () {
-  this.disabled = true;
-  this.style.opacity = '0.4';
-  this.style.cursor = 'not-allowed';
+  var btn = this;
+  var isNL = (currentUILang === 'nl');
+
+  // Désactiver immédiatement pour éviter double-clic
+  btn.disabled = true;
+  btn.style.opacity = '0.4';
+  btn.style.cursor = 'not-allowed';
+  btn.textContent = isNL ? '⏳ Verzenden...' : '⏳ Envoi en cours...';
+
   genererPDF();
-  alert("Le document a été envoyé pour signature ✔");
+
+  // Délai 5s avant de permettre un nouvel envoi — évite les doublons côté Odoo
+  setTimeout(function(){
+    var isNLnow = (currentUILang === 'nl');
+    alert(isNLnow
+      ? "Het document is verzonden ter ondertekening ✔\n\nWacht 1 minuut voor de volgende offerte."
+      : "Le document a été envoyé pour signature ✔\n\nAttendez 1 minute avant d'envoyer la prochaine offre."
+    );
+    // resetSignBtn() remet disabled — l'utilisateur doit re-prévisualiser
+    resetSignBtn();
+    // Remettre le label du bouton
+    applyUILang();
+  }, 5000);
 });
 
 var cAllBrokers = [];
