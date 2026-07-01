@@ -281,13 +281,13 @@ header img.logo{height:34px}
     <div class="slabel">Client</div>
     <div class="card">
       <div class="frow" style="position:relative">
-  <label>Nom du bureau</label>
+  <label id="lbl-nom-bureau">Nom du bureau</label>
   <div style="position:relative;width:150px">
     <input type="text" id="cnom" placeholder="Rechercher..." autocomplete="off" oninput="searchBroker(this.value)" onfocus="searchBroker(this.value)"/>
     <div id="broker-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid #00BFA5;border-radius:6px;z-index:999;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.15)"></div>
   </div>
 </div>
-      <div class="frow"><label>Contact</label><input type="text" id="ccont" placeholder="Prénom Nom" readonly style="background:#F7F9F8;color:#8B9794"/></div>
+      <div class="frow"><label id="lbl-contact">Contact</label><input type="text" id="ccont" placeholder="Prénom Nom" readonly style="background:#F7F9F8;color:#8B9794"/></div>
 <div class="frow" style="display:none"><label>Odoo ID</label><input type="text" id="codoo" readonly/></div>
 <div id="broker-warning" style="display:none;color:#E85D04;font-size:12px;padding:6px 2px">⚠ Ce courtier n'a pas d'ID Odoo — veuillez en sélectionner un autre ou compléter sa fiche dans Supabase.</div>
     </div>
@@ -353,32 +353,32 @@ header img.logo{height:34px}
     <div id="cond-content" class="hidden" style="margin-top:.625rem">
       <div class="card">
         <div class="frow">
-          <label>Engagement</label>
+          <label id="lbl-engagement">Engagement</label>
           <div class="tab-row">
-            <div class="tab active" data-eng="monthly">Mensuel</div>
-            <div class="tab" data-eng="3months">3 mois résiliable</div>
+            <div class="tab active" data-eng="monthly" id="tab-mensuel">Mensuel</div>
+            <div class="tab" data-eng="3months" id="tab-3mois">3 mois résiliable</div>
           </div>
         </div>
         <div class="frow">
-          <label>Remise setup</label>
+          <label id="lbl-remise-setup">Remise setup</label>
           <div class="tab-row">
-            <div class="tab active" data-promo="none">Aucune</div>
+            <div class="tab active" data-promo="none" id="tab-aucune-setup">Aucune</div>
             <div class="tab" data-promo="pct">%</div>
           </div>
         </div>
-        <div class="psub hidden" id="pct-wrap"><input type="number" id="remise-pct" value="10" min="0" max="100" step="1"/><label>% de remise sur le setup</label></div>
+        <div class="psub hidden" id="pct-wrap"><input type="number" id="remise-pct" value="10" min="0" max="100" step="1"/><label id="lbl-pct-remise">% de remise sur le setup</label></div>
         <div class="frow">
-          <label>Remise abonnement<small>Affichée comme « X premier(s) mois offert(s) » sur le PDF</small></label>
+          <label id="lbl-remise-abo">Remise abonnement<small id="lbl-remise-abo-small">Affichée comme « X premier(s) mois offert(s) » sur le PDF</small></label>
           <div class="tab-row">
-            <div class="tab active" data-sub="0">Aucune</div>
-            <div class="tab" data-sub="1">1 mois offert</div>
-            <div class="tab" data-sub="2">2 mois offerts</div>
-            <div class="tab" data-sub="3">3 mois offerts</div>
+            <div class="tab active" data-sub="0" id="tab-sub-0">Aucune</div>
+            <div class="tab" data-sub="1" id="tab-sub-1">1 mois offert</div>
+            <div class="tab" data-sub="2" id="tab-sub-2">2 mois offerts</div>
+            <div class="tab" data-sub="3" id="tab-sub-3">3 mois offerts</div>
           </div>
         </div>
         <div class="frow">
-          <label>Validité de l'offre</label>
-          <div class="psub" style="margin-top:0"><input type="number" id="validite" value="30" min="1" max="365" step="1"/><label>jours</label></div>
+          <label id="lbl-validite">Validité de l'offre</label>
+          <div class="psub" style="margin-top:0"><input type="number" id="validite" value="30" min="1" max="365" step="1"/><label id="lbl-jours">jours</label></div>
         </div>
       </div>
     </div>
@@ -953,9 +953,10 @@ function trow(l,v){return "<div class=\"trow\"><span class=\"tl\">"+l+"</span><s
 function render(){
   var c=calcul(); var sub=S.subMonths;
   var sp=c.sp;
+  var isNL = (currentUILang === 'nl');
   document.getElementById("etp-result").innerHTML=
-    "<div class=\"res-top\"><span class=\"res-name\">Setup "+sp.label+"</span><span class=\"res-price\">"+money(sp.setup*TVA)+"</span><span class=\"res-unit\">unique TVAC</span></div>"+
-    "<div class=\"res-sub\">"+sp.etpMin+(sp.etpMax<9999?"-"+sp.etpMax:"+")+" ETP \u00b7 installation & formation incluses</div>";
+    "<div class=\"res-top\"><span class=\"res-name\">Setup "+sp.label+"</span><span class=\"res-price\">"+money(sp.setup*TVA)+"</span><span class=\"res-unit\">"+(isNL?"incl. BTW":"unique TVAC")+"</span></div>"+
+    "<div class=\"res-sub\">"+sp.etpMin+(sp.etpMax<9999?"-"+sp.etpMax:"+")+(isNL?" VTE \u00b7 installatie, integratie & opleiding":" ETP \u00b7 installation & formation incluses")+"</div>";
 
   // Validation ETP vs M1Q1
   var etpWarn = document.getElementById('etp-warning');
@@ -970,6 +971,9 @@ function render(){
       var trimmed = (window._m1q1 + '').trim();
       var range = ranges[trimmed];
       if(range && (S.nbEtp < range[0] || S.nbEtp > range[1])) {
+        etpWarn.textContent = isNL
+          ? "\u26a0 Het aantal VTE stemt niet overeen met het ingevoerde getal in module 1. Door de offerte te verzenden, wijzigt u het antwoord van de makelaar."
+          : "\u26a0 Le nombre d'ETP ne correspond pas au nombre renseign\u00e9 dans le module 1. En envoyant l'offre, vous modifierez la r\u00e9ponse du courtier.";
         etpWarn.style.display = 'block';
       } else {
         etpWarn.style.display = 'none';
@@ -979,15 +983,20 @@ function render(){
     }
   }
   var abo=c.abo;
-  var subStr=money(abo.palier.base*TVA)+" base";
-  if(abo.suppl>0) subStr+=" + "+abo.suppl+" suppl. \u00d7 "+money(abo.palier.prixSuppl*TVA);
+  var subStr = isNL ? money(abo.palier.base*TVA)+" basis" : money(abo.palier.base*TVA)+" base";
+  if(abo.suppl>0) subStr += isNL
+    ? " + "+abo.suppl+" extra \u00d7 "+money(abo.palier.prixSuppl*TVA)
+    : " + "+abo.suppl+" suppl. \u00d7 "+money(abo.palier.prixSuppl*TVA);
   document.getElementById("addr-result").innerHTML=
-    "<div class=\"res-top\"><span class=\"res-name\">Abonnement</span><span class=\"res-price\">"+money(abo.total*TVA)+"</span><span class=\"res-unit\">/mois TVAC</span></div>"+
+    "<div class=\"res-top\"><span class=\"res-name\">Abonnement</span><span class=\"res-price\">"+money(abo.total*TVA)+"</span><span class=\"res-unit\">"+(isNL?"/maand incl. BTW":"/mois TVAC")+"</span></div>"+
     "<div class=\"res-sub\">"+subStr+"</div>";
   var addrWarn = document.getElementById('addr-warning');
   var maxAddr = sp.etpMax < 9999 ? sp.etpMax : 9999;
   if(addrWarn) {
     if(maxAddr < 9999 && S.nbAddr > maxAddr) {
+      addrWarn.textContent = isNL
+        ? "\u26a0 U overschrijdt het maximale aantal adressen voor dit niveau."
+        : "\u26a0 Vous d\u00e9passez le nombre d'adresses autoris\u00e9es pour ce palier.";
       addrWarn.style.display = 'block';
     } else {
       addrWarn.style.display = 'none';
@@ -1007,29 +1016,29 @@ function render(){
   }
 
   document.getElementById("cred-total").textContent=intf(c.creditsTotal);
-  document.getElementById("cred-mails").textContent="\u2248 "+intf(c.mailsTotal)+" emails / mois";
+  document.getElementById("cred-mails").textContent="\u2248 "+intf(c.mailsTotal)+(isNL?" e-mails/maand":" emails / mois");
   document.getElementById("cred-suppl").textContent=intf(abo.palier.creditsSuppl);
-  document.getElementById("cred-suppl-mails").textContent="\u2248 "+abo.palier.mailsSuppl+" emails / adr.";
+  document.getElementById("cred-suppl-mails").textContent="\u2248 "+abo.palier.mailsSuppl+(isNL?" e-mails/adr.":" emails / adr.");
   document.getElementById("cred-extra").textContent=money3(abo.palier.extraCall);
 
   var h="";
-  h+="<div class=\"tsec\">Abonnement mensuel (TVAC)</div>";
-  h+=trow("Forfait de base",money(abo.palier.base*TVA));
+  h+="<div class=\"tsec\">"+(isNL?"Maandelijks abonnement (incl. BTW)":"Abonnement mensuel (TVAC)")+"</div>";
+  h+=trow(isNL?"Basisabonnement":"Forfait de base",money(abo.palier.base*TVA));
   if(abo.suppl>0) h+=trow("+"+abo.suppl+" adr. \u00d7 "+money(abo.palier.prixSuppl*TVA),money(abo.suppl*abo.palier.prixSuppl*TVA));
-  if(S.modules.regulia)   h+=trow("Conformité ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
-  if(S.modules.relancia)  h+=trow("Commercial ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
-  if(S.modules.portfolia) h+=trow("Portefeuille (10 % base)",money(abo.palier.base*0.1*TVA));
-  h+="<div class=\"ttot\"><span class=\"ttl\">Total mensuel</span><span class=\"ttv\">"+money(c.mensuelHT*TVA)+"</span></div>";
-  h+="<div class=\"tsub\">HTVA "+money(c.mensuelHT)+"</div>";
-  if(sub>0) h+="<div class=\"ppill\">"+sub+" premier"+(sub>1?"s":"")+" mois offert"+(sub>1?"s":"")+"</div>";
+  if(S.modules.regulia)   h+=trow(isNL?"Compliance ("+S.nbAddr+"\u00d7\u20ac10)":"Conformit\u00e9 ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
+  if(S.modules.relancia)  h+=trow(isNL?"Commercieel ("+S.nbAddr+"\u00d7\u20ac10)":"Commercial ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
+  if(S.modules.portfolia) h+=trow(isNL?"Portefeuille (10 % basis)":"Portefeuille (10 % base)",money(abo.palier.base*0.1*TVA));
+  h+="<div class=\"ttot\"><span class=\"ttl\">"+(isNL?"Totaal maandelijks":"Total mensuel")+"</span><span class=\"ttv\">"+money(c.mensuelHT*TVA)+"</span></div>";
+  h+="<div class=\"tsub\">"+(isNL?"excl. BTW ":"HTVA ")+money(c.mensuelHT)+"</div>";
+  if(sub>0) h+="<div class=\"ppill\">"+sub+(isNL?" eerste maand"+(sub>1?"en":"")+" gratis":" premier"+(sub>1?"s":"")+" mois offert"+(sub>1?"s":""))+"</div>";
   h+="<div class=\"tsep\"></div>";
-  h+="<div class=\"tsec\">Setup unique (TVAC)</div>";
-  h+=trow("Plateforme "+sp.label,money(sp.setup*TVA));
+  h+="<div class=\"tsec\">"+(isNL?"Eenmalige setup (incl. BTW)":"Setup unique (TVAC)")+"</div>";
+  h+=trow((isNL?"Platform ":"Plateforme ")+sp.label,money(sp.setup*TVA));
   if(c.nbMod>0) h+=trow("Modules ("+c.nbMod+"\u00d7\u20ac500)",money(c.nbMod*500*TVA));
-  if(c.remise>0) h+="<div class=\"trow\"><span class=\"tl rl\">- Remise setup</span><span class=\"tv rv\">- "+money(c.remise*TVA)+"</span></div>";
-  h+="<div class=\"ttot\"><span class=\"ttl\">Total setup</span><span class=\"ttv\">"+money(c.setupNet*TVA)+"</span></div>";
-  h+="<div class=\"tsub\">HTVA "+money(c.setupNet)+"</div>";
-  if(S.engagement==="3months") h+="<div class=\"eng-n\">3 mois \u00b7 résiliable en fin de période</div>";
+  if(c.remise>0) h+="<div class=\"trow\"><span class=\"tl rl\">"+(isNL?"- Setupkorting":"- Remise setup")+"</span><span class=\"tv rv\">- "+money(c.remise*TVA)+"</span></div>";
+  h+="<div class=\"ttot\"><span class=\"ttl\">"+(isNL?"Totale setup":"Total setup")+"</span><span class=\"ttv\">"+money(c.setupNet*TVA)+"</span></div>";
+  h+="<div class=\"tsub\">"+(isNL?"excl. BTW ":"HTVA ")+money(c.setupNet)+"</div>";
+  if(S.engagement==="3months") h+="<div class=\"eng-n\">"+(isNL?"3 maanden \u00b7 opzegbaar aan het einde van de periode":"3 mois \u00b7 r\u00e9siliable en fin de p\u00e9riode")+"</div>";
   document.getElementById("tot-wrap").innerHTML=h;
   resetSignBtn();
 }
@@ -2346,6 +2355,27 @@ function applyUILang() {
     var n = t.dataset.offer;
     t.textContent = (lang === 'nl' ? 'Aanbod ' : 'Offre ') + n;
   });
+  // Label "Nom du bureau" / "Contact"
+  setTextIfFound('lbl-nom-bureau', lang === 'nl' ? 'Naam kantoor' : 'Nom du bureau');
+  setTextIfFound('lbl-contact', lang === 'nl' ? 'Contactpersoon' : 'Contact');
+  // Conditions commerciales
+  setTextIfFound('lbl-engagement', lang === 'nl' ? 'Verbintenis' : 'Engagement');
+  setTextIfFound('tab-mensuel', lang === 'nl' ? 'Maandelijks' : 'Mensuel');
+  setTextIfFound('tab-3mois', lang === 'nl' ? '3 maanden opzegbaar' : '3 mois résiliable');
+  setTextIfFound('lbl-remise-setup', lang === 'nl' ? 'Setupkorting' : 'Remise setup');
+  setTextIfFound('tab-aucune-setup', lang === 'nl' ? 'Geen' : 'Aucune');
+  setTextIfFound('lbl-pct-remise', lang === 'nl' ? '% korting op de setup' : '% de remise sur le setup');
+  setTextIfFound('lbl-remise-abo', lang === 'nl' ? 'Abonnementskorting' : 'Remise abonnement');
+  setTextIfFound('lbl-remise-abo-small', lang === 'nl' ? 'Weergegeven als "X eerste maand(en) gratis" op de PDF' : 'Affichée comme « X premier(s) mois offert(s) » sur le PDF');
+  setTextIfFound('tab-sub-0', lang === 'nl' ? 'Geen' : 'Aucune');
+  setTextIfFound('tab-sub-1', lang === 'nl' ? '1 maand gratis' : '1 mois offert');
+  setTextIfFound('tab-sub-2', lang === 'nl' ? '2 maanden gratis' : '2 mois offerts');
+  setTextIfFound('tab-sub-3', lang === 'nl' ? '3 maanden gratis' : '3 mois offerts');
+  setTextIfFound('lbl-validite', lang === 'nl' ? 'Geldigheid offerte' : 'Validité de l\'offre');
+  setTextIfFound('lbl-jours', lang === 'nl' ? 'dagen' : 'jours');
+  // Broker warning
+  var bw = document.getElementById('broker-warning');
+  if (bw) bw.textContent = lang === 'nl' ? '⚠ Deze makelaar heeft geen Odoo-ID — selecteer een andere of vul zijn fiche in Supabase aan.' : '⚠ Ce courtier n\'a pas d\'ID Odoo — veuillez en sélectionner un autre ou compléter sa fiche dans Supabase.';
   // Buttons
   var prevbtn = document.getElementById('prevbtn');
   if (prevbtn) { var svg=prevbtn.querySelector('svg'); prevbtn.innerHTML=''; if(svg)prevbtn.appendChild(svg); prevbtn.appendChild(document.createTextNode(lang==='nl'?'Voorvertoning':'Prévisualiser')); }
