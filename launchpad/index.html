@@ -177,6 +177,8 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .q-lbl .req{color:var(--red);margin-left:2px}
 .q-hint{font-size:12px;color:var(--g400);margin-bottom:8px;line-height:1.5;font-style:italic}
 .other-field{animation:fadeIn .2s}
+.q-autofilled{background:var(--blue-pale);border-radius:var(--r);padding:12px 16px;border:1.5px solid var(--blue-mid);opacity:.85}
+.q-auto-badge{display:inline-block;font-size:10px;font-weight:600;color:var(--blue);background:white;border:1px solid var(--blue-mid);border-radius:10px;padding:2px 8px;margin-left:8px;vertical-align:middle;letter-spacing:.03em}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 .pct-grid{display:grid;grid-template-columns:1fr 120px;gap:8px 12px;align-items:center;margin-bottom:10px}
 .pct-row-label{font-size:13px;color:var(--g700)}
@@ -2006,10 +2008,15 @@ function toggleSec(id,hdr){
   document.getElementById('schev-'+id).classList.toggle('open');
 }
 
+// Questions remplies automatiquement — bloquées pour l'utilisateur
+const AUTO_FILLED_QS = ['M2Q1','M2Q3'];
+
 function buildQuestion(q,saved){
   const el=document.createElement('div');
-  el.className='q-item';el.id='qi-'+q.id;
-  const lbl=`<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}</div>`;
+  const isAutoFilled = AUTO_FILLED_QS.includes(q.id);
+  el.className='q-item'+(isAutoFilled?' q-autofilled':'');el.id='qi-'+q.id;
+  const autoTag = isAutoFilled ? `<span class="q-auto-badge">⚡ Rempli automatiquement</span>` : '';
+  const lbl=`<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}${autoTag}</div>`;
   let inp='';
   if(q.type==='text') inp=`<input type="text" class="q-input${saved?' ans':''}" data-qid="${q.id}" value="${escA(saved||'')}" placeholder="${escA(q.placeholder||'Votre réponse…')}">`;
   else if(q.type==='textarea') inp=`<textarea class="q-input${saved?' ans':''}" data-qid="${q.id}" rows="3" placeholder="${escA(q.placeholder||'Votre réponse…')}">${escH(saved||'')}</textarea>`;
@@ -2193,6 +2200,15 @@ function buildQuestion(q,saved){
     setTimeout(()=>cmUpdateSummary(q.id,sv),0);
   }
   el.innerHTML=lbl+inp;
+  if(isAutoFilled){
+    // Bloquer toutes les interactions sur cette question
+    setTimeout(()=>{
+      el.querySelectorAll('.rbtn,.citem,.bm-ok,.q-input,.q-slider,.cm-box,.pct-inp').forEach(function(i){
+        i.style.pointerEvents='none';
+        i.style.cursor='not-allowed';
+      });
+    },0);
+  }
   setTimeout(()=>{
     el.querySelectorAll('.q-input:not(.other-txt):not(.pct-inp):not(.contact-inp):not(.cm-search):not(.cm-add-inp)').forEach(i=>{
       i.addEventListener('input',()=>{i.classList.toggle('ans',i.value.trim()!=='');debounceSave(i.dataset.qid,i.value);});
