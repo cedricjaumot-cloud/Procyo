@@ -2287,6 +2287,9 @@ async function toggleChkOther(el){
   const ofEl=document.getElementById('of-'+qid);
   if(ofEl) ofEl.style.display=el.classList.contains('chk')?'block':'none';
   if(!el.classList.contains('chk')){
+    // vider le champ texte quand on décoche
+    const txt=ofEl&&ofEl.querySelector('.other-txt');
+    if(txt){txt.value='';txt.classList.remove('ans');}
     // removed — rebuild without other
     const checks=Array.from(el.closest('.checks').querySelectorAll('.citem.chk:not([data-val="__other__"])')).map(c=>c.dataset.val);
     await persistAnswer(qid,checks);
