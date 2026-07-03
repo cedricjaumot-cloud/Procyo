@@ -2019,8 +2019,8 @@ function buildQuestion(q,saved){
     const savedOther=typeof saved==='string'&&saved.startsWith('Autre::')?saved.slice(7):'';
     const savedMain=typeof saved==='string'&&saved.startsWith('Autre::') ?'Autre':saved;
     const optionsWithOther=[...q.options,'Autre'];
-    inp='<div class="radios">'+optionsWithOther.map(o=>`<div class="rbtn${savedMain===o?' sel':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="pickRadio(this)">${escH(o)}</div>`).join('')+'</div>';
-    inp+=`<div class="other-field" id="of-${q.id}" style="display:${savedMain==='Autre'?'block':'none'};margin-top:8px"><input type="text" class="q-input other-txt${savedOther?' ans':''}" data-qid="${q.id}" data-other="1" placeholder="${escA(q.otherLabel||'Précisez…')}" value="${escA(savedOther)}"></div>`;
+    inp='<div class="radios">'+optionsWithOther.map(o=>`<div class="rbtn${savedMain===o?' sel':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="pickRadio(this)">${o==='Autre'?escH(t('other_label')):escH(o)}</div>`).join('')+'</div>';
+    inp+=`<div class="other-field" id="of-${q.id}" style="display:${savedMain==='Autre'?'block':'none'};margin-top:8px"><input type="text" class="q-input other-txt${savedOther?' ans':''}" data-qid="${q.id}" data-other="1" placeholder="${escA(q.otherLabel||t('other_ph'))}" value="${escA(savedOther)}"></div>`;
   }
   else if(q.type==='checkbox'){
     const chk=Array.isArray(saved)?saved:[];
@@ -2034,8 +2034,8 @@ function buildQuestion(q,saved){
     const hasOther=!!otherEntry;
     const plainChk=savedArr.filter(v=>!v.startsWith('Autre::'));
     inp='<div class="checks">'+q.options.map(o=>`<div class="citem${plainChk.includes(o)?' chk':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="toggleChk(this)"><div class="cbox"><svg width="10" height="8" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1"/></svg></div>${escH(o)}</div>`).join('');
-    inp+=`<div class="citem${hasOther?' chk':''}" data-qid="${q.id}" data-val="__other__" onclick="toggleChkOther(this)"><div class="cbox"><svg width="10" height="8" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1"/></svg></div>Autre</div></div>`;
-    inp+=`<div class="other-field" id="of-${q.id}" style="display:${hasOther?'block':'none'};margin-top:8px"><input type="text" class="q-input other-txt${savedOtherTxt?' ans':''}" data-qid="${q.id}" data-other="1" placeholder="${escA(q.otherLabel||'Précisez…')}" value="${escA(savedOtherTxt)}"></div>`;
+    inp+=`<div class="citem${hasOther?' chk':''}" data-qid="${q.id}" data-val="__other__" onclick="toggleChkOther(this)"><div class="cbox"><svg width="10" height="8" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1"/></svg></div>${t('other_label')}</div></div>`;
+    inp+=`<div class="other-field" id="of-${q.id}" style="display:${hasOther?'block':'none'};margin-top:8px"><input type="text" class="q-input other-txt${savedOtherTxt?' ans':''}" data-qid="${q.id}" data-other="1" placeholder="${escA(q.otherLabel||t('other_ph'))}" value="${escA(savedOtherTxt)}"></div>`;
   }
   else if(q.type==='percent-split'){
     // saved is object {row:pct, ...}
@@ -2099,12 +2099,12 @@ function buildQuestion(q,saved){
         ${isAutre?'':`<div class="bm-text">${escH(b.text)}</div>`}
         <div class="bm-actions">
           ${isAutre?'':`<div class="bm-ok${st.ok?' active':''}" data-qid="${q.id}" data-key="${b.key}" onclick="bmToggleOk(this)">
-            <span class="bm-check">✓</span> OK — comportement par défaut
+            <span class="bm-check">✓</span> ${t('ok_default')}
           </div>
-          <div class="bm-or${st.ok?' hidden':''}">ou</div>`}
+          <div class="bm-or${st.ok?' hidden':''}">${currentLang==='nl'?'of':currentLang==='de'?'oder':currentLang==='en'?'or':'ou'}</div>`}
           <div class="bm-custom-wrap${(!isAutre&&st.ok)?' hidden':''}">
             <input type="text" class="bm-custom${st.custom?' has-val':''}" data-qid="${q.id}" data-key="${b.key}"
-              placeholder="${isAutre?'Décrivez un autre comportement à paramétrer…':'Écrire mon comportement personnalisé…'}"
+              placeholder="${t('custom_ph')}"
               value="${escA(st.custom||'')}"
               oninput="bmInput(this)">
           </div>
