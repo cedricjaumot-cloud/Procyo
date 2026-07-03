@@ -2208,8 +2208,9 @@ function buildQuestion(q,saved){
         if(qDef.type==='radio-other'){
           debounceSave(qid,'Autre::'+i.value);
         } else {
-          // checkbox-other: rebuild array
-          const checks=Array.from(el.querySelectorAll('.citem.chk:not([data-val="__other__"])')).map(c=>c.dataset.val);
+          // checkbox-other: reconstruire depuis localCache (source de vérité) + nouvelle valeur Autre
+          const prevArr=Array.isArray(localCache[qid])?localCache[qid]:[];
+          const checks=prevArr.filter(x=>!x.startsWith('Autre::'));
           if(i.value.trim()) checks.push('Autre::'+i.value);
           debounceSave(qid,checks);
         }
@@ -2287,7 +2288,7 @@ async function toggleChkOther(el){
   const ofEl=document.getElementById('of-'+qid);
   if(ofEl) ofEl.style.display=el.classList.contains('chk')?'block':'none';
   if(!el.classList.contains('chk')){
-    // vider le champ texte quand on décoche
+    // DECOCHE — vider le champ texte
     const txt=ofEl&&ofEl.querySelector('.other-txt');
     if(txt){txt.value='';txt.classList.remove('ans');}
     // removed — rebuild without other
@@ -2295,6 +2296,11 @@ async function toggleChkOther(el){
     await persistAnswer(qid,checks);
     updateQProgress(getModules()[currentMod]);
     updateSecProg(qid);
+  } else {
+    // COCHE — sauvegarder un placeholder Autre:: pour garder localCache en sync
+    const checks=Array.from(el.closest('.checks').querySelectorAll('.citem.chk:not([data-val="__other__"])')).map(c=>c.dataset.val);
+    checks.push('Autre::');
+    await saveAnswer(qid,checks); // pas persistAnswer pour ne pas flasher "sauvegardé" prématurément
   }
 }
 
