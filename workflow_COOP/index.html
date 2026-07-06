@@ -529,7 +529,7 @@
     <div class="section-header">
       <span class="section-badge badge-comm">Prospection</span>
       <div class="section-rule"></div>
-      <span class="section-team">Antoine · Cédric · Éric · Maxime</span>
+      <span class="section-team">Antoine · Cédric · Éric · Luc · Maxime</span>
     </div>
     <div class="section-name">Phases 1 - 2</div>
 
@@ -610,7 +610,7 @@
     <div class="section-header">
       <span class="section-badge badge-comm">Acquisition client</span>
       <div class="section-rule"></div>
-      <span class="section-team">Antoine · Cédric · Éric · Maxime</span>
+      <span class="section-team">Antoine · Cédric · Éric · Luc · Maxime</span>
     </div>
     <div class="section-name">Phases 3 - 4 - 5</div>
 
@@ -747,11 +747,11 @@
         <div class="pcard-accent accent-ai"></div>
         <div class="pcard-num">Phase 6</div>
         <div class="pcard-title">Bienvenue &amp; Set-Up</div>
-        <div class="pcard-desc">Deux mails automatiques suite au passage en statut Contrat Signé : J+1 pour la demande de clé API, J+2 pour démarrer le Module Paramétrage. La demande de clé déclenche le RDV présentiel et la création de l'accès Dashboard.</div>
+        <div class="pcard-desc">La signature crée automatiquement une Tâche Odoo avec ses sous-tâches. J+1 pour la demande de clé API, J+2 pour démarrer le Module Paramétrage. Le courtier intègre lui-même sa clé et valide la connexion Microsoft Graph.</div>
         <div class="tags">
+          <span class="tag tag-a">Tâche Odoo auto</span>
           <span class="tag tag-a">J+1 · Demande clé API</span>
-          <span class="tag tag-a">J+2 · Module Paramétrage</span>
-          <span class="tag tag-n">RDV présentiel ≈ J+10</span>
+          <span class="tag tag-n">J+2 · Module Paramétrage</span>
         </div>
         <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
       </div>
@@ -760,11 +760,11 @@
         <div class="pcard-accent accent-ai"></div>
         <div class="pcard-num">Phase 7</div>
         <div class="pcard-title">Préparation IA Factory &amp; Go-Live</div>
-        <div class="pcard-desc">Dès réception de la clé Brio, l'IA Factory charge les tables et personnalise les prompts. Add-in Outlook installé. Formation de l'équipe, puis Go-Live à J+2 en Teams.</div>
+        <div class="pcard-desc">Dès la complétion du Module Paramétrage, l'IA Factory charge les tables et personnalise les prompts, puis teste l'assistant avant formation. Add-in ChatBox installé, puis Go-Live en Teams.</div>
         <div class="tags">
-          <span class="tag tag-a">Script Brio standard</span>
-          <span class="tag tag-a">Add-in Outlook</span>
-          <span class="tag tag-n">Go-Live J+2</span>
+          <span class="tag tag-a">Chargement tables + prompts</span>
+          <span class="tag tag-a">Contrôle qualité</span>
+          <span class="tag tag-n">Go-Live Teams</span>
         </div>
         <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
       </div>
@@ -787,49 +787,70 @@
     <div class="drawer" id="d6">
       <div class="drawer-inner">
         <span class="drawer-tag">Phase 6 · Bienvenue &amp; Set-Up</span>
+        <h4>Déclencheur - Tâche Odoo automatique</h4>
+        La signature du contrat déclenche la création automatique d'une <strong>Tâche</strong> dans le projet Odoo « Onboarding - Client », avec l'ensemble de ses sous-tâches (non cochées au départ). Cette tâche sert de fil conducteur et de checklist pour tout le suivi des Phases 6 et 7.
+        <h4>Mail J0 - Bienvenue</h4>
+        Dès la signature, un mail automatique « Comment va se passer l'Onboarding » est envoyé au courtier.
         <h4>Mail J+1 - Demande de clé API</h4>
-        Le lendemain de la signature (J+1), automatisation suite au passage en statut Contrat Signé : un mail est envoyé au courtier pour lui indiquer la procédure de demande de clé API via Portima. <span class="flag flag-urg">template à présenter</span>
-        <h4>Mail J+2 - Module Paramétrage</h4>
-        Le surlendemain (J+2), un second mail automatique invite le courtier à démarrer le Module Paramétrage dans le Launchpad. <span class="flag flag-urg">template à présenter</span> Ce module peut également être complété lors d'un RDV Teams au besoin.
-        <div class="kv-grid" style="margin-top:14px">
-          <span class="kv-k">Relance automatique</span><span class="kv-v">Rappel toutes les 48h si le Module Paramétrage n'est pas complété</span>
-          <span class="kv-k">Notification interne</span><span class="kv-v">Une fois complété, information envoyée à onboarding@procyo2.odoo.com (via APP Assistance) et au Commercial</span>
-        </div>
+        Le lendemain de la signature (J+1), un mail automatique indique au courtier la procédure de demande de clé API auprès de Brio/Portima. <span class="flag flag-urg">template à présenter</span>
         <h4>Demande de clé Brio effectuée</h4>
-        Lorsque le courtier effectue sa demande de clé Brio, <strong>onboarding@procyo2.odoo.com</strong> (via APP Assistance) reçoit l'information. Ceci déclenche deux nouveaux mails :
+        Le courtier effectue sa demande de clé auprès de Brio/Portima (action manuelle). Dès traitement de la demande, <strong>Onboarding</strong> reçoit l'avis et en avertit le <strong>Sales</strong> <span class="flag flag-urg">manuel - à automatiser ?</span>, qui crée alors l'accès Dashboard Procyo pour le courtier.
+        <h4>Création de l'accès Dashboard - trois mails</h4>
+        À la création de l'accès, trois mails automatiques partent vers le courtier :
         <ul>
-          <li>un mail avec Calendly pour fixer un RDV en présentiel au bureau du courtier pour la présentation globale (à ≈ J+10) <span class="flag flag-urg">prévoir template</span> ;</li>
-          <li>un mail vers le commercial afin qu'il crée l'accès au Dashboard via la zone ADMIN (automatisation à prévoir dans le futur) <span class="flag flag-urg">prévoir template</span>.</li>
-        </ul>
-        <h4>Création de l'accès Dashboard</h4>
-        À la création de l'accès au Dashboard, deux mails partent automatiquement vers le courtier :
-        <ul>
-          <li>un mail pour l'accès à la plateforme Procyo <span class="flag flag-urg">prévoir template</span> ;</li>
+          <li>un mail avec l'identifiant de connexion au Dashboard, envoyé par le Sales <span class="flag flag-urg">prévoir template</span> ;</li>
+          <li>un mail expliquant comment intégrer la clé API Brio dans le Dashboard <span class="flag flag-urg">prévoir template</span> ;</li>
           <li>un mail dédié à la connexion Microsoft Graph <span class="flag flag-urg">prévoir template</span>.</li>
         </ul>
+        <h4>Actions manuelles du courtier</h4>
+        Le courtier intègre lui-même sa clé API Brio dans le Dashboard, puis valide lui-même l'autorisation de connexion Microsoft Graph. Ces deux actions sont indépendantes et à rythme variable selon le courtier.
+        <h4>Mail J+2 - Module Paramétrage</h4>
+        Le surlendemain de la signature (J+2), un mail automatique invite le courtier à démarrer le Module Paramétrage dans le Launchpad. <span class="flag flag-urg">template à présenter</span> Ce module peut également être complété lors d'un RDV Teams au besoin.
+        <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Relance automatique</span><span class="kv-v">Rappel toutes les 48h si le Module Paramétrage n'est pas complété</span>
+          <span class="kv-k">Relance conditionnelle</span><span class="kv-v">Mail de rappel vers Brio (courtier en copie) à J+7 après l'avis de demande de clé API, si la clé n'est toujours pas renseignée</span>
+          <span class="kv-k">Notification interne</span><span class="kv-v">Une fois le Module Paramétrage complété, information envoyée à Onboarding (pour action) et au Sales (pour information)</span>
+        </div>
+        <h4>Checklist Odoo (sous-tâches)</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+          <span class="flag flag-ok">☑ Créer accès dashboard</span>
+          <span class="flag flag-ok">☑ API Key Brio reçue</span>
+          <span class="flag flag-ok">☑ Autorisation Microsoft Graph validée</span>
+        </div>
       </div>
     </div>
 
     <div class="drawer" id="d7">
       <div class="drawer-inner">
         <span class="drawer-tag">Phase 7 · Préparation IA Factory &amp; Go-Live</span>
-        <h4>Réception de la clé Brio</h4>
-        Lorsque le courtier renvoie la clé Brio, celle-ci arrive sur <strong>onboarding@procyo2.odoo.com</strong> (via APP Assistance). <span class="flag flag-urg">Mail du courtier ou de Brio directement ? À définir.</span> On passe alors en Phase 7.
-        <h4>Présentation à l'équipe</h4>
-        Selon toute logique, c'est durant cette période que se déroule la présentation à l'équipe du courtier, planifiée lors de la Phase 6 (RDV présentiel ≈ J+10).
-        <h4>Mail Add-in Outlook</h4>
-        À la réception de la clé Brio chez Procyo, un mail automatique est envoyé au courtier pour le téléchargement et l'installation de l'add-in Outlook (Chatbox Procyo IA). <span class="flag flag-urg">template à prévoir</span>
+        <h4>Déclencheur</h4>
+        Cette phase démarre suite à l'avis de fin de complétion du Module Paramétrage, transmis à Onboarding (pour action) et au Sales (pour information) - et non plus simplement à la réception de la clé Brio, déjà traitée en Phase 6.
         <h4>Préparation IA Factory</h4>
-        L'IA Factory exécute un script Brio standard pour charger les tables : sinistres, objets de risques, contrats, clients, codes produits, etc., et prépare la personnalisation des prompts et des actions Brio pour le courtier.
-        <h4>Go-Live (J+2 et au moins J+4 de la remise de la clé Brio)</h4>
-        À la fin de la formation de l'équipe, le Go-Live est fixé à J+2, et au moins à J+4 de la remise de la clé Brio, en Teams (courtier, commercial, IA Factory).
-        <h4>Au programme</h4>
+        L'IA Factory intègre les paramètres du courtier dans les assistants : chargement des tables (sinistres, objets de risques, contrats, clients, codes produits, etc.) et personnalisation des prompts et des actions Brio.
+        <h4>Mail RDV formation &amp; Go-Live</h4>
+        Au moment où le courtier intègre sa clé API dans le Dashboard, un mail automatique lui est envoyé pour fixer le rendez-vous de formation et de Go-Live. Le rendez-vous est ensuite confirmé manuellement entre le Sales et le courtier.
+        <h4>Mail Add-in ChatBox</h4>
+        Le lendemain de l'intégration de la clé API, un mail automatique est envoyé au courtier pour le téléchargement et l'installation de l'add-in Outlook (Chatbox Procyo IA). <span class="flag flag-urg">template à prévoir</span>
+        <h4>Contrôle qualité avant formation</h4>
+        Avant la date de formation/Go-Live, l'IA Factory teste l'assistant et le paramétrage du courtier, et corrige les éventuelles anomalies.
+        <h4>Go-Live</h4>
+        Formation et Go-Live se déroulent en Teams (courtier, Sales, IA Factory), à la date du rendez-vous fixé :
         <ul>
           <li>parcourir le Dashboard ;</li>
           <li>lancer les premiers cas en live ;</li>
           <li>personnaliser plus si besoin ;</li>
           <li>montrer le catalogue de prompts et son fonctionnement.</li>
         </ul>
+        <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Après Go-Live</span><span class="kv-v">Le courtier effectue sa première connexion sur la plateforme</span>
+          <span class="kv-k">Support renforcé</span><span class="kv-v">Activation du support de 3 mois post-Go-Live <span class="flag flag-urg">automatisé ou manuel - à confirmer</span></span>
+        </div>
+        <h4>Checklist Odoo (sous-tâches)</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+          <span class="flag flag-ok">☑ Formation planifiée</span>
+          <span class="flag flag-ok">☑ Envoyer information installation chatbox</span>
+          <span class="flag flag-ok">☑ Première connexion effectuée</span>
+        </div>
       </div>
     </div>
 
@@ -845,6 +866,10 @@
         Ce rythme reste souple et à adapter au cas par cas, selon les aptitudes et la complexité du bureau de courtage.
         <h4>Apprentissage autonome</h4>
         Au terme du suivi de proximité, l'assistant apprend ensuite seul des usages réels du bureau, sans nouveau questionnaire.
+        <h4>Checklist Odoo (sous-tâches)</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+          <span class="flag flag-ok">☑ Support 3 mois activé</span>
+        </div>
       </div>
     </div>
   </section>
