@@ -1023,7 +1023,8 @@ function render(){
 
   var h="";
   h+="<div class=\"tsec\">"+(isNL?"Maandelijks abonnement (incl. BTW)":"Abonnement mensuel (TVAC)")+"</div>";
-  h+=trow(isNL?"Basisabonnement":"Forfait de base",money(abo.palier.base*TVA));
+  var adrLabelRecap=" ("+abo.palier.addrIncl+" "+(isNL?"adr. incl.":"adresses incluses")+")";
+  h+=trow((isNL?"Basisabonnement":"Forfait de base")+adrLabelRecap,money(abo.palier.base*TVA));
   if(abo.suppl>0) h+=trow("+"+abo.suppl+" adr. \u00d7 "+money(abo.palier.prixSuppl*TVA),money(abo.suppl*abo.palier.prixSuppl*TVA));
   if(S.modules.regulia)   h+=trow(isNL?"Compliance ("+S.nbAddr+"\u00d7\u20ac10)":"Conformit\u00e9 ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
   if(S.modules.relancia)  h+=trow(isNL?"Commercieel ("+S.nbAddr+"\u00d7\u20ac10)":"Commercial ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
@@ -1033,7 +1034,8 @@ function render(){
   if(sub>0) h+="<div class=\"ppill\">"+sub+(isNL?" eerste maand"+(sub>1?"en":"")+" gratis":" premier"+(sub>1?"s":"")+" mois offert"+(sub>1?"s":""))+"</div>";
   h+="<div class=\"tsep\"></div>";
   h+="<div class=\"tsec\">"+(isNL?"Eenmalige setup (incl. BTW)":"Setup unique (TVAC)")+"</div>";
-  h+=trow((isNL?"Platform ":"Plateforme ")+sp.label,money(sp.setup*TVA));
+  var etpLabelRecap = sp.etpMax<9999?" ("+sp.etpMin+"-"+sp.etpMax+" "+(isNL?"VTE":"ETP")+")":" ("+sp.etpMin+"+ "+(isNL?"VTE":"ETP")+")";
+  h+=trow((isNL?"Platform ":"Plateforme ")+sp.label+etpLabelRecap,money(sp.setup*TVA));
   if(c.nbMod>0) h+=trow("Modules ("+c.nbMod+"\u00d7\u20ac500)",money(c.nbMod*500*TVA));
   if(c.remise>0) h+="<div class=\"trow\"><span class=\"tl rl\">"+(isNL?"- Setupkorting":"- Remise setup")+"</span><span class=\"tv rv\">- "+money(c.remise*TVA)+"</span></div>";
   h+="<div class=\"ttot\"><span class=\"ttl\">"+(isNL?"Totale setup":"Total setup")+"</span><span class=\"ttv\">"+money(c.setupNet*TVA)+"</span></div>";
@@ -1123,7 +1125,8 @@ function construirePDF(){
 
   sh(isNL?"MAANDELIJKS ABONNEMENT":"ABONNEMENT MENSUEL");
   colHead();
-  row3(isNL?"Basisabonnement Procyo AI":"Forfait de base Procyo AI",c.abo.palier.base);
+  var adrLabelPDF=" ("+c.abo.palier.addrIncl+" "+(isNL?"adr. incl.":"adresses incluses")+")";
+  row3((isNL?"Basisabonnement Procyo AI":"Forfait de base Procyo AI")+adrLabelPDF,c.abo.palier.base);
   if(c.abo.suppl>0) row3((isNL?"+ "+c.abo.suppl+" extra adres"+(c.abo.suppl>1?"sen":"")+" × "+money(c.abo.palier.prixSuppl):"+ "+c.abo.suppl+" adresse"+(c.abo.suppl>1?"s":"")+" suppl. \u00d7 "+money(c.abo.palier.prixSuppl)),c.abo.suppl*c.abo.palier.prixSuppl);
   if(S.modules.regulia)   row3(isNL?"+ Complianceassistent ("+S.nbAddr+" \u00d7 \u20ac10/adr.)":"+ Assistant Conformité ("+S.nbAddr+" \u00d7 \u20ac10/adr.)",S.nbAddr*10);
   if(S.modules.relancia)  row3(isNL?"+ Commerciële assistent ("+S.nbAddr+" \u00d7 \u20ac10/adr.)":"+ Assistant Commercial ("+S.nbAddr+" \u00d7 \u20ac10/adr.)",S.nbAddr*10);
@@ -1137,7 +1140,8 @@ function construirePDF(){
 
   y+=4;sh(isNL?"EENMALIGE SETUP":"SETUP UNIQUE");
   colHead();
-  row3((isNL?"Platform ":"Plateforme ")+c.sp.label+(isNL?" — installatie, integratie & opleiding":" - installation, intégration & formation"),c.sp.setup);
+  var etpLabelPDF=c.sp.etpMax<9999?" ("+c.sp.etpMin+"-"+c.sp.etpMax+" "+(isNL?"VTE":"ETP")+")":" ("+c.sp.etpMin+"+ "+(isNL?"VTE":"ETP")+")";
+  row3((isNL?"Platform ":"Plateforme ")+c.sp.label+etpLabelPDF+(isNL?" — installatie, integratie & opleiding":" - installation, intégration & formation"),c.sp.setup);
   if(c.nbMod>0) row3((isNL?"Setup modules (":"Setup modules (")+c.nbMod+" \u00d7 \u20ac500)",c.nbMod*500);
   if(c.remise>0) row3neg((isNL?"- Setup-korting (":"- Remise setup (")+S.remisePct+" %)",c.remise,ORANGE);
   total3(isNL?"TOTALE EENMALIGE SETUP":"TOTAL SETUP UNIQUE",c.setupNet);
