@@ -353,6 +353,14 @@ header img.logo{height:34px}
     <div id="cond-content" class="hidden" style="margin-top:.625rem">
       <div class="card">
         <div class="frow">
+          <label id="lbl-bms">BMS</label>
+          <div class="tab-row">
+            <div class="tab" data-bms="brio" id="tab-bms-brio">Brio</div>
+            <div class="tab" data-bms="brokercloud" id="tab-bms-brokercloud">BrokerCloud</div>
+          </div>
+        </div>
+        <div id="bms-warning" style="display:none;color:#DC2626;font-size:12px;padding:3px 2px;margin-top:-8px;margin-bottom:4px">⚠ Veuillez choisir le BMS</div>
+        <div class="frow">
           <label id="lbl-engagement">Engagement</label>
           <div class="tab-row">
             <div class="tab active" data-eng="monthly" id="tab-mensuel">Mensuel</div>
@@ -869,7 +877,7 @@ var PALIERS = [
   {"key":"corporate",  "label":"Corporate",  "etpMin":51, "etpMax":9999,"addrIncl":51, "base":6000, "prixSuppl":90,  "setup":10000, "credits":200000, "mailsMois":40000, "creditsSuppl":3000, "mailsSuppl":600, "extraCall":0.015}
 ];
 
-var S = {nbEtp:5, nbAddr:5, modules:{regulia:false,relancia:false,portfolia:false}, setupDiscType:"none", remisePct:10, subMonths:0, engagement:"monthly", validite:30};
+var S = {nbEtp:5, nbAddr:5, modules:{regulia:false,relancia:false,portfolia:false}, setupDiscType:"none", remisePct:10, subMonths:0, engagement:"monthly", validite:30, bms:null};
 
 S.offerNum = 1;
 window._offerSent = 0;
@@ -938,9 +946,12 @@ function calcul(){
   var setupHT=sp.setup+nbMod*500;
   var remise=0;
   if(S.setupDiscType==="pct") remise=n2(setupHT*S.remisePct/100);
+  var mensuelHTbrut=mensuelHT;
+  var remiseBMS=0;
+  if(S.bms==='brokercloud'){remiseBMS=n2(mensuelHT*0.1);mensuelHT=n2(mensuelHT-remiseBMS);}
   var creditsTotal = abo.palier.credits + abo.suppl * abo.palier.creditsSuppl;
   var mailsTotal = abo.palier.mailsMois + abo.suppl * abo.palier.mailsSuppl;
-  return {abo:abo, sp:sp, mensuelHT:mensuelHT, setupHT:setupHT, setupNet:setupHT-remise, remise:remise, nbMod:nbMod, creditsTotal:creditsTotal, mailsTotal:mailsTotal};
+  return {abo:abo, sp:sp, mensuelHT:mensuelHT, mensuelHTbrut:mensuelHTbrut, remiseBMS:remiseBMS, setupHT:setupHT, setupNet:setupHT-remise, remise:remise, nbMod:nbMod, creditsTotal:creditsTotal, mailsTotal:mailsTotal};
 }
 
 function resetSignBtn(){
@@ -1029,6 +1040,7 @@ function render(){
   if(S.modules.regulia)   h+=trow(isNL?"Compliance ("+S.nbAddr+"\u00d7\u20ac10)":"Conformit\u00e9 ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
   if(S.modules.relancia)  h+=trow(isNL?"Commercieel ("+S.nbAddr+"\u00d7\u20ac10)":"Commercial ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
   if(S.modules.portfolia) h+=trow(isNL?"Portefeuille (10 % basis)":"Portefeuille (10 % base)",money(abo.palier.base*0.1*TVA));
+  if(c.remiseBMS>0) h+="<div class=\"trow\"><span class=\"tl rl\">"+(isNL?"- BrokerCloud korting (10 %)":"- Remise BrokerCloud (10 %)")+"</span><span class=\"tv rv\">- "+money(c.remiseBMS*TVA)+"</span></div>";
   h+="<div class=\"ttot\"><span class=\"ttl\">"+(isNL?"Totaal maandelijks":"Total mensuel")+"</span><span class=\"ttv\">"+money(c.mensuelHT*TVA)+"</span></div>";
   h+="<div class=\"tsub\">"+(isNL?"excl. BTW ":"HTVA ")+money(c.mensuelHT)+"</div>";
   if(sub>0) h+="<div class=\"ppill\">"+sub+(isNL?" eerste maand"+(sub>1?"en":"")+" gratis":" premier"+(sub>1?"s":"")+" mois offert"+(sub>1?"s":""))+"</div>";
@@ -1131,6 +1143,7 @@ function construirePDF(){
   if(S.modules.regulia)   row3(isNL?"+ Complianceassistent ("+S.nbAddr+" \u00d7 \u20ac10/adr.)":"+ Assistant Conformité ("+S.nbAddr+" \u00d7 \u20ac10/adr.)",S.nbAddr*10);
   if(S.modules.relancia)  row3(isNL?"+ Commerciële assistent ("+S.nbAddr+" \u00d7 \u20ac10/adr.)":"+ Assistant Commercial ("+S.nbAddr+" \u00d7 \u20ac10/adr.)",S.nbAddr*10);
   if(S.modules.portfolia) row3(isNL?"+ Portefeuilleassistent (10 % van de basis)":"+ Assistant Portefeuille (10 % de la base)",c.abo.palier.base*0.1);
+  if(c.remiseBMS>0) row3neg((isNL?"- BrokerCloud korting (10 %)":"- Remise BrokerCloud (10 %)"),c.remiseBMS,ORANGE);
   total3(isNL?"TOTAAL MAANDELIJKS":"TOTAL MENSUEL",c.mensuelHT);
   if(sub>0){
     doc.setFillColor(TEAL_BG[0],TEAL_BG[1],TEAL_BG[2]);doc.rect(X,y-2,W,9,"F");
@@ -1365,6 +1378,7 @@ function genererPDF(){
 document.getElementById("nb-etp").addEventListener("input",function(){S.nbEtp=Math.max(1,parseInt(this.value)||1);render();});
 document.getElementById("nb-addr").addEventListener("input",function(){S.nbAddr=Math.max(1,parseInt(this.value)||1);render();});
 document.querySelectorAll(".mod").forEach(function(b){b.addEventListener("click",function(){b.classList.toggle("active");S.modules[b.dataset.mod]=b.classList.contains("active");render();});});
+document.querySelectorAll("[data-bms]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-bms]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.bms=b.dataset.bms;document.getElementById('bms-warning').style.display='none';render();});});
 document.querySelectorAll("[data-eng]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-eng]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.engagement=b.dataset.eng;render();});});
 document.querySelectorAll("[data-promo]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-promo]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.setupDiscType=b.dataset.promo;document.getElementById("pct-wrap").classList.toggle("hidden",S.setupDiscType!=="pct");render();});});
 document.getElementById("remise-pct").addEventListener("input",function(){S.remisePct=parseFloat(this.value)||0;render();});
@@ -1377,6 +1391,16 @@ document.getElementById("cond-toggle").addEventListener("click",function(){
 });
 document.getElementById("validite").addEventListener("input",function(){S.validite=Math.max(1,parseInt(this.value)||30);render();});
 document.getElementById("prevbtn").addEventListener("click",function(){
+  var isNL = (currentUILang === 'nl');
+  // Vérification BMS obligatoire
+  if(!S.bms){
+    document.getElementById('bms-warning').textContent = isNL ? '⚠ Gelieve het BMS te kiezen' : '⚠ Veuillez choisir le BMS';
+    document.getElementById('bms-warning').style.display='block';
+    document.getElementById('cond-content').classList.remove('hidden');
+    document.getElementById('cond-arrow').innerHTML='&#9660;';
+    return;
+  }
+  document.getElementById('bms-warning').style.display='none';
   // Vérification ordre des offres — bloque si invalide
   if(!checkOfferValid()) return;
   var odooId = document.getElementById('codoo').value;
@@ -2370,6 +2394,7 @@ function applyUILang() {
   setTextIfFound('lbl-contact', lang === 'nl' ? 'Contactpersoon' : 'Contact');
   // Conditions commerciales
   setTextIfFound('lbl-engagement', lang === 'nl' ? 'Verbintenis' : 'Engagement');
+  setTextIfFound('lbl-bms', 'BMS');
   setTextIfFound('tab-mensuel', lang === 'nl' ? 'Maandelijks' : 'Mensuel');
   setTextIfFound('tab-3mois', lang === 'nl' ? '3 maanden opzegbaar' : '3 mois résiliable');
   setTextIfFound('lbl-remise-setup', lang === 'nl' ? 'Setupkorting' : 'Remise setup');
