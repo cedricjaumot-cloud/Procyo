@@ -653,6 +653,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')"><span id="admin-tab-brokers-el">Courtiers inscrits</span></button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')"><span id="admin-tab-export-el">Export réponses</span></button>
+        <button class="admin-tab" id="atab-corbeille" onclick="switchAdminTab('corbeille')">🗑️ Corbeille</button>
       </div>
       <div style="display:flex;gap:10px;margin:-10px 0 24px">
         <a href="../pricing/index.html" target="_blank" class="btn btn-primary" style="text-decoration:none;width:auto;padding:10px 18px">💶 Pricing</a>
@@ -661,6 +662,10 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       <div id="admin-tab-courtiers">
         <p class="admin-sub" id="admin-sub-brokers-el">Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.</p>
         <div id="admin-list"></div>
+      </div>
+      <div id="admin-tab-corbeille" style="display:none">
+        <p class="admin-sub">Courtiers supprimés — conservés 30 jours, puis effacés définitivement.</p>
+        <div id="trash-list"></div>
       </div>
       <div id="admin-tab-export" style="display:none">
         <p class="admin-sub" id="admin-sub-export-el">Tableau croisé — une ligne par question, une colonne par courtier.</p>
@@ -737,13 +742,13 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 <div class="modal-overlay hidden" id="modal-delete-broker">
   <div class="modal">
     <h3 id="delete-modal-title" style="color:var(--red)">🗑️ Supprimer ce courtier</h3>
-    <p><span id="delete-p-el">Vous êtes sur le point de supprimer</span> <strong id="delete-broker-name"></strong> <span id="delete-p2-el">et l'ensemble de ses données (réponses, observations). <strong>Cette action est irréversible.</strong></span></p>
-    <div id="delete-warn-el" style="background:var(--red-pale);border:1px solid #fecaca;border-radius:8px;padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:20px">
-      ⚠️ Toutes les réponses et observations associées seront définitivement supprimées de Supabase.
+    <p><span id="delete-p-el">Vous êtes sur le point de déplacer</span> <strong id="delete-broker-name"></strong> <span id="delete-p2-el">dans la corbeille. Ses données resteront accessibles en lecture pendant 30 jours.</span></p>
+    <div id="delete-warn-el" style="background:#fff3e8;border:1px solid #fed7aa;border-radius:8px;padding:12px 16px;font-size:13px;color:#9a3412;margin-bottom:20px">
+      🗑️ Le courtier sera supprimé définitivement après 30 jours. Vous pouvez consulter ses données depuis l'onglet Corbeille.
     </div>
     <div class="modal-actions">
       <button class="modal-btn cancel" onclick="closeDeleteModal()">Annuler</button>
-      <button class="modal-btn" id="delete-confirm-btn" onclick="confirmDeleteBroker()" style="background:var(--red);color:white">Supprimer définitivement</button>
+      <button class="modal-btn" id="delete-confirm-btn" onclick="confirmDeleteBroker()" style="background:var(--red);color:white">Déplacer dans la corbeille</button>
     </div>
   </div>
 </div>
@@ -2697,7 +2702,8 @@ async function showAdmin(){
   document.getElementById('screen-admin').style.display='block';
   setLoading(true,'Chargement des courtiers…');
   try{
-    const brokers=(await sbGet('brokers','select=*&order=created_at.desc')).filter(b=>!ADMIN_EMAILS.includes((b.email||'').toLowerCase()));
+    autoPurgeTrash();
+    const brokers=(await sbGet('brokers','select=*&order=created_at.desc&deleted_at=is.null')).filter(b=>!ADMIN_EMAILS.includes((b.email||'').toLowerCase()));
     const list=document.getElementById('admin-list');
     list.innerHTML='';
     if(!brokers||brokers.length===0){list.innerHTML='<p style="color:var(--g400);font-size:14px">Aucun courtier inscrit.</p>';return;}
@@ -2948,21 +2954,65 @@ function closeDeleteModal(){
 async function confirmDeleteBroker(){
   if(!_deleteBrokerId) return;
   const btn = document.getElementById('delete-confirm-btn');
-  btn.disabled = true; btn.textContent = 'Suppression…';
+  btn.disabled = true; btn.textContent = 'Déplacement…';
   try{
-    // 1. Supprimer les observations
-    await sbFetch('observations?broker_id=eq.'+_deleteBrokerId, 'DELETE');
-    // 2. Supprimer les réponses
-    await sbFetch('answers?broker_id=eq.'+_deleteBrokerId, 'DELETE');
-    // 3. Supprimer le courtier
-    await sbFetch('brokers?id=eq.'+_deleteBrokerId, 'DELETE');
+    // Soft delete : on pose juste deleted_at, rien n'est effacé
+    await sbUpdate('brokers', 'id=eq.'+_deleteBrokerId, { deleted_at: new Date().toISOString(), deleted_by: currentUser.email });
     closeDeleteModal();
-    // Recharger la liste admin
     showAdmin();
   }catch(e){
-    btn.disabled = false; btn.textContent = 'Supprimer définitivement';
-    alert('Erreur lors de la suppression : '+e.message);
+    btn.disabled = false; btn.textContent = 'Déplacer dans la corbeille';
+    alert('Erreur : '+e.message);
     console.error(e);
+  }
+}
+
+async function autoPurgeTrash(){
+  // Hard delete les courtiers en corbeille depuis > 30 jours
+  try{
+    const cutoff = new Date(Date.now() - 30*24*60*60*1000).toISOString();
+    const expired = await sbGet('brokers','select=id&deleted_at=not.is.null&deleted_at=lt.'+cutoff);
+    if(!expired||!expired.length) return;
+    for(const b of expired){
+      await sbFetch('observations?broker_id=eq.'+b.id, 'DELETE');
+      await sbFetch('answers?broker_id=eq.'+b.id, 'DELETE');
+      await sbFetch('brokers?id=eq.'+b.id, 'DELETE');
+    }
+    console.log('[Corbeille] '+expired.length+' courtier(s) purgé(s) définitivement.');
+  }catch(e){
+    console.warn('[autoPurgeTrash] Erreur :', e.message);
+  }
+}
+
+async function showTrash(){
+  const list = document.getElementById('trash-list');
+  list.innerHTML = '<p style="color:var(--g400);font-size:14px;padding:20px 0">Chargement…</p>';
+  try{
+    const all = await sbGet('brokers','select=*&deleted_at=not.is.null&order=deleted_at.desc');
+    const brokers = (all||[]).filter(b=>!ADMIN_EMAILS.includes((b.email||'').toLowerCase()));
+    if(!brokers.length){
+      list.innerHTML='<p style="color:var(--g400);font-size:14px;padding:20px 0">La corbeille est vide.</p>';
+      return;
+    }
+    const now = Date.now();
+    list.innerHTML = brokers.map(b=>{
+      const deletedAt = new Date(b.deleted_at);
+      const daysLeft = Math.max(0, 30 - Math.floor((now - deletedAt.getTime())/(24*60*60*1000)));
+      const dateStr = deletedAt.toLocaleDateString('fr-BE');
+      const urgentColor = daysLeft<=7 ? 'var(--red)' : 'var(--orange)';
+      return `<div class="broker-card" style="opacity:.85;border-left:3px solid var(--red)">
+        <h3 style="display:flex;align-items:center;gap:10px">${escH(b.company_name||b.email)} <span style="font-size:11px;font-weight:500;background:var(--red-pale);color:var(--red);padding:3px 10px;border-radius:20px">Supprimé</span></h3>
+        <div class="broker-meta">${b.email} — supprimé le ${dateStr} par <strong>${escH(b.deleted_by||'inconnu')}</strong></div>
+        <div style="font-size:13px;color:${urgentColor};margin:10px 0 14px;font-weight:500">
+          ⏳ Suppression définitive dans <strong>${daysLeft} jour${daysLeft>1?'s':''}</strong>
+        </div>
+        <div class="broker-actions">
+          <button class="dossier-btn" onclick="showDossier('${b.id}')">📋 Voir le dossier</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML='<p style="color:var(--red);font-size:14px">Erreur : '+e.message+'</p>';
   }
 }
 
@@ -3069,10 +3119,13 @@ async function doChangePwd(){
 
 // ── ADMIN TABS ──────────────────────────────────────────────
 function switchAdminTab(tab){
-  document.getElementById('admin-tab-courtiers').style.display = tab==='courtiers'?'':'none';
-  document.getElementById('admin-tab-export').style.display    = tab==='export'?'':'none';
-  document.getElementById('atab-courtiers').className = 'admin-tab'+(tab==='courtiers'?' on':'');
-  document.getElementById('atab-export').className    = 'admin-tab'+(tab==='export'?' on':'');
+  document.getElementById('admin-tab-courtiers').style.display  = tab==='courtiers'?'':'none';
+  document.getElementById('admin-tab-export').style.display     = tab==='export'?'':'none';
+  document.getElementById('admin-tab-corbeille').style.display  = tab==='corbeille'?'':'none';
+  document.getElementById('atab-courtiers').className  = 'admin-tab'+(tab==='courtiers'?' on':'');
+  document.getElementById('atab-export').className     = 'admin-tab'+(tab==='export'?' on':'');
+  document.getElementById('atab-corbeille').className  = 'admin-tab'+(tab==='corbeille'?' on':'');
+  if(tab==='corbeille') showTrash();
 }
 
 // ── EXPORT PIVOT ─────────────────────────────────────────────
