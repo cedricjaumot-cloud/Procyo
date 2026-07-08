@@ -819,6 +819,7 @@ const LANG = {
     notif_reminder:'<strong>Rappel quotidien actif.</strong> Tant que ce module n\'est pas clôturé, vous recevez un email de rappel chaque jour. Vos réponses sont synchronisées sur tous vos appareils.',
     notif_readonly:'Ce module est <strong>clôturé</strong>. Vos réponses sont en lecture seule.',
     btn_cest_moi:'👤 C\'est moi',
+    autofill_badge:'⚡ Rempli automatiquement',
     no_files:'Pas de templates',
     hint_label:'💡',
     other_label:'Autre…', other_ph:'Précisez…',
@@ -904,6 +905,7 @@ const LANG = {
     notif_reminder:'<strong>Dagelijkse herinnering actief.</strong> Zolang deze module niet afgesloten is, ontvangt u elke dag een herinneringsmail. Uw antwoorden worden gesynchroniseerd op al uw apparaten.',
     notif_readonly:'Deze module is <strong>afgesloten</strong>. Uw antwoorden zijn alleen-lezen.',
     btn_cest_moi:'👤 Dat ben ik',
+    autofill_badge:'⚡ Automatisch ingevuld',
     no_files:'Geen sjablonen',
     hint_label:'💡',
     other_label:'Andere…', other_ph:'Preciseer…',
@@ -985,6 +987,7 @@ const LANG = {
     notif_reminder:'<strong>Tägliche Erinnerung aktiv.</strong> Solange dieses Modul nicht abgeschlossen ist, erhalten Sie täglich eine Erinnerungs-E-Mail. Ihre Antworten werden auf allen Geräten synchronisiert.',
     notif_readonly:'Dieses Modul ist <strong>abgeschlossen</strong>. Ihre Antworten sind schreibgeschützt.',
     btn_cest_moi:'👤 Das bin ich',
+    autofill_badge:'⚡ Automatisch ausgefüllt',
     no_files:'Keine Vorlagen',
     hint_label:'💡',
     other_label:'Sonstiges…', other_ph:'Präzisieren…',
@@ -1066,6 +1069,7 @@ const LANG = {
     notif_reminder:'<strong>Daily reminder active.</strong> Until this module is completed, you will receive a daily reminder email. Your answers are synchronised across all your devices.',
     notif_readonly:'This module is <strong>completed</strong>. Your answers are read-only.',
     btn_cest_moi:'👤 That\'s me',
+    autofill_badge:'⚡ Auto-filled',
     no_files:'No templates',
     hint_label:'💡',
     other_label:'Other…', other_ph:'Please specify…',
@@ -1264,7 +1268,7 @@ const MODULES_DATA = {
       {id:'M2B',name:'Identification juridique',questions:[
         {id:'M2Q4',type:'text',label:'Dénomination sociale',required:true},
         {id:'M2Q5',type:'text',label:'Numéro BCE',required:true,placeholder:'BE 0xxx.xxx.xxx'},
-        {id:'M2Q6',type:'text',label:'Adresse du siège social',required:true},
+        {id:'M2Q6',type:'address-fields',label:'Adresse du siège social',required:true},
         {id:'M2Q7',type:'text',label:'Numéro d\'agrément FSMA',required:true,placeholder:'Ex. : 12345A'},
         {id:'M2Q8',type:'radio',label:'Forme juridique',required:true,options:['SRL','SA','SNC','SPRL','Personne physique','Autre']},
         {id:'M2Q9',type:'text',label:'Responsable légal (administrateur)',required:true,placeholder:'Prénom Nom'},
@@ -1336,7 +1340,7 @@ const MODULES_DATA = {
       {id:'M2B',name:'Juridische identificatie',questions:[
         {id:'M2Q4',type:'text',label:'Maatschappelijke benaming',required:true},
         {id:'M2Q5',type:'text',label:'KBO-nummer',required:true,placeholder:'BE 0xxx.xxx.xxx'},
-        {id:'M2Q6',type:'text',label:'Adres van de maatschappelijke zetel',required:true},
+        {id:'M2Q6',type:'address-fields',label:'Adres van de maatschappelijke zetel',required:true},
         {id:'M2Q7',type:'text',label:'FSMA-erkenningsnummer',required:true,placeholder:'Bijv. : 12345A'},
         {id:'M2Q8',type:'radio',label:'Rechtsvorm',required:true,options:['BV','NV','VOF','BVBA','Natuurlijk persoon','Andere']},
         {id:'M2Q9',type:'text',label:'Wettelijk vertegenwoordiger (bestuurder)',required:true,placeholder:'Voornaam Naam'},
@@ -1408,7 +1412,7 @@ const MODULES_DATA = {
       {id:'M2B',name:'Rechtliche Identifizierung',questions:[
         {id:'M2Q4',type:'text',label:'Firmenname',required:true},
         {id:'M2Q5',type:'text',label:'Unternehmensnummer (KBO/BCE)',required:true,placeholder:'BE 0xxx.xxx.xxx'},
-        {id:'M2Q6',type:'text',label:'Anschrift des Firmensitzes',required:true},
+        {id:'M2Q6',type:'address-fields',label:'Anschrift des Firmensitzes',required:true},
         {id:'M2Q7',type:'text',label:'FSMA-Zulassungsnummer',required:true,placeholder:'z.B.: 12345A'},
         {id:'M2Q8',type:'radio',label:'Rechtsform',required:true,options:['GmbH','AG','OHG','SARL','Natürliche Person','Andere']},
         {id:'M2Q9',type:'text',label:'Gesetzlicher Vertreter (Geschäftsführer)',required:true,placeholder:'Vorname Nachname'},
@@ -1480,7 +1484,7 @@ const MODULES_DATA = {
       {id:'M2B',name:'Legal identification',questions:[
         {id:'M2Q4',type:'text',label:'Company name',required:true},
         {id:'M2Q5',type:'text',label:'Company registration number',required:true,placeholder:'BE 0xxx.xxx.xxx'},
-        {id:'M2Q6',type:'text',label:'Registered office address',required:true},
+        {id:'M2Q6',type:'address-fields',label:'Registered office address',required:true},
         {id:'M2Q7',type:'text',label:'FSMA approval number',required:true,placeholder:'e.g.: 12345A'},
         {id:'M2Q8',type:'radio',label:'Legal form',required:true,options:['SRL/BV','SA/NV','SNC','SPRL','Natural person','Other']},
         {id:'M2Q9',type:'text',label:'Legal representative (director)',required:true,placeholder:'First Last'},
@@ -1799,6 +1803,9 @@ function getProgress(mid){
     } else if(q.type==='contact-fields'){
       // answered if au moins nom rempli
       if(v&&typeof v==='object'&&v.nom&&v.nom.trim())ans++;
+    } else if(q.type==='address-fields'){
+      // answered if au moins rue remplie
+      if(v&&typeof v==='object'&&v.rue&&v.rue.trim())ans++;
     } else if(q.type==='company-matrix'){
       if(v&&typeof v==='object'&&Object.values(v).some(arr=>Array.isArray(arr)&&arr.length>0))ans++;
     } else if(q.type==='percent-split'){
@@ -2020,7 +2027,7 @@ function buildQuestion(q,saved){
   const el=document.createElement('div');
   const isAutoFilled = AUTO_FILLED_QS.includes(q.id);
   el.className='q-item'+(isAutoFilled?' q-autofilled':'');el.id='qi-'+q.id;
-  const autoTag = isAutoFilled ? `<span class="q-auto-badge">⚡ Rempli automatiquement</span>` : '';
+  const autoTag = isAutoFilled ? `<span class="q-auto-badge">${t('autofill_badge')}</span>` : '';
   const lbl=`<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}${autoTag}</div>`;
   let inp='';
   if(q.type==='text') inp=`<input type="text" class="q-input${saved?' ans':''}" data-qid="${q.id}" value="${escA(saved||'')}" placeholder="${escA(q.placeholder||'Votre réponse…')}">`;
@@ -2091,6 +2098,26 @@ function buildQuestion(q,saved){
     inp=`<button type="button" class="btn-cest-moi" onclick="fillCestMoi('${q.id}')">${t('btn_cest_moi')}</button>`;
     inp+=`<div class="contact-grid">`;
     fields.forEach(f=>{
+      const v=sv[f.key]||'';
+      inp+=`<div class="contact-field">
+        <label class="contact-lbl">${f.label}</label>
+        <input type="${f.type}" class="q-input contact-inp${v?' ans':''}" data-qid="${q.id}" data-field="${f.key}" value="${escA(v)}" placeholder="${escA(f.placeholder)}">
+      </div>`;
+    });
+    inp+=`</div>`;
+  }
+  else if(q.type==='address-fields'){
+    // saved = {rue, numero, code_postal, ville, pays}
+    const sv=saved&&typeof saved==='object'?saved:{};
+    const addrFields=[
+      {key:'rue',      label:currentLang==='nl'?'Straat':currentLang==='de'?'Straße':currentLang==='en'?'Street':'Rue',           type:'text', placeholder:currentLang==='nl'?'Leuvenseweg':currentLang==='de'?'Hauptstraße':currentLang==='en'?'Main Street':'Avenue Louise', wide:true},
+      {key:'numero',   label:currentLang==='nl'?'Nr':currentLang==='de'?'Nr.':currentLang==='en'?'No.':'N°',                       type:'text', placeholder:'10', wide:false},
+      {key:'code_postal',label:currentLang==='nl'?'Postcode':currentLang==='de'?'PLZ':currentLang==='en'?'Postal code':'Code postal', type:'text', placeholder:'1000', wide:false},
+      {key:'ville',    label:currentLang==='nl'?'Stad':currentLang==='de'?'Stadt':currentLang==='en'?'City':'Ville',               type:'text', placeholder:currentLang==='nl'?'Brussel':currentLang==='de'?'Brüssel':currentLang==='en'?'Brussels':'Bruxelles', wide:true},
+      {key:'pays',     label:currentLang==='nl'?'Land':currentLang==='de'?'Land':currentLang==='en'?'Country':'Pays',              type:'text', placeholder:currentLang==='nl'?'België':currentLang==='de'?'Belgien':currentLang==='en'?'Belgium':'Belgique', wide:true},
+    ];
+    inp=`<div class="contact-grid" style="grid-template-columns:1fr auto 1fr 1fr 1fr;gap:10px 12px">`;
+    addrFields.forEach(f=>{
       const v=sv[f.key]||'';
       inp+=`<div class="contact-field">
         <label class="contact-lbl">${f.label}</label>
@@ -2829,6 +2856,10 @@ function formatDossierValue(q,val){
     if(parsed&&typeof parsed==='object'){
       if(q.type==='contact-fields'){
         return [parsed.nom,parsed.fonction,parsed.email,parsed.tel].filter(Boolean).map(escH).join(' — ');
+      }
+      if(q.type==='address-fields'){
+        const street=[parsed.rue,parsed.numero].filter(Boolean).join(' ');
+        return [street,parsed.code_postal,parsed.ville,parsed.pays].filter(Boolean).map(escH).join(', ');
       }
       if(q.type==='percent-split'){
         return Object.entries(parsed).filter(([,v])=>v!=='').map(([k,v])=>`${escH(k)} : ${v}%`).join('<br>');
