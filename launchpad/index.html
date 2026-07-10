@@ -1278,8 +1278,8 @@ const MODULES_DATA = {
         {id:'M2Q11',type:'contact-fields',label:'Interlocuteur principal (signataire)',required:true},
         {id:'M2Q12',type:'contact-fields',label:'Responsable technique / IT',required:true},
         {id:'M2Q13',type:'contact-fields',label:'Référent compliance / DPO',required:true},
-        {id:'M2Q14',type:'textarea',label:'Modalités contractuelles particulières ?',required:false},
-        {id:'M2Q15',type:'radio',label:'Mode de facturation souhaité',required:false,options:['Mensuel','Annuel']},
+        {id:'M2Q14',type:'textarea',label:'Modalités contractuelles particulières ?',required:false,hidden:true},
+        {id:'M2Q15',type:'radio',label:'Mode de facturation souhaité',required:false,options:['Mensuel','Annuel'],hidden:true,defaultValue:'Mensuel'},
       ]},
     ]},
     {id:'module3',title:'Paramétrage',desc:'Configuration fine de votre agent IA Inboxia : ton, compagnies, filtres, sinistres, BRIO.',icon:'⚙️',sections:[
@@ -1350,8 +1350,8 @@ const MODULES_DATA = {
         {id:'M2Q11',type:'contact-fields',label:'Hoofdcontactpersoon (ondertekenaar)',required:true},
         {id:'M2Q12',type:'contact-fields',label:'Technisch verantwoordelijke / IT',required:true},
         {id:'M2Q13',type:'contact-fields',label:'Compliance referent / DPO',required:true},
-        {id:'M2Q14',type:'textarea',label:'Bijzondere contractuele modaliteiten?',required:false},
-        {id:'M2Q15',type:'radio',label:'Gewenste facturatiewijze',required:false,options:['Maandelijks','Jaarlijks']},
+        {id:'M2Q14',type:'textarea',label:'Bijzondere contractuele modaliteiten?',required:false,hidden:true},
+        {id:'M2Q15',type:'radio',label:'Gewenste facturatiewijze',required:false,options:['Maandelijks','Jaarlijks'],hidden:true,defaultValue:'Maandelijks'},
       ]},
     ]},
     {id:'module3',title:'Configuratie',desc:'Fijnafstemming van uw Inboxia AI-agent: toon, bedrijven, filters, schades, BRIO.',icon:'⚙️',sections:[
@@ -1422,8 +1422,8 @@ const MODULES_DATA = {
         {id:'M2Q11',type:'contact-fields',label:'Hauptansprechpartner (Unterzeichner)',required:true},
         {id:'M2Q12',type:'contact-fields',label:'Technischer Verantwortlicher / IT',required:true},
         {id:'M2Q13',type:'contact-fields',label:'Compliance-Referent / DPO',required:true},
-        {id:'M2Q14',type:'textarea',label:'Besondere Vertragsbedingungen?',required:false},
-        {id:'M2Q15',type:'radio',label:'Gewünschte Abrechnungsweise',required:false,options:['Monatlich','Jährlich']},
+        {id:'M2Q14',type:'textarea',label:'Besondere Vertragsbedingungen?',required:false,hidden:true},
+        {id:'M2Q15',type:'radio',label:'Gewünschte Abrechnungsweise',required:false,options:['Monatlich','Jährlich'],hidden:true,defaultValue:'Monatlich'},
       ]},
     ]},
     {id:'module3',title:'Konfiguration',desc:'Feineinstellung Ihres Inboxia KI-Agenten: Ton, Unternehmen, Filter, Schäden, BRIO.',icon:'⚙️',sections:[
@@ -1494,8 +1494,8 @@ const MODULES_DATA = {
         {id:'M2Q11',type:'contact-fields',label:'Main contact (signatory)',required:true},
         {id:'M2Q12',type:'contact-fields',label:'Technical contact / IT',required:true},
         {id:'M2Q13',type:'contact-fields',label:'Compliance contact / DPO',required:true},
-        {id:'M2Q14',type:'textarea',label:'Special contractual terms?',required:false},
-        {id:'M2Q15',type:'radio',label:'Preferred billing frequency',required:false,options:['Monthly','Annually']},
+        {id:'M2Q14',type:'textarea',label:'Special contractual terms?',required:false,hidden:true},
+        {id:'M2Q15',type:'radio',label:'Preferred billing frequency',required:false,options:['Monthly','Annually'],hidden:true,defaultValue:'Monthly'},
       ]},
     ]},
     {id:'module3',title:'Configuration',desc:'Fine-tuning your Inboxia AI agent: tone, companies, filters, claims, BRIO.',icon:'⚙️',sections:[
@@ -2025,6 +2025,19 @@ const AUTO_FILLED_QS = ['M2Q1','M2Q3'];
 
 function buildQuestion(q,saved){
   const el=document.createElement('div');
+
+  // Question cachée : invisible, pré-remplie avec 'NA', continue d'être sauvegardée
+  if(q.hidden){
+    el.style.display='none';
+    el.id='qi-'+q.id;
+    const defVal = q.defaultValue || 'NA';
+    if(localCache[q.id]===undefined||localCache[q.id]===null||localCache[q.id]===''){
+      localCache[q.id]=defVal;
+      saveAnswer(q.id,defVal);
+    }
+    return el;
+  }
+
   const isAutoFilled = AUTO_FILLED_QS.includes(q.id);
   el.className='q-item'+(isAutoFilled?' q-autofilled':'');el.id='qi-'+q.id;
   const autoTag = isAutoFilled ? `<span class="q-auto-badge">${t('autofill_badge')}</span>` : '';
