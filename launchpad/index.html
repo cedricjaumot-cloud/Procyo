@@ -2120,24 +2120,33 @@ function buildQuestion(q,saved){
     inp+=`</div>`;
   }
   else if(q.type==='address-fields'){
-    // saved = {rue, numero, code_postal, ville, pays}
+    // saved = {rue, numero, boite, code_postal, ville, pays}
     const sv=saved&&typeof saved==='object'?saved:{};
-    const addrFields=[
-      {key:'rue',      label:currentLang==='nl'?'Straat':currentLang==='de'?'Straße':currentLang==='en'?'Street':'Rue',           type:'text', placeholder:currentLang==='nl'?'Leuvenseweg':currentLang==='de'?'Hauptstraße':currentLang==='en'?'Main Street':'Avenue Louise', wide:true},
-      {key:'numero',   label:currentLang==='nl'?'Nr':currentLang==='de'?'Nr.':currentLang==='en'?'No.':'N°',                       type:'text', placeholder:'10', wide:false},
-      {key:'code_postal',label:currentLang==='nl'?'Postcode':currentLang==='de'?'PLZ':currentLang==='en'?'Postal code':'Code postal', type:'text', placeholder:'1000', wide:false},
-      {key:'ville',    label:currentLang==='nl'?'Stad':currentLang==='de'?'Stadt':currentLang==='en'?'City':'Ville',               type:'text', placeholder:currentLang==='nl'?'Brussel':currentLang==='de'?'Brüssel':currentLang==='en'?'Brussels':'Bruxelles', wide:true},
-      {key:'pays',     label:currentLang==='nl'?'Land':currentLang==='de'?'Land':currentLang==='en'?'Country':'Pays',              type:'text', placeholder:currentLang==='nl'?'België':currentLang==='de'?'Belgien':currentLang==='en'?'Belgium':'Belgique', wide:true},
-    ];
-    inp=`<div class="contact-grid" style="grid-template-columns:1fr auto 1fr 1fr 1fr;gap:10px 12px">`;
-    addrFields.forEach(f=>{
-      const v=sv[f.key]||'';
-      inp+=`<div class="contact-field">
-        <label class="contact-lbl">${f.label}</label>
-        <input type="${f.type}" class="q-input contact-inp${v?' ans':''}" data-qid="${q.id}" data-field="${f.key}" value="${escA(v)}" placeholder="${escA(f.placeholder)}">
-      </div>`;
-    });
-    inp+=`</div>`;
+    const lRue   = currentLang==='nl'?'Straat':currentLang==='de'?'Straße':currentLang==='en'?'Street':'Rue';
+    const lNum   = currentLang==='nl'?'Nr':currentLang==='de'?'Nr.':currentLang==='en'?'No.':'N°';
+    const lBoite = currentLang==='nl'?'Bus':currentLang==='de'?'Box':currentLang==='en'?'Box':'Boîte';
+    const lCp    = currentLang==='nl'?'Postcode':currentLang==='de'?'PLZ':currentLang==='en'?'Postal code':'Code postal';
+    const lVille = currentLang==='nl'?'Stad':currentLang==='de'?'Stadt':currentLang==='en'?'City':'Ville';
+    const lPays  = currentLang==='nl'?'Land':currentLang==='de'?'Land':currentLang==='en'?'Country':'Pays';
+    const phRue  = currentLang==='nl'?'Leuvenseweg':currentLang==='de'?'Hauptstraße':currentLang==='en'?'Main Street':'Avenue Louise';
+    const phVille= currentLang==='nl'?'Brussel':currentLang==='de'?'Brüssel':currentLang==='en'?'Brussels':'Bruxelles';
+    const phPays = currentLang==='nl'?'België':currentLang==='de'?'Belgien':currentLang==='en'?'Belgium':'Belgique';
+    const mkField=(key,label,ph)=>{
+      const v=sv[key]||'';
+      return '<div class="contact-field"><label class="contact-lbl">'+label+'</label><input type="text" class="q-input contact-inp'+(v?' ans':'')+'" data-qid="'+q.id+'" data-field="'+key+'" value="'+escA(v)+'" placeholder="'+escA(ph)+'"></div>';
+    };
+    inp='<div style="display:flex;flex-direction:column;gap:10px">'
+      +'<div style="display:grid;grid-template-columns:1fr 80px 80px;gap:10px">'
+      +mkField('rue',lRue,phRue)
+      +mkField('numero',lNum,'10')
+      +mkField('boite',lBoite,'B2')
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:100px 1fr 1fr;gap:10px">'
+      +mkField('code_postal',lCp,'1000')
+      +mkField('ville',lVille,phVille)
+      +mkField('pays',lPays,phPays)
+      +'</div>'
+      +'</div>';
   }
   else if(q.type==='behavior-matrix'){
     // saved = { production:{ok:true,custom:''}, sinistre:{...}, ... }
@@ -2871,7 +2880,7 @@ function formatDossierValue(q,val){
         return [parsed.nom,parsed.fonction,parsed.email,parsed.tel].filter(Boolean).map(escH).join(' — ');
       }
       if(q.type==='address-fields'){
-        const street=[parsed.rue,parsed.numero].filter(Boolean).join(' ');
+        const street=[parsed.rue,parsed.numero,parsed.boite?'bte '+parsed.boite:null].filter(Boolean).join(' ');
         return [street,parsed.code_postal,parsed.ville,parsed.pays].filter(Boolean).map(escH).join(', ');
       }
       if(q.type==='percent-split'){
@@ -3052,11 +3061,26 @@ async function showTrash(){
         </div>
         <div class="broker-actions">
           <button class="dossier-btn" onclick="showDossier('${b.id}')">📋 Voir le dossier</button>
+          <button class="dossier-btn" style="background:var(--red-pale);color:var(--red);border-color:#fecaca" onclick="hardDeleteBroker('${b.id}','${escA(b.company_name||b.email)}',this)">🗑️ Supprimer définitivement</button>
         </div>
       </div>`;
     }).join('');
   }catch(e){
     list.innerHTML='<p style="color:var(--red);font-size:14px">Erreur : '+e.message+'</p>';
+  }
+}
+
+async function hardDeleteBroker(id, name, btn){
+  if(!confirm('Supprimer définitivement "'+name+'" ? Cette action est irréversible — toutes les réponses et observations seront effacées de Supabase.')) return;
+  btn.disabled=true; btn.textContent='Suppression…';
+  try{
+    await sbFetch('observations?broker_id=eq.'+id,'DELETE');
+    await sbFetch('answers?broker_id=eq.'+id,'DELETE');
+    await sbFetch('brokers?id=eq.'+id,'DELETE');
+    showTrash();
+  }catch(e){
+    btn.disabled=false; btn.textContent='🗑️ Supprimer définitivement';
+    alert('Erreur : '+e.message);
   }
 }
 
