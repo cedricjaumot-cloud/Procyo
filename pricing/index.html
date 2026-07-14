@@ -775,7 +775,7 @@ function searchBroker(q) {
   `).join('');
   dd.style.display='block';
 }
-function escapeStr(s) { return s.replace(/'/g,"\'").replace(/"/g,'&quot;'); }
+function escapeStr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 async function selectBroker(name, email, odooId, brokerId) {
   document.getElementById('cnom').value = name;
   document.getElementById('ccont').value = email;
