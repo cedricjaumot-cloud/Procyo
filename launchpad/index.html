@@ -533,7 +533,7 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <div class="auth-step"><div class="step-dot">4</div><div class="step-text" id="step4-el"><strong>Optimisation</strong> — L'IA observe et propose des ajustements</div></div>
       </div>
     </div>
-    <div class="auth-foot">© 2026 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.73</span></div>
+    <div class="auth-foot">© 2026 Procyo — Tous droits réservés &nbsp;·&nbsp; <span style="opacity:.5">V2.74</span></div>
   </div>
   <div class="auth-right">
     <div class="auth-card">
@@ -649,11 +649,12 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         Retour
       </button>
-      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.73</span></h2>
+      <h2 class="admin-title">Administration <span style="font-size:12px;font-weight:400;color:var(--g400);margin-left:8px">V2.74</span></h2>
       <div class="admin-tabs">
         <button class="admin-tab on" id="atab-courtiers" onclick="switchAdminTab('courtiers')"><span id="admin-tab-brokers-el">Courtiers inscrits</span></button>
         <button class="admin-tab" id="atab-export" onclick="switchAdminTab('export')"><span id="admin-tab-export-el">Export réponses</span></button>
         <button class="admin-tab" id="atab-corbeille" onclick="switchAdminTab('corbeille')">🗑️ Corbeille</button>
+        <button class="admin-tab" id="atab-admins" onclick="switchAdminTab('admins')" style="display:none">🔑 Admins</button>
       </div>
       <div style="display:flex;gap:10px;margin:-10px 0 24px">
         <a href="../pricing/index.html" target="_blank" class="btn btn-primary" style="text-decoration:none;width:auto;padding:10px 18px">💶 Pricing</a>
@@ -661,11 +662,36 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
       </div>
       <div id="admin-tab-courtiers">
         <p class="admin-sub" id="admin-sub-brokers-el">Gérez les accès aux modules et ajoutez des observations M4 pour chaque courtier.</p>
+        <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+          <input type="text" id="admin-search" placeholder="🔎 Rechercher un courtier (nom ou email)…" oninput="adminSetSearch(this.value)"
+            style="flex:1;min-width:220px;padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none">
+          <select id="admin-sort" onchange="adminSetSort(this.value)"
+            style="padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none;background:white;cursor:pointer">
+            <option value="date_desc">Date d'inscription (récent → ancien)</option>
+            <option value="date_asc">Date d'inscription (ancien → récent)</option>
+            <option value="name_asc">Ordre alphabétique</option>
+          </select>
+        </div>
         <div id="admin-list"></div>
       </div>
       <div id="admin-tab-corbeille" style="display:none">
         <p class="admin-sub">Courtiers supprimés — conservés 30 jours, puis effacés définitivement.</p>
         <div id="trash-list"></div>
+      </div>
+      <div id="admin-tab-admins" style="display:none">
+        <p class="admin-sub">Créez ou révoquez des accès administrateur. Réservé à <strong>cedric.jaumot@procyo.be</strong>.</p>
+        <div class="broker-card" style="margin-bottom:20px">
+          <h3 style="margin-bottom:14px">➕ Créer un accès admin</h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <input type="email" id="newadmin-email" placeholder="prenom.nom@procyo.be"
+              style="flex:1;min-width:220px;padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none">
+            <input type="text" id="newadmin-pwd" placeholder="Mot de passe temporaire"
+              style="flex:1;min-width:180px;padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none">
+            <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="adminCreateAdmin()" id="newadmin-btn">Créer l'accès admin</button>
+          </div>
+          <div id="newadmin-msg" style="display:none;margin-top:10px;font-size:13px"></div>
+        </div>
+        <div id="admins-list"></div>
       </div>
       <div id="admin-tab-export" style="display:none">
         <p class="admin-sub" id="admin-sub-export-el">Tableau croisé — une ligne par question, une colonne par courtier.</p>
@@ -777,6 +803,11 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 const SB_URL = 'https://rzeequxjvsoqvbetxmev.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6ZWVxdXhqdnNvcXZiZXR4bWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NDE3NDksImV4cCI6MjA5NTAxNzc0OX0.ogJp7NDVnVlU63fkzbbo8LTvuBtLd1IU6aDE5I8o2tM';
 const ADMIN_EMAILS = ['cedric.jaumot@procyo.be','gianni.luyckx@procyo.be','antoine.moriau@procyo.be','maxime.dejean@procyo.be','eric.vandoren@procyo.be','admin@procyo.be','luc.renard@procyo.be','procyo@procyo.be'];
+// Comptes habilités à créer/révoquer des accès admin (gestion des admins).
+const SUPER_ADMIN_EMAILS = ['cedric.jaumot@procyo.be'];
+// Un utilisateur est admin s'il porte le flag is_admin (base) OU figure dans la liste historique ADMIN_EMAILS (compat).
+function isAdmin(u){ return !!(u && (u.is_admin===true || ADMIN_EMAILS.includes((u.email||'').toLowerCase()))); }
+function isSuperAdmin(u){ return !!(u && SUPER_ADMIN_EMAILS.includes((u.email||'').toLowerCase())); }
 
 // ══════════════════════════════════════════════════════════════
 // LANGUE
@@ -1718,7 +1749,7 @@ function enterApp(){
   document.getElementById('screen-auth').style.display='none';
   document.getElementById('screen-app').classList.remove('hidden');
   document.getElementById('tb-email').textContent=currentUser.email;
-  if(ADMIN_EMAILS.includes(currentUser.email))document.getElementById('btn-admin').classList.remove('hidden');
+  if(isAdmin(currentUser))document.getElementById('btn-admin').classList.remove('hidden');
   showHome();
 }
 
@@ -2745,17 +2776,52 @@ function flashSaved(qid){
 // ══════════════════════════════════════════════════════════════
 // ADMIN
 // ══════════════════════════════════════════════════════════════
+let _adminBrokersCache = [];
+let _adminSort = 'date_desc';
+let _adminSearch = '';
+
 async function showAdmin(){
-  if(!currentUser||!ADMIN_EMAILS.includes(currentUser.email))return;
+  if(!currentUser||!isAdmin(currentUser))return;
   hideAll();
   document.getElementById('screen-admin').style.display='block';
+  document.getElementById('atab-admins').style.display = isSuperAdmin(currentUser)?'':'none';
   setLoading(true,'Chargement des courtiers…');
   try{
     autoPurgeTrash();
-    const brokers=(await sbGet('brokers','select=*&order=created_at.desc&deleted_at=is.null')).filter(b=>!ADMIN_EMAILS.includes((b.email||'').toLowerCase()));
+    const brokers=(await sbGet('brokers','select=*&order=created_at.desc&deleted_at=is.null')).filter(b=>!isAdmin(b));
+    _adminBrokersCache = brokers||[];
+    renderAdminList();
+  }finally{setLoading(false);}
+}
+
+function adminFilterSort(brokers){
+  let out = brokers.slice();
+  const q = (_adminSearch||'').trim().toLowerCase();
+  if(q){
+    out = out.filter(b=>
+      (b.company_name||'').toLowerCase().includes(q) ||
+      (b.email||'').toLowerCase().includes(q)
+    );
+  }
+  if(_adminSort==='name_asc'){
+    out.sort((a,b)=>(a.company_name||a.email||'').localeCompare(b.company_name||b.email||'', 'fr', {sensitivity:'base'}));
+  } else if(_adminSort==='date_asc'){
+    out.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  } else {
+    out.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  }
+  return out;
+}
+
+function adminSetSearch(v){ _adminSearch=v; renderAdminList(); }
+function adminSetSort(v){ _adminSort=v; renderAdminList(); }
+
+async function renderAdminList(){
+  {
+    const brokers = adminFilterSort(_adminBrokersCache);
     const list=document.getElementById('admin-list');
     list.innerHTML='';
-    if(!brokers||brokers.length===0){list.innerHTML='<p style="color:var(--g400);font-size:14px">Aucun courtier inscrit.</p>';return;}
+    if(!brokers||brokers.length===0){list.innerHTML='<p style="color:var(--g400);font-size:14px">Aucun courtier ne correspond.</p>';return;}
     for(const b of brokers){
       const answers=await sbGet('answers','broker_id=eq.'+b.id+'&select=question_id');
       const obsRows=await sbGet('observations','broker_id=eq.'+b.id+'&select=id');
@@ -2808,7 +2874,7 @@ async function showAdmin(){
         </div>`;
       list.appendChild(card);
     }
-  }finally{setLoading(false);}
+  }
 }
 
 function closeDossier(){
@@ -3042,7 +3108,7 @@ async function showTrash(){
   list.innerHTML = '<p style="color:var(--g400);font-size:14px;padding:20px 0">Chargement…</p>';
   try{
     const all = await sbGet('brokers','select=*&deleted_at=not.is.null&order=deleted_at.desc');
-    const brokers = (all||[]).filter(b=>!ADMIN_EMAILS.includes((b.email||'').toLowerCase()));
+    const brokers = (all||[]).filter(b=>!isAdmin(b));
     if(!brokers.length){
       list.innerHTML='<p style="color:var(--g400);font-size:14px;padding:20px 0">La corbeille est vide.</p>';
       return;
@@ -3190,10 +3256,83 @@ function switchAdminTab(tab){
   document.getElementById('admin-tab-courtiers').style.display  = tab==='courtiers'?'':'none';
   document.getElementById('admin-tab-export').style.display     = tab==='export'?'':'none';
   document.getElementById('admin-tab-corbeille').style.display  = tab==='corbeille'?'':'none';
+  document.getElementById('admin-tab-admins').style.display     = tab==='admins'?'':'none';
   document.getElementById('atab-courtiers').className  = 'admin-tab'+(tab==='courtiers'?' on':'');
   document.getElementById('atab-export').className     = 'admin-tab'+(tab==='export'?' on':'');
   document.getElementById('atab-corbeille').className  = 'admin-tab'+(tab==='corbeille'?' on':'');
+  document.getElementById('atab-admins').className     = 'admin-tab'+(tab==='admins'?' on':'')+(isSuperAdmin(currentUser)?'':' hidden');
   if(tab==='corbeille') showTrash();
+  if(tab==='admins') loadAdminsList();
+}
+
+// ══════════════════════════════════════════════════════════════
+// GESTION DES ADMINS (réservé à SUPER_ADMIN_EMAILS)
+// ══════════════════════════════════════════════════════════════
+async function loadAdminsList(){
+  if(!isSuperAdmin(currentUser))return;
+  const list=document.getElementById('admins-list');
+  list.innerHTML='<p style="color:var(--g400);font-size:14px">Chargement…</p>';
+  try{
+    const admins=(await sbGet('brokers','select=*&deleted_at=is.null&order=created_at.desc')).filter(b=>isAdmin(b));
+    if(!admins.length){list.innerHTML='<p style="color:var(--g400);font-size:14px">Aucun accès admin.</p>';return;}
+    list.innerHTML = admins.map(a=>{
+      const isSelf = a.email.toLowerCase()===currentUser.email.toLowerCase();
+      const isHardcoded = ADMIN_EMAILS.includes(a.email.toLowerCase()) && !a.is_admin;
+      return `<div class="broker-card" style="margin-bottom:12px">
+        <h3>${escH(a.company_name||a.email)}</h3>
+        <div class="broker-meta">${escH(a.email)} — admin depuis le ${new Date(a.created_at).toLocaleDateString('fr-BE')}</div>
+        <div class="broker-actions" style="margin-top:10px">
+          ${isSelf?'<span style="font-size:13px;color:var(--g400)">Votre propre compte</span>':
+            isHardcoded?'<span style="font-size:13px;color:var(--g400)">Admin historique (code) — non révocable ici</span>':
+            `<button class="unlock-btn" style="border-color:var(--red);color:var(--red)" onclick="adminRevokeAdmin('${a.id}','${escA(a.company_name||a.email)}',this)">Retirer l'accès admin</button>`}
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML='<p style="color:var(--red);font-size:14px">Erreur : '+e.message+'</p>';
+  }
+}
+
+async function adminCreateAdmin(){
+  if(!isSuperAdmin(currentUser))return;
+  const email=document.getElementById('newadmin-email').value.trim().toLowerCase();
+  const pwd=document.getElementById('newadmin-pwd').value;
+  const msgEl=document.getElementById('newadmin-msg');
+  const btn=document.getElementById('newadmin-btn');
+  msgEl.style.display='none';
+  if(!email||!/\S+@\S+\.\S+/.test(email)){msgEl.style.display='block';msgEl.style.color='var(--red)';msgEl.textContent='Adresse email invalide.';return;}
+  if(!pwd||pwd.length<8){msgEl.style.display='block';msgEl.style.color='var(--red)';msgEl.textContent='Mot de passe : 8 caractères minimum.';return;}
+  btn.disabled=true;btn.textContent='…';
+  try{
+    const hash=await hashPassword(pwd);
+    const existing=await sbGet('brokers','email=eq.'+encodeURIComponent(email)+'&select=id,is_admin');
+    if(existing&&existing.length>0){
+      await sbUpdate('brokers','id=eq.'+existing[0].id,{is_admin:true,password_hash:hash});
+    }else{
+      await sbInsert('brokers',{email,password_hash:hash,company_name:null,is_admin:true});
+    }
+    msgEl.style.display='block';msgEl.style.color='var(--green)';msgEl.textContent='✓ Accès admin créé pour '+email;
+    document.getElementById('newadmin-email').value='';
+    document.getElementById('newadmin-pwd').value='';
+    loadAdminsList();
+  }catch(e){
+    msgEl.style.display='block';msgEl.style.color='var(--red)';msgEl.textContent='Erreur : '+e.message;
+  }finally{
+    btn.disabled=false;btn.textContent="Créer l'accès admin";
+  }
+}
+
+async function adminRevokeAdmin(id,name,btn){
+  if(!isSuperAdmin(currentUser))return;
+  if(!confirm("Retirer l'accès admin de \"" + name + "\" ? Le compte reste actif mais perdra les droits d'administration."))return;
+  btn.disabled=true;btn.textContent='…';
+  try{
+    await sbUpdate('brokers','id=eq.'+id,{is_admin:false});
+    loadAdminsList();
+  }catch(e){
+    btn.disabled=false;btn.textContent="Retirer l'accès admin";
+    alert('Erreur : '+e.message);
+  }
 }
 
 // ── EXPORT PIVOT ─────────────────────────────────────────────
