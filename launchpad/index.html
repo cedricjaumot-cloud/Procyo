@@ -3281,9 +3281,10 @@ async function loadAdminsList(){
       return `<div class="broker-card" style="margin-bottom:12px">
         <h3>${escH(a.company_name||a.email)}</h3>
         <div class="broker-meta">${escH(a.email)} — admin depuis le ${new Date(a.created_at).toLocaleDateString('fr-BE')}</div>
-        <div class="broker-actions" style="margin-top:10px">
-          ${isSelf?'<span style="font-size:13px;color:var(--g400)">Votre propre compte</span>':
-            isHardcoded?'<span style="font-size:13px;color:var(--g400)">Admin historique (code) — non révocable ici</span>':
+        <div class="broker-actions" style="margin-top:10px;flex-wrap:wrap">
+          <button class="unlock-btn" style="border-color:#f97316;color:#ea580c" onclick="adminResetPassword('${a.id}','${escA(a.email)}',this)">${t('btn_reset_pwd')}</button>
+          ${isSelf?'<span style="font-size:13px;color:var(--g400);align-self:center">Votre propre compte</span>':
+            isHardcoded?'<span style="font-size:13px;color:var(--g400);align-self:center">Admin historique (code) — non révocable ici</span>':
             `<button class="unlock-btn" style="border-color:var(--red);color:var(--red)" onclick="adminRevokeAdmin('${a.id}','${escA(a.company_name||a.email)}',this)">Retirer l'accès admin</button>`}
         </div>
       </div>`;
