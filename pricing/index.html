@@ -899,19 +899,28 @@ function checkOfferValid(){
   var msg = null;
 
   if(n === 1 && sent >= 1)
-    msg = isNL ? "U heeft offerte 1 al verzonden. Selecteer offerte 2." : "Vous avez déjà envoyé l'offre 1. Veuillez sélectionner l'offre 2.";
+    msg = isNL ? "U heeft offerte 1 al verzonden. Wilt u deze vervangen door een nieuwe versie?" : "Vous avez déjà envoyé l'offre 1. Voulez-vous la remplacer par une nouvelle version ?";
   else if(n === 2 && sent === 0)
-    msg = isNL ? "U heeft nog geen offerte verzonden. Selecteer offerte 1." : "Vous n'avez pas encore envoyé d'offre. Veuillez sélectionner l'offre 1.";
+    msg = isNL ? "U heeft nog geen offerte verzonden. Toch doorgaan met offerte 2?" : "Vous n'avez pas encore envoyé l'offre 1. Continuer quand même avec l'offre 2 ?";
   else if(n === 2 && sent >= 2)
-    msg = isNL ? "U heeft offerte 2 al verzonden. Selecteer offerte 3." : "Vous avez déjà envoyé l'offre 2. Veuillez sélectionner l'offre 3.";
+    msg = isNL ? "U heeft offerte 2 al verzonden. Wilt u deze vervangen door een nieuwe versie?" : "Vous avez déjà envoyé l'offre 2. Voulez-vous la remplacer par une nouvelle version ?";
   else if(n === 3 && sent === 0)
-    msg = isNL ? "U heeft nog geen offerte verzonden. Selecteer offerte 1." : "Vous n'avez pas encore envoyé d'offre. Veuillez sélectionner l'offre 1.";
+    msg = isNL ? "U heeft nog geen offerte verzonden. Toch doorgaan met offerte 3?" : "Vous n'avez pas encore envoyé l'offre 1. Continuer quand même avec l'offre 3 ?";
   else if(n === 3 && sent === 1)
-    msg = isNL ? "U heeft offerte 2 nog niet verzonden. Selecteer offerte 2." : "Vous n'avez pas encore envoyé l'offre 2. Veuillez sélectionner l'offre 2.";
+    msg = isNL ? "U heeft offerte 2 nog niet verzonden. Toch doorgaan met offerte 3?" : "Vous n'avez pas encore envoyé l'offre 2. Continuer quand même avec l'offre 3 ?";
   else if(n === 3 && sent >= 3)
-    msg = isNL ? "U heeft al 3 offertes verzonden voor deze makelaar." : "Vous avez déjà envoyé les 3 offres pour ce courtier.";
+    msg = isNL ? "U heeft al 3 offertes verzonden voor deze makelaar. Wilt u offerte 3 vervangen door een nieuwe versie?" : "Vous avez déjà envoyé les 3 offres pour ce courtier. Voulez-vous remplacer l'offre 3 par une nouvelle version ?";
 
-  if(msg){ warnEl.textContent = "⚠ " + msg; warnEl.style.display='block'; return false; }
+  if(msg){
+    var proceed = window.confirm("⚠ " + msg);
+    if(!proceed){
+      warnEl.textContent = "⚠ " + msg;
+      warnEl.style.display='block';
+      return false;
+    }
+    warnEl.style.display='none';
+    return true;
+  }
   warnEl.style.display='none';
   return true;
 }
@@ -1065,6 +1074,12 @@ function construirePDF(){
   var client=document.getElementById("cnom").value||"\u2014";
   var contact=document.getElementById("ccont").value;
   var isNL = (currentUILang === 'nl');
+
+  var now = new Date();
+  var refDate = now.getFullYear() + (now.getMonth()+1).toString().padStart(2,'0') + now.getDate().toString().padStart(2,'0');
+  var refTime = now.getHours().toString().padStart(2,'0') + now.getMinutes().toString().padStart(2,'0');
+  var offerRef = S.offerNum + '_' + refDate + '_' + refTime;
+  S.lastPdfReference = offerRef;
   var modsArr=[];
   if(S.modules.regulia)  modsArr.push(isNL?"Complianceassistent":"Assistant Conformité");
   if(S.modules.relancia) modsArr.push(isNL?"Commerciële assistent":"Assistant Commercial");
@@ -1086,6 +1101,8 @@ function construirePDF(){
   doc.text(client+(contact?" - "+contact:""),195,19,{align:"right"});
   doc.setFontSize(8);doc.setTextColor(150,220,200);
   doc.text(modsStr,195,26,{align:"right"});
+  doc.setFontSize(6.5);doc.setTextColor(150,220,200);
+  doc.text((isNL?"Ref. ":"Réf. ")+offerRef,195,31,{align:"right"});
 
   var y=42;var X=14;var W=182;
   var C1=140, C2=168, C3=194;
@@ -1365,6 +1382,7 @@ function genererPDF(){
       odoo_id: parseInt(odooId),
       pdf_base64: pdfBase64,
       offer_number: S.offerNum,
+      reference: S.lastPdfReference,
       nb_etp: S.nbEtp,
       nb_addr: S.nbAddr,
       modules: modsArr,
