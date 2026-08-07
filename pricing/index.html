@@ -289,6 +289,14 @@ header img.logo{height:34px}
 </div>
       <div class="frow"><label id="lbl-contact">Contact</label><input type="text" id="ccont" placeholder="Prénom Nom" readonly style="background:#F7F9F8;color:#8B9794"/></div>
 <div class="frow" style="display:none"><label>Odoo ID</label><input type="text" id="codoo" readonly/></div>
+<div class="frow" style="margin-top:4px">
+  <label id="lbl-bms">BMS</label>
+  <div class="tab-row">
+    <div class="tab" data-bms="brio" id="tab-bms-brio">Brio</div>
+    <div class="tab" data-bms="brokercloud" id="tab-bms-brokercloud">BrokerCloud</div>
+  </div>
+</div>
+<div id="bms-warning" style="display:none;color:#DC2626;font-size:12px;padding:3px 2px;margin-top:-4px;margin-bottom:2px">⚠ Veuillez choisir le BMS</div>
 <div id="broker-warning" style="display:none;color:#E85D04;font-size:12px;padding:6px 2px">⚠ Ce courtier n'a pas d'ID Odoo — veuillez en sélectionner un autre ou compléter sa fiche dans Supabase.</div>
     </div>
   </div>
@@ -352,14 +360,6 @@ header img.logo{height:34px}
     </button>
     <div id="cond-content" class="hidden" style="margin-top:.625rem">
       <div class="card">
-        <div class="frow">
-          <label id="lbl-bms">BMS</label>
-          <div class="tab-row">
-            <div class="tab" data-bms="brio" id="tab-bms-brio">Brio</div>
-            <div class="tab" data-bms="brokercloud" id="tab-bms-brokercloud">BrokerCloud</div>
-          </div>
-        </div>
-        <div id="bms-warning" style="display:none;color:#DC2626;font-size:12px;padding:3px 2px;margin-top:-8px;margin-bottom:4px">⚠ Veuillez choisir le BMS</div>
         <div class="frow">
           <label id="lbl-engagement">Engagement</label>
           <div class="tab-row">
@@ -1416,8 +1416,6 @@ document.getElementById("prevbtn").addEventListener("click",function(){
   if(!S.bms){
     document.getElementById('bms-warning').textContent = isNL ? '⚠ Gelieve het BMS te kiezen' : '⚠ Veuillez choisir le BMS';
     document.getElementById('bms-warning').style.display='block';
-    document.getElementById('cond-content').classList.remove('hidden');
-    document.getElementById('cond-arrow').innerHTML='&#9660;';
     return;
   }
   document.getElementById('bms-warning').style.display='none';
