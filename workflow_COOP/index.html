@@ -934,7 +934,7 @@ async function checkPwd() {
       return;
     }
     sessionStorage.setItem('procyo_workflow','1');
-    localStorage.setItem('procyo_session', JSON.stringify({email}));
+    localStorage.setItem('procyo_session', JSON.stringify({email, password_hash: h}));
     grantAccess();
   }catch(e){
     errEl.textContent='Erreur de connexion : '+e.message;
