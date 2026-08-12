@@ -1627,7 +1627,7 @@ async function doLogin(){
     if(!rows||rows.length===0){showMsg(errEl,t('err_login_failed'));return;}
     if(rows[0].password_hash!==hash){showMsg(errEl,t('err_login_failed'));return;}
     currentUser=rows[0];
-    localStorage.setItem('procyo_session',JSON.stringify({id:currentUser.id,email:currentUser.email}));
+    localStorage.setItem('procyo_session',JSON.stringify({id:currentUser.id,email:currentUser.email,password_hash:hash}));
     await loadAnswersCache();
     enterApp();
   }catch(e){showMsg(errEl,'Erreur : '+e.message);}
@@ -1653,7 +1653,7 @@ async function doRegister(){
     const hash=await hashPassword(pwd);
     const rows=await sbInsert('brokers',{email,password_hash:hash,company_name:company||null});
     currentUser=rows[0];
-    localStorage.setItem('procyo_session',JSON.stringify({id:currentUser.id,email:currentUser.email}));
+    localStorage.setItem('procyo_session',JSON.stringify({id:currentUser.id,email:currentUser.email,password_hash:hash}));
     showMsg(okEl,'✓ '+t('ok_account_created'));
     setTimeout(()=>enterApp(),800);
   }catch(e){showMsg(errEl,'Erreur : '+e.message);}
