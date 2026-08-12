@@ -697,29 +697,6 @@ function sha256Hex(text){
   });
 }
 
-// p_hash doit deja etre l'empreinte SHA-256 du mot de passe (pas le mot de passe en clair)
-function tryLogin(email, p_hash, onFail){
-  return fetch(SUPABASE_URL + '/rest/v1/rpc/get_comcom_data', {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ p_email: email, p_password_hash: p_hash })
-  }).then(function(r){
-    if(!r.ok){ throw new Error('Acces refuse.'); }
-    return r.json();
-  }).then(function(data){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('loading-screen').style.display='none';
-    document.getElementById('app-root').style.display='block';
-    initApp(data);
-  }).catch(function(err){
-    if(onFail) onFail(err);
-  });
-}
-
 document.getElementById('loginForm').addEventListener('submit', function(e){
   e.preventDefault();
   var email = document.getElementById('loginEmail').value.trim();
@@ -731,33 +708,30 @@ document.getElementById('loginForm').addEventListener('submit', function(e){
   btn.textContent = 'Connexion...';
 
   sha256Hex(password).then(function(hash){
-    tryLogin(email, hash, function(err){
-      errEl.textContent = 'Acces refuse. Verifie ton email et mot de passe.';
-      errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Se connecter';
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/get_comcom_data', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ p_email: email, p_password_hash: hash })
     });
+  }).then(function(r){
+    if(!r.ok){ throw new Error('Acces refuse. Verifie ton email et mot de passe.'); }
+    return r.json();
+  }).then(function(data){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('loading-screen').style.display='none';
+    document.getElementById('app-root').style.display='block';
+    initApp(data);
+  }).catch(function(err){
+    errEl.textContent = err.message || 'Erreur de connexion.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Se connecter';
   });
 });
-
-// ── RECONNEXION AUTOMATIQUE si deja connecte sur pricing/workflow_COOP ──
-// Utilise la meme session partagee (procyo_session dans le localStorage,
-// commune a tout procyo.auditassur.be). Si absente ou invalide, le
-// formulaire de login normal reste affiche, rien de casse.
-(function tryAutoSession(){
-  try{
-    var s = JSON.parse(localStorage.getItem('procyo_session') || 'null');
-    if(s && s.email && s.password_hash){
-      document.getElementById('login-screen').style.display='none';
-      document.getElementById('loading-screen').style.display='flex';
-      tryLogin(s.email, s.password_hash, function(err){
-        // session invalide/perimee -> on revient simplement au formulaire normal
-        document.getElementById('loading-screen').style.display='none';
-        document.getElementById('login-screen').style.display='flex';
-      });
-    }
-  }catch(e){}
-})();
 </script>
 </body>
 </html>
