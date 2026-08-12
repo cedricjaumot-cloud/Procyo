@@ -714,7 +714,7 @@ async function checkPwd() {
       return;
     }
     sessionStorage.setItem('procyo_pricing','1');
-    localStorage.setItem('procyo_session', JSON.stringify({email, password_hash: h}));
+    localStorage.setItem('procyo_session', JSON.stringify({email}));
     grantAccess();
   }catch(e){
     errEl.textContent='Erreur de connexion : '+e.message;
