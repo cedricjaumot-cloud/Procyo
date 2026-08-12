@@ -1,7 +1,7 @@
 name: Sync Odoo -> Supabase (comcom)
 on:
   schedule:
-    - cron: '5,20,35,50 * * * *'   # toutes les 15 minutes (decale de 5 min)
+    - cron: '*/15 * * * *'   # toutes les 15 minutes
   workflow_dispatch:          # permet aussi de le lancer manuellement depuis l'onglet Actions
 jobs:
   sync:
