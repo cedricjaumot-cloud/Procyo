@@ -1,6 +1,0 @@
-# Ne jamais envoyer les identifiants sur GitHub
-.env
-
-# Fichiers Python courants a ignorer
-__pycache__/
-*.pyc
