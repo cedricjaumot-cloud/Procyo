@@ -718,6 +718,8 @@ function tryLogin(email, p_hash, onFail){
     document.getElementById('loading-screen').style.display='none';
     document.getElementById('app-root').style.display='block';
     initApp(data);
+    // Affiche la date de fraicheur si get_comcom_data la renvoie (sinon ignore)
+    if(typeof setFreshness === 'function'){ setFreshness(data && (data.updated_at || (data.stats && data.stats.updated_at))); }
   }).catch(function(err){
     if(onFail) onFail(err);
   });
@@ -762,15 +764,34 @@ document.getElementById('loginForm').addEventListener('submit', function(e){
   }catch(e){}
 })();
 
+// ── FRAICHEUR DES DONNEES (affichee en haut a droite) ──
+// Accepte une date ISO/UTC et l'affiche en heure locale lisible.
+function setFreshness(isoStr){
+  var el = document.getElementById('nav-sub');
+  if(!el) return;
+  if(!isoStr){ return; } // on ne casse rien si la date n'est pas connue
+  try{
+    var d = new Date(isoStr);
+    if(isNaN(d.getTime())){ el.textContent = ''; return; }
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    var txt = pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()
+            +' à '+pad(d.getHours())+':'+pad(d.getMinutes());
+    el.textContent = 'Données à jour au ' + txt;
+    el.title = 'Dernière synchronisation Odoo';
+  }catch(e){}
+}
+
 // ── BOUTON "Recharger depuis Odoo" ──
+// Appelle directement l'Edge Function Supabase, qui va chercher les donnees
+// dans Odoo et les renvoie immediatement (plus d'attente GitHub Actions).
 document.getElementById('btnRefreshOdoo').addEventListener('click', function(){
   if(!_comcomAuth){ return; }
   var btn = this;
   var original = btn.textContent;
   btn.disabled = true;
-  btn.textContent = '⏳ Lancement...';
+  btn.textContent = '⏳ Récupération Odoo...';
 
-  fetch(SUPABASE_URL + '/rest/v1/rpc/trigger_comcom_refresh', {
+  fetch(SUPABASE_URL + '/functions/v1/refresh-comcom', {
     method: 'POST',
     headers: {
       'apikey': SUPABASE_KEY,
@@ -779,16 +800,16 @@ document.getElementById('btnRefreshOdoo').addEventListener('click', function(){
     },
     body: JSON.stringify({ p_email: _comcomAuth.email, p_password_hash: _comcomAuth.password_hash })
   }).then(function(r){
-    if(!r.ok){ throw new Error('Echec du declenchement.'); }
-    return r.json();
-  }).then(function(){
-    btn.textContent = '⏳ Recuperation en cours (~30-60s)...';
-    // Laisse le temps a GitHub Actions de tourner, puis recharge les donnees affichees
-    setTimeout(function(){
-      tryLogin(_comcomAuth.email, _comcomAuth.password_hash, function(){});
-      btn.disabled = false;
-      btn.textContent = original;
-    }, 45000);
+    return r.json().then(function(j){ return { ok: r.ok, body: j }; });
+  }).then(function(res){
+    if(!res.ok || !res.body || res.body.ok === false){
+      throw new Error((res.body && res.body.error) || 'Echec de la récupération.');
+    }
+    // Donnees fraiches renvoyees directement -> on rafraichit l'affichage sans attendre
+    initApp(res.body.payload);
+    setFreshness(res.body.updated_at);
+    btn.disabled = false;
+    btn.textContent = original;
   }).catch(function(err){
     alert('Erreur : ' + err.message);
     btn.disabled = false;

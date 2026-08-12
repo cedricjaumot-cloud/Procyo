@@ -1,0 +1,5 @@
+# Etat local du CLI Supabase — ne pas publier
+.temp/
+.branches/
+.env.local
+.env

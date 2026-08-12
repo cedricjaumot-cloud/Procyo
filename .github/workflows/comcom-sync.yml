@@ -1,8 +1,12 @@
 name: Sync Odoo -> Supabase (comcom)
 on:
-  schedule:
-    - cron: '*/15 * * * *'   # toutes les 15 minutes
-  workflow_dispatch:          # permet aussi de le lancer manuellement depuis l'onglet Actions
+  # Cron automatique DESACTIVE : GitHub ne respecte pas l'horaire (delais
+  # de 30-50 min frequents). On passe en 100% manuel via le bouton du
+  # dashboard (declenchement workflow_dispatch, fiable et rapide).
+  # Pour reactiver l'automatique un jour, decommenter les 2 lignes ci-dessous.
+  # schedule:
+  #   - cron: '*/15 * * * *'
+  workflow_dispatch:          # lancement a la demande (bouton dashboard + onglet Actions)
 jobs:
   sync:
     runs-on: ubuntu-latest
