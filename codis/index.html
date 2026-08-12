@@ -124,6 +124,7 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
   <button class="nav-btn" id="nb-gen">Vue générale (leads/vendeur)</button>
   <button class="nav-btn" id="nb-per">Analyse en profondeur (Admin)</button>
   <div class="nav-right" id="nav-sub"></div>
+  <button class="nav-btn" id="btnRefreshOdoo" style="margin-left:8px">🔄 Recharger depuis Odoo</button>
 </div>
 
 <div class="datebar" id="datebar">
@@ -698,6 +699,7 @@ function sha256Hex(text){
 }
 
 // p_hash doit deja etre l'empreinte SHA-256 du mot de passe (pas le mot de passe en clair)
+var _comcomAuth = null;
 function tryLogin(email, p_hash, onFail){
   return fetch(SUPABASE_URL + '/rest/v1/rpc/get_comcom_data', {
     method: 'POST',
@@ -711,6 +713,7 @@ function tryLogin(email, p_hash, onFail){
     if(!r.ok){ throw new Error('Acces refuse.'); }
     return r.json();
   }).then(function(data){
+    _comcomAuth = { email: email, password_hash: p_hash };
     document.getElementById('login-screen').style.display='none';
     document.getElementById('loading-screen').style.display='none';
     document.getElementById('app-root').style.display='block';
@@ -758,6 +761,40 @@ document.getElementById('loginForm').addEventListener('submit', function(e){
     }
   }catch(e){}
 })();
+
+// ── BOUTON "Recharger depuis Odoo" ──
+document.getElementById('btnRefreshOdoo').addEventListener('click', function(){
+  if(!_comcomAuth){ return; }
+  var btn = this;
+  var original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Lancement...';
+
+  fetch(SUPABASE_URL + '/rest/v1/rpc/trigger_comcom_refresh', {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ p_email: _comcomAuth.email, p_password_hash: _comcomAuth.password_hash })
+  }).then(function(r){
+    if(!r.ok){ throw new Error('Echec du declenchement.'); }
+    return r.json();
+  }).then(function(){
+    btn.textContent = '⏳ Recuperation en cours (~30-60s)...';
+    // Laisse le temps a GitHub Actions de tourner, puis recharge les donnees affichees
+    setTimeout(function(){
+      tryLogin(_comcomAuth.email, _comcomAuth.password_hash, function(){});
+      btn.disabled = false;
+      btn.textContent = original;
+    }, 45000);
+  }).catch(function(err){
+    alert('Erreur : ' + err.message);
+    btn.disabled = false;
+    btn.textContent = original;
+  });
+});
 </script>
 </body>
 </html>
