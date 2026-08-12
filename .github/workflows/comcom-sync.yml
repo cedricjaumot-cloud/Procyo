@@ -1,25 +1,20 @@
 name: Sync Odoo -> Supabase (comcom)
-
 on:
   schedule:
-    - cron: '*/15 * * * *'   # toutes les 15 minutes
+    - cron: '5,20,35,50 * * * *'   # toutes les 15 minutes (decale de 5 min)
   workflow_dispatch:          # permet aussi de le lancer manuellement depuis l'onglet Actions
-
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
       - name: Recuperer le code
         uses: actions/checkout@v4
-
       - name: Installer Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - name: Installer les dependances
         run: pip install -r scripts/requirements.txt
-
       - name: Lancer la synchronisation
         env:
           ODOO_URL: ${{ secrets.ODOO_URL }}
@@ -28,4 +23,4 @@ jobs:
           ODOO_PASSWORD: ${{ secrets.ODOO_PASSWORD }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: python3 scripts/sync_comcom.py 
+        run: python3 scripts/sync_comcom.py
