@@ -126,12 +126,14 @@ async function fetchOdooData() {
   const validStageNames = new Set<string>(validStagesRaw.map((s) => s.name));
   ["RDV démo planifié", "Nouveau lead", "Contacté", "Offre à Envoyer", "À relancer"]
     .forEach((n) => validStageNames.add(n));
+  // id d'étape -> nom ACTUEL (permet de résoudre les transitions même si l'étape a été renommée)
+  const stageById = new Map<number, string>(validStagesRaw.map((s) => [s.id as number, s.name as string]));
 
-  // Changements d'etape (tracking)
+  // Changements d'etape (tracking) — on récupère aussi les IDs d'étape (immuables au renommage)
   const domain: unknown[] = [["field_id.name", "=", "stage_id"]];
   const tracking: any[] = await execKw("mail.tracking.value", "search_read", [domain], {
-    fields: ["mail_message_id", "old_value_char", "new_value_char", "create_date"],
-    limit: 10000, order: "create_date desc",
+    fields: ["mail_message_id", "old_value_char", "new_value_char", "old_value_integer", "new_value_integer", "create_date"],
+    limit: 50000, order: "create_date desc",
   });
   if (!tracking.length) return buildEmpty();
 
@@ -207,8 +209,9 @@ async function fetchOdooData() {
     const isArchived = !(lead.active ?? true);
     if (isArchived) continue; // include_archived = false
 
-    const de = t.old_value_char || "";
-    const vers = t.new_value_char || "";
+    // Résolution par ID d'étape -> nom actuel (robuste aux renommages), sinon nom historique
+    const de = (t.old_value_integer && stageById.get(t.old_value_integer)) || t.old_value_char || "";
+    const vers = (t.new_value_integer && stageById.get(t.new_value_integer)) || t.new_value_char || "";
     const sDe = stageStatus(de);
     const sVers = stageStatus(vers);
 
@@ -359,8 +362,130 @@ Deno.serve(async (req) => {
     }
 
     // 2) Recuperation Odoo
-    const payload = await fetchOdooData();
+    const payload: any = await fetchOdooData();
     const updatedAt = new Date().toISOString();
+
+    // 2bis) Contrats signés — SOURCE FIABLE : module Sign (documents réellement signés).
+    // On garde les sign.request "signed" dont le nom commence par "Contrat_"
+    // (nomenclature Contrat_<bureau>_<leadid>_<date>.pdf), on exclut les offres
+    // et les contrats étudiants. La date de signature = completion_date.
+    try {
+      const reqs: any[] = await execKw("sign.request", "search_read",
+        [[["state", "=", "signed"]]],
+        { fields: ["id", "reference", "completion_date", "last_action_date", "create_date", "reference_doc"],
+          limit: 5000, order: "completion_date desc" });
+      payload.signed_contracts = reqs
+        .filter((r) => /^contrat_/i.test(String(r.reference || "")))
+        .map((r) => {
+          const ref = String(r.reference || "").replace(/\.pdf$/i, "");
+          const parts = ref.split("_");
+          // Contrat_<bureau>_<leadid>_<yyyymmdd> : l'id est l'avant-dernier jeton numérique
+          let leadId: number | null = null, bureau = "";
+          if (parts.length >= 4) {
+            const maybeId = parts[parts.length - 2];
+            if (/^\d+$/.test(maybeId)) { leadId = parseInt(maybeId); bureau = parts.slice(1, parts.length - 2).join("_"); }
+          }
+          const raw = String(r.completion_date || r.last_action_date || r.create_date || "");
+          return { sign_id: r.id, reference: String(r.reference || ""), bureau, lead_id: leadId,
+                   date: raw.slice(0, 10), when: raw.slice(0, 16) };
+        });
+    } catch (e) {
+      payload.signed_contracts = [];
+      payload._signError = String((e as Error).message || e);
+    }
+
+    // 2ter) ADRESSES actives / potentielles (res.partner) — portefeuille
+    // ACTIVES = champ dédié x_studio_nombre_dadresses_actives (rempli quand le contrat
+    // est signé). POTENTIELLES = estimation depuis les offres (offre retenue, sinon
+    // moyenne des offres proposées) pour les contacts pas encore actifs.
+    try {
+      const numOf = (v: any) => { const n = parseInt(String(v), 10); return isNaN(n) ? 0 : n; };
+      // On vérifie quels champs existent réellement (robuste aux renommages/absences)
+      const fg = await execKw("res.partner", "fields_get", [], { attributes: ["type"] });
+      const has = (n: string) => !!(fg as any)[n];
+      const F_ACT = has("x_studio_nombre_dadresses_actives") ? "x_studio_nombre_dadresses_actives"
+                  : (has("x_studio_nombre_adresses_actives") ? "x_studio_nombre_adresses_actives" : null);
+      const F_OFF = has("x_studio_nombre_adresses_offre") ? "x_studio_nombre_adresses_offre" : null;
+      const F_O = ["x_studio_nombre_adresses_offre_1", "x_studio_nombre_adresses_offre_2", "x_studio_nombre_adresses_offre_3"].filter(has);
+      const F_ETP = has("x_studio_nombre_etp_contrat") ? "x_studio_nombre_etp_contrat" : null;
+      // Modules — champs ACTIFS (signés, "_contrat") et PROPOSÉS (offre, "assistant_")
+      const bF = (n: string) => (has(n) ? n : null);
+      const MF = {
+        conf_a: bF("x_studio_ass_conformite_contrat"), comm_a: bF("x_studio_ass_commercial_contrat"), port_a: bF("x_studio_ass_portefeuille_contrat"),
+        conf_p: bF("x_studio_assistant_conformite"), comm_p: bF("x_studio_assistant_commercial"), port_p: bF("x_studio_assistant_portefeuille"),
+      };
+      const moduleFields = Object.values(MF).filter(Boolean) as string[];
+
+      const conds: any[] = [];
+      if (F_ACT) conds.push([F_ACT, ">", 0]);
+      if (F_OFF) conds.push([F_OFF, ">", 0]);
+      F_O.forEach((f) => conds.push([f, "!=", false]));
+      const domain = conds.length <= 1 ? conds : (Array(conds.length - 1).fill("|") as any[]).concat(conds);
+
+      const readFields = ["id", "name"].concat(F_ACT ? [F_ACT] : [], F_OFF ? [F_OFF] : [], F_O, F_ETP ? [F_ETP] : [], moduleFields);
+      const contacts: any[] = await execKw("res.partner", "search_read", [domain], { fields: readFields, limit: 5000 });
+
+      const boolOf = (c: any, f: string | null) => (f ? !!c[f] : false);
+      payload.address_data = contacts.map((c) => {
+        const active = F_ACT ? numOf(c[F_ACT]) : 0;
+        const offre = F_OFF ? numOf(c[F_OFF]) : 0;
+        const offers = F_O.map((f) => numOf(c[f]));
+        const etp = F_ETP ? numOf(c[F_ETP]) : 0;
+        const mods_active = { conf: boolOf(c, MF.conf_a), comm: boolOf(c, MF.comm_a), port: boolOf(c, MF.port_a) };
+        const mods_prop = { conf: boolOf(c, MF.conf_p), comm: boolOf(c, MF.comm_p), port: boolOf(c, MF.port_p) };
+        let potential = 0, statut = "";
+        if (active > 0) {
+          statut = "Actif";
+        } else if (offre > 0) {
+          potential = offre; statut = "Offre retenue";
+        } else {
+          const nz = offers.filter((x) => x > 0);
+          potential = nz.length ? nz.reduce((a, b) => a + b, 0) / nz.length : 0;
+          statut = nz.length ? (nz.length + " offre(s) proposée(s)") : "—";
+        }
+        return { id: c.id, name: c.name, active, potential, offre, offers, statut, etp, mods_active, mods_prop };
+      }).filter((x) => x.active > 0 || x.potential > 0);
+      payload._addrMeta = { champ_actives: F_ACT, champ_offre: F_OFF, champs_offres: F_O, champ_etp: F_ETP, champs_modules: MF, nb_contacts: (payload.address_data as any[]).length };
+
+      // Enrichir les contrats signés avec le nb d'adresses du contact (pour l'évolution)
+      const partnerActive = new Map<number, number>();
+      (payload.address_data as any[]).forEach((c) => partnerActive.set(c.id, c.active));
+      const scLeadIds = (payload.signed_contracts as any[]).map((c) => c.lead_id).filter((x: any) => x != null);
+      const leadPartner = new Map<number, number>();
+      for (let i = 0; i < scLeadIds.length; i += 200) {
+        const ls: any[] = await execKw("crm.lead", "read", [scLeadIds.slice(i, i + 200)],
+          { fields: ["partner_id"], context: { active_test: false } });
+        ls.forEach((l) => { const p = m2oId(l.partner_id); if (p != null) leadPartner.set(l.id, p); });
+      }
+      (payload.signed_contracts as any[]).forEach((c) => {
+        const p = c.lead_id != null ? leadPartner.get(c.lead_id) : null;
+        c.addresses = (p != null ? partnerActive.get(p) : 0) || 0;
+      });
+
+      // SNAPSHOT quotidien des totaux d'adresses (pour calculer l'évolution dans le temps)
+      let totActive = 0, totPot = 0;
+      (payload.address_data as any[]).forEach((c) => { totActive += c.active || 0; totPot += c.potential || 0; });
+      const sbHeaders = {
+        "apikey": SUPABASE_SERVICE_KEY, "Authorization": "Bearer " + SUPABASE_SERVICE_KEY,
+        "Content-Type": "application/json",
+      };
+      const today = new Date().toISOString().slice(0, 10);
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/address_snapshots`, {
+          method: "POST",
+          headers: { ...sbHeaders, "Prefer": "resolution=merge-duplicates" },
+          body: JSON.stringify([{ snapshot_date: today, active: totActive, potential: totPot, total: totActive + totPot, captured_at: new Date().toISOString() }]),
+        });
+        const h = await fetch(`${SUPABASE_URL}/rest/v1/address_snapshots?select=snapshot_date,active,potential,total&order=snapshot_date.asc&limit=400`, { headers: sbHeaders });
+        payload.address_history = h.ok ? await h.json() : [];
+      } catch (eSnap) {
+        payload.address_history = [];
+        payload._snapError = String((eSnap as Error).message || eSnap);
+      }
+    } catch (e) {
+      payload.address_data = [];
+      payload._addrError = String((e as Error).message || e);
+    }
 
     // 3) Sauvegarde dans Supabase
     await pushToSupabase(payload, updatedAt);

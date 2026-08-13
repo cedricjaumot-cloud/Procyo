@@ -90,6 +90,60 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
 .modal-sub{font-size:11px;color:#bbb;margin-top:2px}
 .modal-close{width:30px;height:30px;border-radius:50%;border:1px solid #eee;background:#f8f8f8;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .modal-body{overflow-y:auto;padding:18px 22px}
+
+/* ===== PAGE PILOTAGE (nouvelle) ===== */
+.pil{--blue:#2A78D6;--blue-bg:#E6F1FB;--green:#1E9E6A;--green-bg:#E3F5EC;--red:#D64545;--red-bg:#FDECEA;--muted:#6B7688;--faint:#9AA4B2;--border:#E4E8EE;--soft:#EEF1F5}
+.pil-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin:22px 2px 12px}
+.pil-title:first-child{margin-top:2px}
+.pil-grid{display:grid;gap:14px}
+.pg4{grid-template-columns:repeat(4,1fr)}.pg2{grid-template-columns:repeat(2,1fr)}.psplit{grid-template-columns:1.6fr 1fr}
+@media(max-width:1000px){.pg4{grid-template-columns:repeat(2,1fr)}.psplit{grid-template-columns:1fr}}
+@media(max-width:560px){.pg4,.pg2{grid-template-columns:1fr}}
+.pcard{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(16,24,40,.06);transition:box-shadow .15s,border-color .15s,transform .15s}
+.pcard.click{cursor:pointer}
+.pcard.click:hover{border-color:#BcD6F2;box-shadow:0 6px 18px rgba(16,24,40,.10);transform:translateY(-2px)}
+.pcard-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ptile{display:flex;flex-direction:column;gap:8px;min-height:140px;justify-content:space-between}
+.ptile-top{display:flex;align-items:flex-start;justify-content:space-between}
+.ptile-num{font-size:42px;font-weight:800;line-height:1}
+.ptile-sub{font-size:12px;color:var(--muted)}
+.ptile-foot{border-top:1px solid var(--soft);padding-top:10px;display:flex;align-items:center;justify-content:space-between}
+.ptile-link{font-size:11.5px;font-weight:600;color:var(--muted)}
+.pcard.click:hover .ptile-link{color:var(--blue)}
+.pico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.pblue .ptile-num{color:var(--blue)}.pblue .pico{background:var(--blue-bg)}
+.pgreen .ptile-num{color:var(--green)}.pgreen .pico{background:var(--green-bg)}
+.pred .ptile-num{color:var(--red)}.pred .pico{background:var(--red-bg)}
+.pfore{background:linear-gradient(140deg,#F4F8FE,#FFF);border:1px solid #D3E2F6;border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:13px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.pfore-big{font-size:38px;font-weight:800;color:#1E2733;display:flex;align-items:baseline;gap:8px}
+.pfore-big .cur{color:var(--faint);font-size:21px}
+.pbadge{align-self:flex-start;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);background:var(--blue-bg);padding:3px 9px;border-radius:6px}
+.pfore-row{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--muted);border-top:1px solid var(--soft);padding-top:8px}
+.pfore-row b{color:#1E2733}
+.pfunnel{display:flex;gap:8px;align-items:flex-end;overflow-x:auto;padding-top:6px}
+.pstage{flex:1;min-width:76px;text-align:center;cursor:pointer}
+.pstage .pcnt{font-size:21px;font-weight:800;margin-bottom:6px}
+.pstage .pbar{background:var(--soft);border:1px solid var(--border);border-radius:7px;position:relative}
+.pstage:hover .pbar{background:#E1E8F1}
+.pstage .pfill{position:absolute;left:0;right:0;bottom:0;border-radius:6px;opacity:.9}
+.pstage .pnm{font-size:10.5px;color:var(--muted);margin-top:8px;line-height:1.2;height:26px}
+.pcrit{font-size:11.5px;color:var(--red);font-weight:600}
+.psub-rows{display:flex;flex-direction:column;gap:3px;margin-top:8px;font-size:11.5px;color:var(--muted)}
+.pperiod{display:inline-flex;background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-left:auto}
+.pperiod button{padding:6px 13px;font-size:12px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-right:1px solid var(--border)}
+.pperiod button:last-child{border-right:none}
+.pperiod button.on{background:var(--blue);color:#fff}
+.pchip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px}
+.pchip.up{background:var(--green-bg);color:var(--green)}
+.pchip.down{background:var(--red-bg);color:var(--red)}
+.pchip.flat{background:var(--soft);color:var(--muted)}
+.pdelta{font-size:10px;margin-top:4px;font-weight:700}
+.pdelta .pin{color:var(--green)}.pdelta .pout{color:var(--red)}
+.pinfo{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--soft);color:var(--muted);font-size:10px;font-weight:700;font-style:italic;cursor:help;position:relative;margin-left:5px;vertical-align:middle}
+.pinfo .ptip{display:none;position:absolute;left:0;top:135%;width:250px;background:#1E2733;color:#fff;font-size:11px;font-weight:400;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:9px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.28);text-transform:none;letter-spacing:normal}
+.pinfo .ptip b{color:#8FD0FF}
+.pinfo:hover .ptip,.pinfo:focus .ptip{display:block}
+.ptile-sec{font-size:12px;color:var(--muted);font-weight:600}
 </style>
 </head>
 <body>
@@ -120,7 +174,8 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
 <div id="app-root" style="display:none">
 <div class="nav">
   <div class="nav-logo">Odoo CRM</div>
-  <button class="nav-btn on" id="nb-kpi">KPI</button>
+  <button class="nav-btn on" id="nb-pil">Pilotage</button>
+  <button class="nav-btn" id="nb-kpi">KPI détaillés</button>
   <button class="nav-btn" id="nb-gen">Vue générale (leads/vendeur)</button>
   <button class="nav-btn" id="nb-per">Analyse en profondeur (Admin)</button>
   <div class="nav-right" id="nav-sub"></div>
@@ -139,11 +194,119 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
 
 <div class="main">
 
+<!-- ======= PILOTAGE (nouvelle page d'accueil) ======= -->
+<div class="view on pil" id="v-pil">
+  <div class="pil-title" style="display:flex;align-items:center">
+    <span>Indicateurs clés</span>
+    <span class="pperiod" id="pilPeriod">
+      <button data-days="7" class="on">7 j</button>
+      <button data-days="14">14 j</button>
+      <button data-days="30">30 j</button>
+      <button data-days="90">90 j</button>
+    </span>
+  </div>
+  <div class="pil-grid pg4">
+    <div class="pcard click ptile pblue" id="pil-c1">
+      <div class="ptile-top"><div class="pcard-lbl">Nouveaux prospects</div><div class="pico">👤</div></div>
+      <div><div class="ptile-num" id="pil-v1">-</div><div class="ptile-sub">entrés dans le CRM</div></div>
+      <div class="ptile-foot"><span class="pchip flat" id="pil-t1"></span><span class="ptile-link">Voir le détail →</span></div>
+    </div>
+    <div class="pcard click ptile pgreen" id="pil-addr">
+      <div class="ptile-top"><div class="pcard-lbl">Adresses signées</div><div class="pico">🏢</div></div>
+      <div>
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div class="ptile-num" id="pil-addr-active">-</div>
+          <div class="ptile-sec"><span id="pil-addr-pot">-</span> pot. · <span id="pil-addr-total">-</span> tot.</div>
+        </div>
+        <div class="ptile-sub">actives · +potentielles · total</div>
+      </div>
+      <div class="ptile-foot"><span class="pchip flat" id="pil-addr-trend"></span><span class="ptile-link">Voir le détail →</span></div>
+    </div>
+    <div class="pcard click ptile pgreen" id="pil-c6">
+      <div class="ptile-top"><div class="pcard-lbl">Contrats signés</div><div class="pico">✅</div></div>
+      <div><div class="ptile-num" id="pil-v6">-</div><div class="ptile-sub">signés cette période</div></div>
+      <div class="ptile-foot"><span class="pchip flat" id="pil-t6"></span><span class="ptile-link">Voir le détail →</span></div>
+    </div>
+    <div class="pcard click ptile pred" id="pil-c9">
+      <div class="ptile-top"><div class="pcard-lbl">Leads perdus</div><div class="pico">🚫</div></div>
+      <div><div class="ptile-num" id="pil-v9">-</div><div class="ptile-sub">passés en perdu</div></div>
+      <div class="ptile-foot"><span class="pchip flat" id="pil-t9"></span><span class="ptile-link">Voir le détail →</span></div>
+    </div>
+  </div>
+
+  <div class="pil-title">Possibilité d'évolution — portefeuille signé</div>
+  <div class="pcard click" id="pil-upside" style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+    <div class="pico" style="background:#E6F1FB;width:42px;height:42px;font-size:20px">📈</div>
+    <div>
+      <div class="pcard-lbl">Adresses activables en plus</div>
+      <div class="ptile-num" style="color:#2A78D6;font-size:34px" id="pil-upside-val">-</div>
+    </div>
+    <div class="ptile-sub" style="max-width:340px">Clients signés dont le nombre d'ETP dépasse le nombre d'adresses actives → potentiel commercial d'expansion.</div>
+    <span class="ptile-link" style="margin-left:auto">Voir le détail →</span>
+  </div>
+
+  <div class="pil-title">Prévision &amp; tunnel</div>
+  <div class="pil-grid psplit">
+    <div class="pfore" id="pil-forecast" style="cursor:pointer">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="pcard-lbl" style="color:#6B7688">Prévision financière — MRR</div>
+        <span class="ptile-link">Voir le détail →</span>
+      </div>
+      <div>
+        <div class="ptile-sub">MRR garanti (contrat) — dès l'onboarding terminé</div>
+        <div class="pfore-big" style="color:#1E9E6A"><span id="pil-mrr-asis">—</span><span class="cur"> €/mois</span></div>
+      </div>
+      <div style="border-top:1px solid var(--soft);padding-top:10px">
+        <div class="ptile-sub" style="margin-bottom:6px">Potentiel du portefeuille signé (to-be)</div>
+        <div class="pfore-row"><span>MRR to-be adresses (max ETP)</span><b id="pil-mrr-tobeaddr">—</b></div>
+        <div class="pfore-row"><span>+ tous modules (extra)</span><b id="pil-mrr-mod">—</b></div>
+        <div class="pfore-row" style="font-weight:700"><span style="color:#2A78D6">= MRR to-be total</span><b style="color:#2A78D6;font-size:15px" id="pil-mrr-tobe">—</b></div>
+      </div>
+      <div style="border-top:1px solid var(--soft);padding-top:10px">
+        <div class="pfore-row" style="color:#9AA4B2"><span>Pipeline non signé — en plus si ça signe (non garanti)</span><b style="color:#6B7688" id="pil-mrr-pipe">—</b></div>
+      </div>
+      <div style="font-size:10.5px;color:#c9a227;background:#FFF7E6;border:1px solid #F0D28A;border-radius:7px;padding:7px 10px">
+        ⚠️ Montants bruts HTVA. Les réductions commerciales (1 mois offert, −15%/mois…) ne sont <b>pas encore</b> prises en compte — en attente de données.
+      </div>
+    </div>
+    <div class="pcard click" id="pil-funnelcard">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="pcard-lbl">Pipeline en un coup d'œil</div><span class="ptile-link">Détail →</span>
+      </div>
+      <div class="pfunnel" id="pil-funnel"></div>
+    </div>
+  </div>
+
+  <div class="pil-title">À traiter — santé d'exécution</div>
+  <div class="pil-grid pg2">
+    <div class="pcard click pred" id="pil-c11">
+      <div class="ptile-top"><div class="pcard-lbl">Tâches en retard</div><div class="pico">⏰</div></div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin:8px 0 2px">
+        <div class="ptile-num" style="color:#D64545" id="pil-v11">-</div>
+        <div class="pcrit" id="pil-v11crit"></div>
+      </div>
+      <div class="psub-rows">
+        <div>Retard +3j : <b id="pil-v11d3">-</b> · +7j : <b id="pil-v11d7">-</b> · +10j : <b id="pil-v11d10">-</b></div>
+      </div>
+      <div class="ptile-foot"><span></span><span class="ptile-link">Voir le détail →</span></div>
+    </div>
+    <div class="pcard click pred" id="pil-c10">
+      <div class="ptile-top"><div class="pcard-lbl">Leads sans activité planifiée</div><div class="pico">💤</div></div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin:8px 0 2px">
+        <div class="ptile-num" style="color:#D64545" id="pil-v10">-</div>
+        <div class="pcrit" style="color:#6B7688">leads actifs sans tâche</div>
+      </div>
+      <div class="ptile-foot"><span></span><span class="ptile-link">Voir le détail →</span></div>
+    </div>
+  </div>
+</div>
+
 <!-- ======= KPI ======= -->
-<div class="view on" id="v-kpi">
+<div class="view" id="v-kpi">
   <div class="kpi-filters">
     <div class="period-group">
       <button class="pbtn on" data-days="7">7 derniers jours</button>
+      <button class="pbtn" data-days="14">14 derniers jours</button>
       <button class="pbtn" data-days="30">30 derniers jours</button>
       <button class="pbtn" data-days="90">90 derniers jours</button>
     </div>
@@ -156,80 +319,80 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
       <div><div class="ksub" id="k1s"></div>
       <div class="kfooter"><span></span><span class="kfooter-link" style="color:#2A78D6">Voir le detail →</span></div></div>
     </div>
-    <div class="kcard" id="kc2" style="--col:#EB6834">
+    <div class="kcard" id="kc2" style="--col:#2A78D6">
       <div class="klabel" style="font-size:9px">Leads dans RDV demo planifie</div>
-      <div class="knum" id="k2v" style="color:#EB6834">-</div>
-      <div><div class="kinout"><div class="kinout-pill" style="background:#fde8dc;color:#EB6834">Entres <span id="k2i">-</span></div><div class="kinout-pill" style="background:#e6f1fb;color:#2A78D6">Sortis <span id="k2o">-</span></div></div>
-      <div class="kfooter"><span class="kstuck" id="k2stk"></span><span class="kfooter-link" style="color:#EB6834">Voir →</span></div></div>
+      <div class="knum" id="k2v" style="color:#2A78D6">-</div>
+      <div><div class="kinout"><div class="kinout-pill" style="background:#E6F1FB;color:#2A78D6">Entres <span id="k2i">-</span></div><div class="kinout-pill" style="background:#EEF1F5;color:#8A94A6">Sortis <span id="k2o">-</span></div></div>
+      <div class="kfooter"><span class="kstuck" id="k2stk"></span><span class="kfooter-link" style="color:#2A78D6">Voir →</span></div></div>
     </div>
-    <div class="kcard" id="kc3" style="--col:#4a3aa7">
+    <div class="kcard" id="kc3" style="--col:#2A78D6">
       <div class="klabel" style="font-size:9px">Leads dans Offre envoyee</div>
-      <div class="knum" id="k3v" style="color:#4a3aa7">-</div>
-      <div><div class="kinout"><div class="kinout-pill" style="background:#ede9f9;color:#4a3aa7">Entres <span id="k3i">-</span></div><div class="kinout-pill" style="background:#e6f1fb;color:#2A78D6">Sortis <span id="k3o">-</span></div></div>
-      <div class="kfooter"><span class="kstuck" id="k3stk"></span><span class="kfooter-link" style="color:#4a3aa7">Voir →</span></div></div>
+      <div class="knum" id="k3v" style="color:#2A78D6">-</div>
+      <div><div class="kinout"><div class="kinout-pill" style="background:#E6F1FB;color:#2A78D6">Entres <span id="k3i">-</span></div><div class="kinout-pill" style="background:#EEF1F5;color:#8A94A6">Sortis <span id="k3o">-</span></div></div>
+      <div class="kfooter"><span class="kstuck" id="k3stk"></span><span class="kfooter-link" style="color:#2A78D6">Voir →</span></div></div>
     </div>
-    <div class="kcard" id="kc4" style="--col:#0F6E56">
+    <div class="kcard" id="kc4" style="--col:#1E9E6A">
       <div class="klabel" style="font-size:9px">Leads dans Offre signee</div>
-      <div class="knum" id="k4v" style="color:#0F6E56">-</div>
-      <div><div class="kinout"><div class="kinout-pill" style="background:#d6f5ea;color:#0F6E56">Entres <span id="k4i">-</span></div><div class="kinout-pill" style="background:#e6f1fb;color:#2A78D6">Sortis <span id="k4o">-</span></div></div>
-      <div class="kfooter"><span class="kstuck" id="k4stk"></span><span class="kfooter-link" style="color:#0F6E56">Voir →</span></div></div>
+      <div class="knum" id="k4v" style="color:#1E9E6A">-</div>
+      <div><div class="kinout"><div class="kinout-pill" style="background:#E3F5EC;color:#1E9E6A">Entres <span id="k4i">-</span></div><div class="kinout-pill" style="background:#EEF1F5;color:#8A94A6">Sortis <span id="k4o">-</span></div></div>
+      <div class="kfooter"><span class="kstuck" id="k4stk"></span><span class="kfooter-link" style="color:#1E9E6A">Voir →</span></div></div>
     </div>
-    <div class="kcard" id="kc5" style="--col:#BA7517">
+    <div class="kcard" id="kc5" style="--col:#2A78D6">
       <div class="klabel" style="font-size:9px">Leads dans Contrat envoye</div>
-      <div class="knum" id="k5v" style="color:#BA7517">-</div>
-      <div><div class="kinout"><div class="kinout-pill" style="background:#faeeda;color:#BA7517">Entres <span id="k5i">-</span></div><div class="kinout-pill" style="background:#e6f1fb;color:#2A78D6">Sortis <span id="k5o">-</span></div></div>
-      <div class="kfooter"><span class="kstuck" id="k5stk"></span><span class="kfooter-link" style="color:#BA7517">Voir →</span></div></div>
+      <div class="knum" id="k5v" style="color:#2A78D6">-</div>
+      <div><div class="kinout"><div class="kinout-pill" style="background:#E6F1FB;color:#2A78D6">Entres <span id="k5i">-</span></div><div class="kinout-pill" style="background:#EEF1F5;color:#8A94A6">Sortis <span id="k5o">-</span></div></div>
+      <div class="kfooter"><span class="kstuck" id="k5stk"></span><span class="kfooter-link" style="color:#2A78D6">Voir →</span></div></div>
     </div>
-    <div class="kcard" id="kc6" style="--col:#1A5DAB">
+    <div class="kcard" id="kc6" style="--col:#1E9E6A">
       <div class="klabel" style="font-size:9px">Leads dans Contrat signe</div>
-      <div class="knum" id="k6v" style="color:#1A5DAB">-</div>
-      <div><div class="kinout"><div class="kinout-pill" style="background:#d6e8fa;color:#1A5DAB">Entres <span id="k6i">-</span></div><div class="kinout-pill" style="background:#e6f1fb;color:#2A78D6">Sortis <span id="k6o">-</span></div></div>
-      <div class="kfooter"><span class="kstuck" id="k6stk"></span><span class="kfooter-link" style="color:#1A5DAB">Voir →</span></div></div>
+      <div class="knum" id="k6v" style="color:#1E9E6A">-</div>
+      <div><div class="kinout"><div class="kinout-pill" style="background:#E3F5EC;color:#1E9E6A">Entres <span id="k6i">-</span></div><div class="kinout-pill" style="background:#EEF1F5;color:#8A94A6">Sortis <span id="k6o">-</span></div></div>
+      <div class="kfooter"><span class="kstuck" id="k6stk"></span><span class="kfooter-link" style="color:#1E9E6A">Voir →</span></div></div>
     </div>
-    <div class="kcard" id="kc7" style="--col:#008300">
+    <div class="kcard" id="kc7" style="--col:#2A78D6">
       <div class="klabel" style="font-size:9px">Leads Onboarding en cours</div>
-      <div class="knum" id="k7v" style="color:#008300">-</div>
-      <div><div class="kinout"><div class="kinout-pill" style="background:#d6f0d6;color:#008300">Entres <span id="k7i">-</span></div><div class="kinout-pill" style="background:#e6f1fb;color:#2A78D6">Sortis <span id="k7o">-</span></div></div>
-      <div class="kfooter"><span class="kstuck" id="k7stk"></span><span class="kfooter-link" style="color:#008300">Voir →</span></div></div>
+      <div class="knum" id="k7v" style="color:#2A78D6">-</div>
+      <div><div class="kinout"><div class="kinout-pill" style="background:#E6F1FB;color:#2A78D6">Entres <span id="k7i">-</span></div><div class="kinout-pill" style="background:#EEF1F5;color:#8A94A6">Sortis <span id="k7o">-</span></div></div>
+      <div class="kfooter"><span class="kstuck" id="k7stk"></span><span class="kfooter-link" style="color:#2A78D6">Voir →</span></div></div>
     </div>
-    <div class="kcard" id="kc8" style="--col:#e87ba4">
+    <div class="kcard" id="kc8" style="--col:#1E9E6A">
       <div class="klabel" style="font-size:9px">Leads Onboarding Fini</div>
-      <div class="knum" id="k8v" style="color:#e87ba4">-</div>
-      <div><div class="kinout"><div class="kinout-pill" style="background:#fce8f1;color:#e87ba4">Entres <span id="k8i">-</span></div><div class="kinout-pill" style="background:#e6f1fb;color:#2A78D6">Sortis <span id="k8o">-</span></div></div>
-      <div class="kfooter"><span class="kstuck" id="k8stk"></span><span class="kfooter-link" style="color:#e87ba4">Voir →</span></div></div>
+      <div class="knum" id="k8v" style="color:#1E9E6A">-</div>
+      <div><div class="kinout"><div class="kinout-pill" style="background:#E3F5EC;color:#1E9E6A">Entres <span id="k8i">-</span></div><div class="kinout-pill" style="background:#EEF1F5;color:#8A94A6">Sortis <span id="k8o">-</span></div></div>
+      <div class="kfooter"><span class="kstuck" id="k8stk"></span><span class="kfooter-link" style="color:#1E9E6A">Voir →</span></div></div>
     </div>
-    <div class="kcard" id="kc9" style="--col:#a32d2d">
+    <div class="kcard" id="kc9" style="--col:#D64545">
       <div class="klabel">Leads passes en perdu</div>
-      <div class="knum" id="k9v" style="color:#a32d2d">-</div>
+      <div class="knum" id="k9v" style="color:#D64545">-</div>
       <div><div class="ksub" id="k9s"></div>
-      <div class="kfooter"><span></span><span class="kfooter-link" style="color:#a32d2d">Voir le detail →</span></div></div>
+      <div class="kfooter"><span></span><span class="kfooter-link" style="color:#D64545">Voir le detail →</span></div></div>
     </div>
-    <div class="kcard" id="kc10">
-      <div class="klabel" style="color:#888">Leads sans activite (tache)</div>
-      <div class="knum" id="k10v" style="color:#888">-</div>
+    <div class="kcard" id="kc10" style="--col:#D64545">
+      <div class="klabel" style="color:#D64545">Leads sans activite (tache)</div>
+      <div class="knum" id="k10v" style="color:#D64545">-</div>
       <div>
         <div class="ksub" style="margin-bottom:6px">actifs sans tache planifiee</div>
-        <div class="kfooter"><span></span><span class="kfooter-link" style="color:#888">Voir le detail &rarr;</span></div>
+        <div class="kfooter"><span></span><span class="kfooter-link" style="color:#D64545">Voir le detail &rarr;</span></div>
       </div>
     </div>
-    <div class="kcard" id="kc11">
-      <div class="klabel" style="color:#a32d2d">Taches en retard</div>
-      <div class="knum" id="k11v" style="color:#a32d2d">-</div>
+    <div class="kcard" id="kc11" style="--col:#D64545">
+      <div class="klabel" style="color:#D64545">Taches en retard</div>
+      <div class="knum" id="k11v" style="color:#D64545">-</div>
       <div>
         <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:6px;font-size:11px">
-          <div style="color:#EB6834">Retard de +3j : <strong id="k11d3">-</strong> leads</div>
-          <div style="color:#a32d2d">Retard de +7j : <strong id="k11d7">-</strong> leads</div>
-          <div style="color:#7a0000">Retard de +10j : <strong id="k11d10">-</strong> leads</div>
+          <div style="color:#E06A6A">Retard de +3j : <strong id="k11d3">-</strong> leads</div>
+          <div style="color:#D64545">Retard de +7j : <strong id="k11d7">-</strong> leads</div>
+          <div style="color:#A32D2D">Retard de +10j : <strong id="k11d10">-</strong> leads</div>
         </div>
-        <div class="kfooter"><span></span><span class="kfooter-link" style="color:#a32d2d">Voir le detail &rarr;</span></div>
+        <div class="kfooter"><span></span><span class="kfooter-link" style="color:#D64545">Voir le detail &rarr;</span></div>
       </div>
     </div>
-    <div class="kcard" id="kc12">
-      <div class="klabel" style="color:#888">Leads sans mouvement</div>
-      <div class="knum" id="k12v" style="color:#888">-</div>
+    <div class="kcard" id="kc12" style="--col:#D64545">
+      <div class="klabel" style="color:#D64545">Leads sans mouvement</div>
+      <div class="knum" id="k12v" style="color:#D64545">-</div>
       <div>
         <div class="ksub" style="margin-bottom:6px">aucun mouvement sur la periode</div>
-        <div class="kfooter"><span></span><span class="kfooter-link" style="color:#888">Voir le detail &rarr;</span></div>
+        <div class="kfooter"><span></span><span class="kfooter-link" style="color:#D64545">Voir le detail &rarr;</span></div>
       </div>
     </div>
   </div>
@@ -239,9 +402,9 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
 <div class="view" id="v-gen">
   <div class="g-kpis">
     <div class="gkpi"><div class="gkpi-l">Leads actifs</div><div class="gkpi-v" style="color:#2A78D6" id="gg1">-</div></div>
-    <div class="gkpi"><div class="gkpi-l">Bloques +30j</div><div class="gkpi-v" style="color:#EB6834" id="gg2">-</div></div>
-    <div class="gkpi"><div class="gkpi-l">Bloques +90j</div><div class="gkpi-v" style="color:#a32d2d" id="gg3">-</div></div>
-    <div class="gkpi"><div class="gkpi-l">Sans activite</div><div class="gkpi-v" style="color:#a32d2d" id="gg4">-</div></div>
+    <div class="gkpi"><div class="gkpi-l">Bloques +30j</div><div class="gkpi-v" style="color:#D64545" id="gg2">-</div></div>
+    <div class="gkpi"><div class="gkpi-l">Bloques +90j</div><div class="gkpi-v" style="color:#D64545" id="gg3">-</div></div>
+    <div class="gkpi"><div class="gkpi-l">Sans activite</div><div class="gkpi-v" style="color:#D64545" id="gg4">-</div></div>
   </div>
   <div class="g2">
     <div class="card"><div class="ctitle">Repartition par vendeur</div><div id="gBars"></div></div>
@@ -305,22 +468,301 @@ function sortTableByDate(th){
 function initApp(D){
 var MV = D.movements, M = D.matrix, AU = D.authors, S = D.stats;
 var ALL = D.all_leads || [];
+var SC = D.signed_contracts || [];              // contrats réellement signés (module Sign)
+var AD = D.address_data || [];                  // adresses par contact (actives/potentielles)
+var AH = D.address_history || [];               // snapshots quotidiens (pour l'évolution)
+var leadVend = {}; ALL.forEach(function(l){ leadVend[l.id] = l.vendeur; }); // lead id -> vendeur
 var CL = ['#2a78d6','#1baf7a','#eb6834','#4a3aa7','#e87ba4','#008300','#eda100','#e34948','#1A5DAB','#0F6E56','#BA7517'];
 
 document.getElementById('nav-sub').textContent = S.total + ' mouvements';
 
 // ── NAVIGATION ──
 function showView(name) {
-  ['kpi','gen','per'].forEach(function(n) {
+  ['pil','kpi','gen','per'].forEach(function(n) {
     document.getElementById('nb-'+n).classList.toggle('on', n===name);
     document.getElementById('v-'+n).classList.toggle('on', n===name);
   });
   document.getElementById('datebar').style.display = name==='per' ? 'flex' : 'none';
   if (name==='gen') renderGen();
 }
+document.getElementById('nb-pil').addEventListener('click', function(){ showView('pil'); });
 document.getElementById('nb-kpi').addEventListener('click', function(){ showView('kpi'); });
 document.getElementById('nb-gen').addEventListener('click', function(){ showView('gen'); });
 document.getElementById('nb-per').addEventListener('click', function(){ showView('per'); });
+
+// ── PAGE PILOTAGE : synchro avec les vraies valeurs KPI + funnel ──
+// Les tuiles reflètent les chiffres déjà calculés (k*v) et, au clic,
+// déclenchent la même carte détaillée que la page "KPI détaillés".
+function pilClickProxy(pilId, kcId){
+  var el=document.getElementById(pilId);
+  if(el) el.addEventListener('click', function(){ var t=document.getElementById(kcId); if(t) t.click(); });
+}
+pilClickProxy('pil-c1','kc1'); pilClickProxy('pil-c4','kc4');
+pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('pil-c11','kc11');
+(function(){ var fc=document.getElementById('pil-funnelcard'); if(fc) fc.addEventListener('click', function(){ showView('kpi'); }); })();
+// Carte Portefeuille — adresses : détail au clic (le rendu se fait via syncPilote)
+(function(){
+  var el=document.getElementById('pil-addr'); if(!el) return;
+  el.addEventListener('click', function(){
+    var rows=AD.slice().sort(function(a,b){ return (b.active+b.potential)-(a.active+a.potential); }).map(function(c){
+      var isAct=c.active>0;
+      var val=isAct?c.active:(Math.round(c.potential*10)/10);
+      var tag=isAct?'<span class="badge bok">Active</span>':'<span class="badge" style="background:#E6F1FB;color:#2A78D6">Potentielle</span>';
+      var detail=isAct?('adresses actives : '+c.active):(c.offre>0?('offre retenue : '+c.offre):('offres : '+c.offers.filter(function(x){return x>0;}).join(' / ')));
+      return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,32)+'</strong></td><td>'+tag+'</td><td style="font-size:12px;font-weight:700">'+val+'</td><td style="font-size:11px;color:#888">'+c.statut+'</td><td style="font-size:11px;color:#bbb">'+detail+'</td></tr>';
+    }).join('');
+    var act=0,pot=0; AD.forEach(function(c){act+=c.active||0;pot+=c.potential||0;});
+    openModal('Portefeuille — adresses', AD.length+' clients — '+act+' actives + '+Math.round(pot)+' potentielles = '+Math.round(act+pot)+' au total',
+      rows?'<table class="tbl"><thead><tr><th>Client</th><th>Type</th><th>Adresses</th><th>Statut</th><th>Détail</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucune donnée d\'adresses</div>');
+  });
+})();
+// Carte "Possibilité d'évolution" : détail au clic
+(function(){
+  var el=document.getElementById('pil-upside'); if(!el) return;
+  el.addEventListener('click', function(){
+    var rows=AD.filter(function(c){ return (c.active||0)>0; })
+      .map(function(c){ var noEtp=(c.etp||0)<=0; return {c:c, noEtp:noEtp, up:noEtp?-1:Math.max(0,(c.etp||0)-(c.active||0))}; })
+      .sort(function(a,b){ return b.up-a.up; })  // potentiel décroissant, ETP inconnu en bas
+      .map(function(o){ var c=o.c;
+        var etpTxt=o.noEtp?'<span style="color:#c9a227">indispo.</span>':(c.etp||0);
+        var upTxt=o.noEtp?'<span style="color:#c9a227">info ETP indisponible</span>':(o.up>0?('<span class="badge" style="background:#E6F1FB;color:#2A78D6">+'+o.up+'</span>'):'<span style="color:#bbb">—</span>');
+        return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,32)+'</strong></td><td style="font-size:12px">'+etpTxt+'</td><td style="font-size:12px">'+(c.active||0)+'</td><td>'+upTxt+'</td></tr>';
+      }).join('');
+    var total=0; AD.forEach(function(c){ if((c.active||0)>0){ var u=(c.etp||0)-(c.active||0); if(u>0) total+=u; } });
+    openModal("Possibilité d'évolution", total+" adresses activables en plus (ETP > adresses actives)",
+      rows?'<table class="tbl"><thead><tr><th>Client</th><th>ETP</th><th>Adresses actives</th><th>Potentiel</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun client signé</div>');
+  });
+})();
+// Prévision MRR : détail par client au clic
+(function(){
+  var el=document.getElementById('pil-forecast'); if(!el) return;
+  el.addEventListener('click', function(){
+    var rows=AD.filter(function(c){ return (c.active||0)>0; })
+      .map(function(c){ return {c:c, asis:clientAsIs(c), tobe:clientToBe(c)}; })
+      .sort(function(a,b){ return (b.tobe-b.asis)-(a.tobe-a.asis); })
+      .map(function(o){ var c=o.c, gap=o.tobe-o.asis;
+        var miss=[]; if(!c.mods_active.conf)miss.push('Conformité'); if(!c.mods_active.comm)miss.push('Commercial'); if(!c.mods_active.port)miss.push('Portefeuille');
+        var noEtp=(c.etp||0)<=0;
+        var addrGap=Math.max(0,(c.etp||0)-(c.active||0));
+        var todo=[];
+        if(addrGap>0) todo.push(addrGap+' adresse'+(addrGap>1?'s':'')+' à vendre');
+        if(miss.length) todo.push((miss.length>1?'modules':'module')+' : '+miss.join(', '));
+        var todoTxt = noEtp ? '<span style="color:#c9a227">ETP inconnu (potentiel non calculable)</span>'
+                     : (todo.length ? todo.join(' + ') : '<span style="color:#1E9E6A">portefeuille complet ✓</span>');
+        var adrTxt = (c.active||0)+' → '+(noEtp?'?':Math.max(c.active||0,c.etp||0));
+        return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,24)+'</strong></td>'
+          +'<td style="font-size:12px">'+eur(o.asis)+' €</td>'
+          +'<td style="font-size:12px;color:#2A78D6">'+eur(o.tobe)+' €</td>'
+          +'<td style="font-size:12px;font-weight:700;color:#D64545">+'+eur(gap)+' €</td>'
+          +'<td style="font-size:11px;color:#666">'+adrTxt+'</td>'
+          +'<td style="font-size:11px;color:#888">'+todoTxt+'</td></tr>';
+      }).join('');
+    // Section pipeline non signé (prospects avec offre, pas encore signés)
+    var pipeRows=AD.filter(function(c){ return (c.active||0)<=0 && (c.potential||0)>0; })
+      .map(function(c){ return {c:c, mrr:clientPipe(c)}; })
+      .sort(function(a,b){ return b.mrr-a.mrr; })
+      .map(function(o){ var c=o.c, addr=Math.round(c.potential||0);
+        var mods=[]; if(c.mods_prop.conf)mods.push('Conformité'); if(c.mods_prop.comm)mods.push('Commercial'); if(c.mods_prop.port)mods.push('Portefeuille');
+        var src=c.offre>0?'offre retenue':'moyenne offres';
+        return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,24)+'</strong></td>'
+          +'<td style="font-size:12px">'+addr+' <span style="color:#bbb;font-size:10px">('+src+')</span></td>'
+          +'<td style="font-size:11px;color:#888">'+(mods.length?mods.join(', '):'—')+'</td>'
+          +'<td style="font-size:12px;color:#2A78D6;font-weight:700">+'+eur(o.mrr)+' €</td></tr>';
+      }).join('');
+
+    var asis=0,tobe=0,pipe=0; AD.forEach(function(c){ asis+=clientAsIs(c); tobe+=clientToBe(c); pipe+=clientPipe(c); });
+    var body=''
+      +'<div style="font-size:12px;font-weight:700;color:#1E9E6A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Clients signés — garanti '+eur(asis)+' € → to-be '+eur(tobe)+' €/mois</div>'
+      +'<div style="font-size:11px;color:#888;margin-bottom:10px">L\'écart (rouge) = revenu mensuel à aller chercher chez chaque client déjà signé.</div>'
+      +(rows?'<div class="twrap"><table class="tbl"><thead><tr><th>Client</th><th>Garanti</th><th>To-be</th><th>Écart</th><th>Adresses</th><th>À activer</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty">Aucun client signé</div>')
+      +'<div style="font-size:12px;font-weight:700;color:#2A78D6;text-transform:uppercase;letter-spacing:.05em;margin:20px 0 8px">Pipeline non signé — +'+eur(pipe)+' €/mois si ça signe</div>'
+      +'<div style="font-size:11px;color:#888;margin-bottom:10px">Prospects avec une offre en cours mais pas encore de contrat signé. Non garanti.</div>'
+      +(pipeRows?'<div class="twrap"><table class="tbl"><thead><tr><th>Prospect</th><th>Adresses (offre)</th><th>Modules proposés</th><th>MRR potentiel</th></tr></thead><tbody>'+pipeRows+'</tbody></table></div>':'<div class="empty">Aucun prospect avec offre en cours</div>');
+    openModal('Prévision MRR — détail', 'Signé (garanti/to-be) et pipeline non signé', body);
+  });
+})();
+// Clic "Contrats signés" (Pilotage) : liste des leads passés en "Contrat signé" SUR LA PERIODE
+(function(){
+  var el=document.getElementById('pil-c6'); if(!el) return;
+  el.addEventListener('click', function(){
+    var r=kpiRange(kpiDays);
+    var rows=pilSignedInPeriod(r.from,r.to).map(function(c){
+      var v=leadVend[c.lead_id]||'-';
+      return '<tr data-date="'+(c.date||'')+'"><td style="white-space:nowrap;font-size:11px">'+(c.when||c.date||'-')+'</td><td><strong style="font-size:11px">'+(c.reference||'').slice(0,44)+'</strong></td><td style="font-size:11px">'+(c.bureau||'-')+'</td><td style="font-size:11px">'+v+'</td><td style="font-size:10px;color:#bbb">#'+(c.lead_id||'?')+'</td></tr>';
+    });
+    openModal('Contrats signés — sur la période', rows.length+' contrat(s) signé(s) du '+r.from+' au '+r.to+' (module Sign)',
+      rows.length?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByDate(this)">Date signature</th><th>Contrat</th><th>Bureau</th><th>Vendeur</th><th>Lead</th></tr></thead><tbody>'+rows.join('')+'</tbody></table>':'<div class="empty">Aucun contrat signé sur la période</div>');
+  });
+})();
+
+// Boutons de période de la page Pilotage (pilotent le même filtre)
+document.querySelectorAll('#pilPeriod button').forEach(function(b){
+  b.addEventListener('click', function(){
+    kpiDays=parseInt(b.dataset.days);
+    document.querySelectorAll('.pbtn').forEach(function(x){ x.classList.toggle('on', parseInt(x.dataset.days)===kpiDays); });
+    renderKPIs();
+  });
+});
+
+function setTxt(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
+var PIL_FUNNEL=[
+  {kc:'kc2',v:'k2v',i:'k2i',o:'k2o',nm:'RDV démo',a:'#2A78D6'},
+  {kc:'kc3',v:'k3v',i:'k3i',o:'k3o',nm:'Offre envoyée',a:'#2A78D6'},
+  {kc:'kc4',v:'k4v',i:'k4i',o:'k4o',nm:'Offre signée',a:'#1E9E6A'},
+  {kc:'kc5',v:'k5v',i:'k5i',o:'k5o',nm:'Contrat envoyé',a:'#2A78D6'},
+  {kc:'kc6',v:'k6v',i:'k6i',o:'k6o',nm:'Contrat signé',a:'#1E9E6A'},
+  {kc:'kc7',v:'k7v',i:'k7i',o:'k7o',nm:'Onboarding',a:'#2A78D6'}
+];
+
+// Contrats signés = documents réellement SIGNÉS via le module Sign (source fiable).
+// Chaque document compte (2 contrats pour un même client = 2 lignes).
+function pilSignedInPeriod(from,to){
+  var vend=function(x){ return !kpiVend || x===kpiVend; };
+  return SC.filter(function(c){
+    var d=(c.date||'').slice(0,10);
+    if(!(d>=from&&d<=to)) return false;
+    return vend(leadVend[c.lead_id]||'');
+  }).sort(function(a,b){ return (b.date||'')<(a.date||'')?-1:1; });
+}
+
+// KPI adresses : totaux (snapshot) + évolution des nouvelles adresses signées sur la période
+function renderAddresses(){
+  var active=0, pot=0;
+  AD.forEach(function(c){ active+=(c.active||0); pot+=(c.potential||0); });
+  setTxt('pil-addr-active', active);
+  setTxt('pil-addr-pot', Math.round(pot));
+  setTxt('pil-addr-total', Math.round(active+pot));
+  // Évolution des adresses actives : total actuel vs snapshot d'il y a N jours (historique réel)
+  var target=kpiRange(kpiDays).from;   // date = aujourd'hui - N jours
+  var base=null;
+  AH.forEach(function(s){ if(s.snapshot_date<=target && (!base||s.snapshot_date>base.snapshot_date)) base=s; });
+  var LBL={7:'sem. passée',14:'2 sem. préc.',30:'mois passé',90:'3 mois préc.'};
+  var el=document.getElementById('pil-addr-trend');
+  if(base){ pilTrend('pil-addr-trend', active-(base.active||0), true, '', LBL[kpiDays]||'période préc.'); }
+  else if(el){ el.className='pchip flat'; el.textContent='historique en cours…'; }
+}
+
+// KPI possibilité d'évolution : ETP - adresses actives (clients signés uniquement)
+function renderUpside(){
+  var total=0;
+  AD.forEach(function(c){ if((c.active||0)>0){ var up=(c.etp||0)-(c.active||0); if(up>0) total+=up; } });
+  setTxt('pil-upside-val', total);
+}
+
+// ── PRÉVISION MRR ──
+var TIERS=[
+  {name:'Starter',   max:3,      base:150,  incl:1,  sup:125},
+  {name:'Pro',       max:10,     base:500,  incl:4,  sup:115},
+  {name:'Business',  max:30,     base:1250, incl:11, sup:100},
+  {name:'Enterprise',max:50,     base:3500, incl:31, sup:95},
+  {name:'Corporate', max:999999, base:6000, incl:51, sup:90}
+];
+function tierOf(a){ if(a<=0) return null; for(var i=0;i<TIERS.length;i++){ if(a<=TIERS[i].max) return TIERS[i]; } return TIERS[TIERS.length-1]; }
+function mrrBase(a){ var t=tierOf(a); return t? t.base+Math.max(0,a-t.incl)*t.sup : 0; }
+function modMRR(a,mods){ var t=tierOf(a); var base=t?t.base:0; var m=0; if(mods&&mods.conf) m+=a*10; if(mods&&mods.comm) m+=a*10; if(mods&&mods.port) m+=0.1*base; return m; }
+function clientAsIs(c){ var a=c.active||0; return a>0 ? mrrBase(a)+modMRR(a,c.mods_active) : 0; }
+function clientToBe(c){ var a=Math.max(c.active||0, c.etp||0); return a>0 ? mrrBase(a)+modMRR(a,{conf:true,comm:true,port:true}) : 0; }
+function clientPipe(c){ var a=Math.round(c.potential||0); return (a>0 && (c.active||0)<=0) ? mrrBase(a)+modMRR(a,c.mods_prop) : 0; }
+function eur(n){ return Math.round(n).toLocaleString('fr-BE'); }
+function renderForecast(){
+  var asis=0, toBeAddr=0, toBeTotal=0, pipe=0;
+  AD.forEach(function(c){
+    asis+=clientAsIs(c); toBeTotal+=clientToBe(c); pipe+=clientPipe(c);
+    var a0=c.active||0; if(a0<=0) return;
+    var a=Math.max(a0, c.etp||0);
+    toBeAddr+=(mrrBase(a)+modMRR(a,c.mods_active));   // adresses au max ETP, modules actuels
+  });
+  var modExtra=toBeTotal-toBeAddr;                     // apport des modules non activés
+  setTxt('pil-mrr-asis', eur(asis));
+  setTxt('pil-mrr-tobeaddr', eur(toBeAddr)+' €');
+  setTxt('pil-mrr-mod', '+'+eur(modExtra)+' €');
+  setTxt('pil-mrr-tobe', eur(toBeTotal)+' €');
+  setTxt('pil-mrr-pipe', '+'+eur(pipe)+' €');
+}
+
+// Calcule les métriques clés (flux) sur une plage de dates donnée
+function pilMetrics(from,to){
+  var inR=function(d){ return d>=from && d<=to; };
+  var vend=function(x){ return !kpiVend || x===kpiVend; };
+  // étapes "gagnantes" (offre signée et au-delà) et "contrat gagné" (contrat signé et au-delà)
+  var WON=['Offre signée','Contrat envoyé','DocuSign (Contrat envoyé)','Contrat signé','Onboarding en cours','Onboarding Fini'];
+  var prospects=ALL.filter(function(l){ var d=(l.create_date||'').slice(0,10); return inR(d)&&vend(l.vendeur); }).length;
+  // Conversion par COHORTE : parmi les leads passés en "Offre envoyée" pendant
+  // la période, combien ont atteint une étape gagnante (à tout moment). Borné à 100%.
+  var sent={}, sentN=0;
+  MV.forEach(function(m){ var d=(m.date||'').slice(0,10); if(inR(d)&&!m.dirty&&m.vers==='Offre envoyée'&&vend(m.vendeur)&&!sent[m.lead_id]){ sent[m.lead_id]=1; sentN++; } });
+  var won={};
+  MV.forEach(function(m){ if(!m.dirty&&sent[m.lead_id]&&WON.indexOf(m.vers)>=0){ won[m.lead_id]=1; } });
+  var conv=sentN>0 ? Math.round(Object.keys(won).length/sentN*100) : 0;
+  // Flux simple : offres envoyées / signées PENDANT la période (peut dépasser 100%)
+  var sentFlow=0, signFlow=0;
+  MV.forEach(function(m){ var d=(m.date||'').slice(0,10); if(inR(d)&&!m.dirty&&vend(m.vendeur)){ if(m.vers==='Offre envoyée') sentFlow++; else if(m.vers==='Offre signée') signFlow++; } });
+  // Contrats signés = leads GAGNÉS pendant la période, basés sur la date de gain
+  // réelle d'Odoo (date_closed), pas sur l'historique des mouvements (incomplet).
+  // On garde les leads actuellement en Contrat signé OU onboarding (= gagnés).
+  var contrats=pilSignedInPeriod(from,to).length;
+  var perdus=ALL.filter(function(l){ if(l.active||l.proba!==0) return false; var d=((l.date_closed&&l.date_closed!=='')?l.date_closed:(l.write_date||'')).slice(0,10); return inR(d)&&vend(l.vendeur); }).length;
+  return {prospects:prospects, conv:conv, convDen:sentN, contrats:contrats, perdus:perdus, sentFlow:sentFlow, signFlow:signFlow};
+}
+// Plage précédente de même durée, juste avant la plage courante
+function pilPrevRange(r){
+  var f=new Date(r.from), t=new Date(r.to);
+  var span=Math.round((t-f)/86400000);
+  var pt=new Date(f); pt.setDate(pt.getDate()-1);
+  var pf=new Date(pt); pf.setDate(pf.getDate()-span);
+  return {from:pf.toISOString().slice(0,10), to:pt.toISOString().slice(0,10)};
+}
+// Affiche un triangle d'évolution (▲/▼ + écart) ; higherGood = true si "plus = mieux"
+function pilTrend(id,delta,higherGood,unit,lbl){
+  var el=document.getElementById(id); if(!el) return;
+  unit=unit||'';
+  if(!delta){ el.className='pchip flat'; el.textContent='= vs '+lbl; return; }
+  var good=(delta>0)===higherGood;
+  el.className='pchip '+(good?'up':'down');
+  el.textContent=(delta>0?'▲ +':'▼ ')+delta+unit+' vs '+lbl;
+}
+
+function syncPilote(){
+  var g=function(id){ var e=document.getElementById(id); return e?e.textContent:'-'; };
+  // Métriques flux : période courante vs précédente
+  var r=kpiRange(kpiDays), pr=pilPrevRange(r);
+  var cur=pilMetrics(r.from,r.to), prev=pilMetrics(pr.from,pr.to);
+  setTxt('pil-v1', cur.prospects);
+  setTxt('pil-v6', cur.contrats);
+  setTxt('pil-v9', cur.perdus);
+  var LBL={7:'sem. passée',14:'2 sem. préc.',30:'mois passé',90:'3 mois préc.'};
+  var lbl=LBL[kpiDays]||'période préc.';
+  pilTrend('pil-t1', cur.prospects-prev.prospects, true, '', lbl);
+  pilTrend('pil-t6', cur.contrats-prev.contrats, true, '', lbl);
+  pilTrend('pil-t9', cur.perdus-prev.perdus, false, '', lbl); // + de perdus = mauvais
+  renderAddresses(); // tuile adresses (totaux + évolution)
+  renderUpside();    // carte possibilité d'évolution (ETP vs adresses actives)
+  renderForecast();  // prévision MRR as-is / to-be / pipeline
+  // "À traiter" (miroir des cartes existantes)
+  setTxt('pil-v10', g('k10v')); setTxt('pil-v11', g('k11v'));
+  setTxt('pil-v11d3', g('k11d3')); setTxt('pil-v11d7', g('k11d7')); setTxt('pil-v11d10', g('k11d10'));
+  var crit=parseInt(g('k11d10'))||0;
+  setTxt('pil-v11crit', crit>0 ? 'dont '+crit+' critiques (+10j)' : '');
+  // Prévision (stock actuel)
+  setTxt('pil-f4', g('k4v')); setTxt('pil-f6', g('k6v'));
+  // état des boutons période
+  document.querySelectorAll('#pilPeriod button').forEach(function(x){ x.classList.toggle('on', parseInt(x.dataset.days)===kpiDays); });
+  // funnel avec entrées / sorties
+  var vals=PIL_FUNNEL.map(function(s){ return parseInt(g(s.v))||0; });
+  var mx=Math.max.apply(null, vals.concat([1]));
+  document.getElementById('pil-funnel').innerHTML=PIL_FUNNEL.map(function(s,i){
+    var h=40+Math.round((vals[i]/mx)*90);
+    var ins=parseInt(g(s.i))||0, outs=parseInt(g(s.o))||0;
+    return '<div class="pstage" data-kc="'+s.kc+'">'
+      +'<div class="pcnt" style="color:'+s.a+'">'+vals[i]+'</div>'
+      +'<div class="pbar" style="height:'+h+'px"><div class="pfill" style="height:'+Math.round((vals[i]/mx)*100)+'%;background:'+s.a+'"></div></div>'
+      +'<div class="pnm">'+s.nm+'</div>'
+      +'<div class="pdelta"><span class="pin">+'+ins+'</span> / <span class="pout">-'+outs+'</span></div></div>';
+  }).join('');
+  document.querySelectorAll('#pil-funnel .pstage').forEach(function(st){
+    st.addEventListener('click', function(e){ e.stopPropagation(); var t=document.getElementById(st.dataset.kc); if(t) t.click(); });
+  });
+}
 
 // Pre-fill dates
 (function(){
@@ -349,11 +791,10 @@ function isNegStage(name){
   return n.indexOf('refus')>=0 || n.indexOf('expir')>=0;
 }
 function blqLabel(j){
-  if(j===null||j===undefined) return {l:'-',c:'#ccc',b:'#f8f8f8'};
-  if(j<=7)  return {l:j+'j',c:'#0F6E56',b:'#d6f5ea'};
-  if(j<=30) return {l:j+'j',c:'#BA7517',b:'#faeeda'};
-  if(j<=90) return {l:j+'j',c:'#EB6834',b:'#fde8dc'};
-  return {l:j+'j!',c:'#a32d2d',b:'#fdecea'};
+  if(j===null||j===undefined) return {l:'-',c:'#8A94A6',b:'#EEF1F5'};
+  if(j<=7)  return {l:j+'j',c:'#1E9E6A',b:'#E3F5EC'};   // vert : récent
+  if(j<=30) return {l:j+'j',c:'#2A78D6',b:'#E6F1FB'};   // bleu : normal
+  return {l:j+'j!',c:'#D64545',b:'#FDECEA'};            // rouge : trop long
 }
 function mkBar(id,labels,data){
   var ctx=document.getElementById(id); if(!ctx) return;
@@ -386,9 +827,9 @@ document.querySelectorAll('.pbtn').forEach(function(b){
 document.getElementById('kVend').addEventListener('change', function(){ kpiVend=this.value; renderKPIs(); });
 
 function kpiRange(days) {
+  // Fenêtre glissante exacte : les N derniers jours jusqu'à aujourd'hui.
   var t=new Date(), b=new Date(t);
   b.setDate(t.getDate()-days);
-  var dow=b.getDay(); b.setDate(b.getDate()-dow);
   return {from:b.toISOString().slice(0,10), to:t.toISOString().slice(0,10)};
 }
 
@@ -460,6 +901,8 @@ function renderKPIs() {
   var movedInPeriod12 = new Set(MV.filter(function(m){ var d=(m.date||'').slice(0,10); return d>=r.from&&d<=r.to; }).map(function(m){ return m.lead_id; }));
   var noMove12 = ALL.filter(function(l){ return l.active && !movedInPeriod12.has(l.id) && (!kpiVend||l.vendeur===kpiVend); });
   document.getElementById('k12v').textContent = noMove12.length;
+
+  syncPilote(); // met à jour la page Pilotage avec ces mêmes valeurs
 }
 
 // Modal helpers for stage KPIs
