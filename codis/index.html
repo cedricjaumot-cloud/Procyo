@@ -120,10 +120,13 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
 .pbadge{align-self:flex-start;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);background:var(--blue-bg);padding:3px 9px;border-radius:6px}
 .pfore-row{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--muted);border-top:1px solid var(--soft);padding-top:8px}
 .pfore-row b{color:#1E2733}
-.pfunnel{display:flex;gap:8px;align-items:flex-end;overflow-x:auto;padding-top:6px}
+.pfunnel{display:flex;gap:8px;align-items:flex-start;overflow-x:auto;padding-top:6px}
 .pstage{flex:1;min-width:76px;text-align:center;cursor:pointer}
 .pstage .pcnt{font-size:21px;font-weight:800;margin-bottom:6px}
-.pstage .pbar{background:var(--soft);border:1px solid var(--border);border-radius:7px;position:relative}
+/* Zone de hauteur FIXE : la barre est toujours ancrée sur la même base,
+   quelle que soit la longueur du texte en dessous (7j/14j/30j/90j...) */
+.pstage .pbarwrap{height:130px;display:flex;align-items:flex-end;justify-content:center}
+.pstage .pbar{width:100%;background:var(--soft);border:1px solid var(--border);border-radius:7px;position:relative}
 .pstage:hover .pbar{background:#E1E8F1}
 .pstage .pfill{position:absolute;left:0;right:0;bottom:0;border-radius:6px;opacity:.9}
 .pstage .pnm{font-size:10.5px;color:var(--muted);margin-top:8px;line-height:1.2;height:26px}
@@ -817,7 +820,7 @@ function syncPilote(){
     var netTxt=(net>0?'+':'')+net+' vs '+(LBL[kpiDays]||'période préc.');
     return '<div class="pstage" data-kc="'+s.kc+'">'
       +'<div class="pcnt" style="color:'+s.a+'">'+vals[i]+'</div>'
-      +'<div class="pbar" style="height:'+h+'px"><div class="pfill" style="height:'+Math.round((vals[i]/mx)*100)+'%;background:'+s.a+'"></div></div>'
+      +'<div class="pbarwrap"><div class="pbar" style="height:'+h+'px"><div class="pfill" style="height:'+Math.round((vals[i]/mx)*100)+'%;background:'+s.a+'"></div></div></div>'
       +'<div class="pnm">'+s.nm+'</div>'
       +'<div class="pdelta"><span class="pin">+'+ins+'</span> / <span class="pout">-'+outs+'</span></div>'
       +'<div class="pdelta ptotal"><span class="'+netCls+'">'+netTxt+'</span></div></div>';
