@@ -150,6 +150,24 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
 .pinfo:hover .ptip,.pinfo:focus .ptip{display:block}
 .pmrrbar{height:9px;border-radius:5px;background:#E6F1FB;overflow:hidden}
 .pmrrfill{height:100%;border-radius:5px;background:#1E9E6A;transition:width .3s}
+.pgoalwrap{margin-top:7px}
+.pgoalbar{height:6px;border-radius:4px;background:var(--soft);overflow:hidden}
+.pgoalfill{height:100%;border-radius:4px;background:var(--green);transition:width .3s}
+.pgoaltxt{font-size:10px;color:var(--muted);margin-top:3px}
+.pupsidebtn{margin-left:auto;text-align:right;cursor:pointer;background:#E6F1FB;border:1px solid #BcD6F2;border-radius:10px;padding:9px 15px;font-family:inherit;display:block;outline:none}
+.pupsidebtn:hover{background:#D5E7FB;border-color:#8fbdea}
+.pupsidebtn-link{font-size:10px;font-weight:700;color:#2A78D6;margin-top:2px}
+.pscenario-tabs{display:inline-flex;background:#fff;border:1px solid var(--border);border-radius:7px;overflow:hidden;margin:2px 0 4px;cursor:default}
+.pscbtn{padding:4px 10px;font-size:10.5px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-right:1px solid var(--border)}
+.pscbtn:last-child{border-right:none}
+.pscbtn.on{background:var(--blue);color:#fff}
+.pscenario-settings{background:#F4F8FE;border:1px solid #D3E2F6;border-radius:9px;padding:12px 14px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center}
+.pscenario-settings label{font-size:12px;color:#1E2733;display:flex;align-items:center;gap:6px}
+.pscenario-settings input[type=range]{width:130px}
+.pscenario-settings input[type=checkbox]{width:14px;height:14px}
+.pscenario-settings.compact{padding:9px 11px;gap:7px 14px;margin-bottom:2px}
+.pscenario-settings.compact label{font-size:11px}
+.pscenario-settings.compact input[type=range]{width:90px}
 .ptile-sec{font-size:12px;color:var(--muted);font-weight:600}
 </style>
 </head>
@@ -226,6 +244,10 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
           <div class="ptile-sec"><span id="pil-addr-pot">-</span> pot. · <span id="pil-addr-total">-</span> tot.</div>
         </div>
         <div class="ptile-sub">actives · +potentielles · total</div>
+        <div class="pgoalwrap">
+          <div class="pgoalbar"><div class="pgoalfill" id="pil-addr-goalfill" style="width:0%"></div></div>
+          <div class="pgoaltxt" id="pil-addr-goaltxt">— / 500 adresses</div>
+        </div>
       </div>
       <div class="ptile-foot"><span class="pchip flat" id="pil-addr-trend"></span><span class="ptile-link">Voir le détail →</span></div>
     </div>
@@ -241,17 +263,6 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
     </div>
   </div>
 
-  <div class="pil-title">Possibilité d'évolution — portefeuille signé</div>
-  <div class="pcard click" id="pil-upside" style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
-    <div class="pico" style="background:#E6F1FB;width:42px;height:42px;font-size:20px">📈</div>
-    <div>
-      <div class="pcard-lbl">Adresses activables en plus</div>
-      <div class="ptile-num" style="color:#2A78D6;font-size:34px" id="pil-upside-val">-</div>
-    </div>
-    <div class="ptile-sub" style="max-width:340px">Clients signés dont le nombre d'ETP dépasse le nombre d'adresses actives → potentiel commercial d'expansion.</div>
-    <span class="ptile-link" style="margin-left:auto">Voir le détail →</span>
-  </div>
-
   <div class="pil-title">Prévision &amp; tunnel</div>
   <div class="pil-grid psplit">
     <div class="pfore" id="pil-forecast" style="cursor:pointer">
@@ -261,20 +272,36 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
       </div>
       <div style="display:flex;gap:30px;flex-wrap:wrap;align-items:baseline">
         <div>
-          <div class="ptile-sub">Garanti (contrat)</div>
+          <div class="ptile-sub">Signé</div>
           <div class="pfore-big" style="color:#1E9E6A"><span id="pil-mrr-asis">—</span><span class="cur"> €/mois</span></div>
         </div>
         <div>
-          <div class="ptile-sub">To-be (potentiel)</div>
+          <div class="ptile-sub">To-be — <span id="pil-scenario-label">personnalisé</span></div>
           <div class="pfore-big" style="color:#2A78D6;font-size:24px"><span id="pil-mrr-tobe">—</span><span class="cur"> €/mois</span></div>
         </div>
+        <button type="button" id="pil-mrr-upside-box" class="pupsidebtn">
+          <div class="ptile-sub" style="color:#2A78D6">Adresses activables</div>
+          <div class="pfore-big" style="color:#2A78D6;font-size:20px">+<span id="pil-mrr-upside">—</span></div>
+          <div class="pupsidebtn-link">Voir le détail →</div>
+        </button>
+      </div>
+      <div class="pscenario-tabs" id="pil-scenario-tabs" onclick="event.stopPropagation()">
+        <button data-sc="etp100" class="pscbtn">100% ETP</button>
+        <button data-sc="perso" class="pscbtn on">Personnalisé</button>
+        <button data-sc="max" class="pscbtn">Max</button>
+      </div>
+      <div class="pscenario-settings compact" id="pil-card-settings" style="display:none" onclick="event.stopPropagation()">
+        <label>% ETP couvert : <input type="range" id="pil-csc-pct" min="0" max="100" step="10" value="80"><b id="pil-csc-pct-val">80%</b></label>
+        <label><input type="checkbox" id="pil-csc-conf"> Conformité</label>
+        <label><input type="checkbox" id="pil-csc-comm"> Commercial</label>
+        <label><input type="checkbox" id="pil-csc-port"> Portefeuille</label>
       </div>
       <div>
         <div class="pmrrbar"><div class="pmrrfill" id="pil-mrr-bar" style="width:0%"></div></div>
         <div class="ptile-sub" id="pil-mrr-pct" style="margin-top:5px">—</div>
       </div>
       <div style="border-top:1px solid var(--soft);padding-top:9px">
-        <div class="pfore-row" style="color:#9AA4B2"><span>Pipeline non signé — en plus si ça signe</span><b style="color:#6B7688" id="pil-mrr-pipe">—</b></div>
+        <div class="pfore-row" style="color:#6B7688;font-size:14px"><span>Pipeline non signé — pondéré par probabilité</span><b style="color:#2A78D6;font-size:17px" id="pil-mrr-pipe">—</b></div>
       </div>
       <div style="font-size:10px;color:#c9a227">⚠️ Montants bruts HTVA, hors réductions commerciales (données à venir).</div>
     </div>
@@ -542,6 +569,31 @@ function pilClickProxy(pilId, kcId){
 pilClickProxy('pil-c1','kc1'); pilClickProxy('pil-c4','kc4');
 pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('pil-c11','kc11');
 (function(){ var fc=document.getElementById('pil-funnelcard'); if(fc) fc.addEventListener('click', function(){ showView('kpi'); }); })();
+// Onglets de scénario to-be (100% ETP / Personnalisé / Max) sur la carte Prévision
+document.querySelectorAll('#pil-scenario-tabs .pscbtn').forEach(function(b){
+  b.addEventListener('click', function(e){
+    e.stopPropagation();
+    PIL_SCENARIO=b.dataset.sc;
+    try{ localStorage.setItem('pil_scenario_active', PIL_SCENARIO); }catch(err){}
+    renderForecast();
+  });
+});
+// Réglages du scénario personnalisé directement sur la carte (pas besoin d'ouvrir le détail)
+(function(){
+  var p=document.getElementById('pil-csc-pct'), pv=document.getElementById('pil-csc-pct-val');
+  var cf=document.getElementById('pil-csc-conf'), cm=document.getElementById('pil-csc-comm'), pt=document.getElementById('pil-csc-port');
+  function apply(){
+    PIL_CUSTOM={pct:parseInt(p.value)||0, mods:{conf:cf.checked, comm:cm.checked, port:pt.checked}};
+    pilSaveCustom();
+    PIL_SCENARIO='perso';
+    try{ localStorage.setItem('pil_scenario_active','perso'); }catch(e){}
+    renderForecast();
+  }
+  if(p){ p.addEventListener('input', function(){ pv.textContent=p.value+'%'; }); p.addEventListener('change', apply); }
+  if(cf){ cf.addEventListener('change', apply); }
+  if(cm){ cm.addEventListener('change', apply); }
+  if(pt){ pt.addEventListener('change', apply); }
+})();
 // Carte Portefeuille — adresses : détail au clic (le rendu se fait via syncPilote)
 (function(){
   var el=document.getElementById('pil-addr'); if(!el) return;
@@ -558,10 +610,11 @@ pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('p
       rows?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Client</th><th class="sortable" onclick="sortTableByCol(this)">Type</th><th class="sortable" onclick="sortTableByCol(this)">Adresses</th><th class="sortable" onclick="sortTableByCol(this)">Statut</th><th class="sortable" onclick="sortTableByCol(this)">Détail</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucune donnée d\'adresses</div>');
   });
 })();
-// Carte "Possibilité d'évolution" : détail au clic
+// Bloc "Adresses activables" (dans la carte Prévision financière) : détail au clic
 (function(){
-  var el=document.getElementById('pil-upside'); if(!el) return;
-  el.addEventListener('click', function(){
+  var el=document.getElementById('pil-mrr-upside-box'); if(!el) return;
+  el.addEventListener('click', function(e){
+    e.stopPropagation(); e.preventDefault();
     var rows=AD.filter(function(c){ return (c.active||0)>0; })
       .map(function(c){ var noEtp=(c.etp||0)<=0; return {c:c, noEtp:noEtp, up:noEtp?-1:Math.max(0,(c.etp||0)-(c.active||0))}; })
       .sort(function(a,b){ return b.up-a.up; })  // potentiel décroissant, ETP inconnu en bas
@@ -575,66 +628,88 @@ pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('p
       rows?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Client</th><th class="sortable" onclick="sortTableByCol(this)">ETP</th><th class="sortable" onclick="sortTableByCol(this)">Adresses actives</th><th class="sortable" onclick="sortTableByCol(this)">Potentiel</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun client signé</div>');
   });
 })();
-// Prévision MRR : détail par client au clic
+// Prévision MRR : détail par client au clic, avec réglage du scénario personnalisé en direct
 (function(){
   var el=document.getElementById('pil-forecast'); if(!el) return;
-  el.addEventListener('click', function(){
+
+  function renderForecastModal(){
     var rows=AD.filter(function(c){ return (c.active||0)>0; })
-      .map(function(c){
-        var a0=c.active||0, aMax=Math.max(a0,c.etp||0);
-        return {c:c,
-          asisAddr: mrrBase(a0),                                   // garanti, adresses seules
-          asis: clientAsIs(c),                                     // garanti total (adresses + modules actifs)
-          tobeAddr: mrrBase(aMax),                                 // to-be, adresses seules (sans modules)
-          tobe: clientToBe(c)                                      // to-be total (adresses ETP + tous modules)
-        };
-      })
+      .map(function(c){ return {c:c, asis:clientAsIs(c), tobe:clientToBeActive(c)}; })
       .sort(function(a,b){ return (b.tobe-b.asis)-(a.tobe-a.asis); })
       .map(function(o){ var c=o.c, gap=o.tobe-o.asis;
-        var miss=[]; if(!c.mods_active.conf)miss.push('Conformité'); if(!c.mods_active.comm)miss.push('Commercial'); if(!c.mods_active.port)miss.push('Portefeuille');
+        var wanted=scenarioMods();   // modules concernés par le scénario ACTIF uniquement
+        var missAll=[];
+        if(wanted.conf && !c.mods_active.conf) missAll.push('Conformité');
+        if(wanted.comm && !c.mods_active.comm) missAll.push('Commercial');
+        if(wanted.port && !c.mods_active.port) missAll.push('Portefeuille');
         var noEtp=(c.etp||0)<=0;
-        var addrGap=Math.max(0,(c.etp||0)-(c.active||0));
+        var targetAddr=scenarioAddr(c, scenarioPct());
+        var addrGap=Math.max(0, targetAddr-(c.active||0));
         var todo=[];
         if(addrGap>0) todo.push(addrGap+' adresse'+(addrGap>1?'s':'')+' à vendre');
-        if(miss.length) todo.push((miss.length>1?'modules':'module')+' : '+miss.join(', '));
-        var todoTxt = noEtp ? '<span style="color:#c9a227">ETP inconnu (potentiel non calculable)</span>'
-                     : (todo.length ? todo.join(' + ') : '<span style="color:#1E9E6A">portefeuille complet ✓</span>');
-        var adrTxt = (c.active||0)+' → '+(noEtp?'?':Math.max(c.active||0,c.etp||0));
-        var asisModPart = o.asis - o.asisAddr;   // ce que rapportent les modules actifs, isolé (garanti)
-        var tobeModPart = o.tobe - o.tobeAddr;   // ce que rapporteraient tous les modules à ETP, isolé (to-be)
-        var tip = '<b>Garanti</b> : '+eur(o.asisAddr)+' € adresses + '+eur(asisModPart)+' € modules<br><b>To-be</b> : '+eur(o.tobeAddr)+' € adresses + '+eur(tobeModPart)+' € modules';
-        var nameCell = '<strong style="font-size:11px">'+(c.name||'').slice(0,22)+'</strong><span class="pinfo" onclick="event.stopPropagation()" tabindex="0">i<span class="ptip">'+tip+'</span></span>';
+        if(missAll.length) todo.push((missAll.length>1?'modules':'module')+' : '+missAll.join(', '));
+        var todoTxt = todo.length ? todo.join(' + ')+(noEtp&&addrGap===0&&scenarioPct()<100?' <span style="color:#c9a227">(ETP inconnu)</span>':'')
+                     : '<span style="color:#1E9E6A">complet pour ce scénario ✓</span>';
+        var adrTxt = (c.active||0)+' → '+targetAddr;
         var potBadge = gap>0 ? ('<span class="badge" style="background:#E6F1FB;color:#2A78D6;font-weight:800">+'+eur(gap)+' €</span>') : '<span style="color:#bbb">—</span>';
-        return '<tr><td>'+nameCell+'</td>'
+        return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,24)+'</strong></td>'
           +'<td style="font-size:12px;font-weight:700;color:#1E9E6A">'+eur(o.asis)+' €</td>'
           +'<td style="font-size:12px;font-weight:700;color:#2A78D6">'+eur(o.tobe)+' €</td>'
           +'<td>'+potBadge+'</td>'
           +'<td style="font-size:11px;color:#888">'+todoTxt+'</td>'
           +'<td style="font-size:11px;color:#666">'+adrTxt+'</td></tr>';
       }).join('');
-    // Section pipeline non signé (prospects avec offre, pas encore signés)
+    // Section pipeline non signé (prospects avec offre, pas encore signés) — pondéré par étape
     var pipeRows=AD.filter(function(c){ return (c.active||0)<=0 && (c.potential||0)>0; })
-      .map(function(c){ return {c:c, mrr:clientPipe(c)}; })
+      .map(function(c){ return {c:c, mrr:clientPipe(c), raw: mrrBase(Math.round(c.potential||0))+modMRR(Math.round(c.potential||0),c.mods_prop)}; })
       .sort(function(a,b){ return b.mrr-a.mrr; })
-      .map(function(o){ var c=o.c, addr=Math.round(c.potential||0);
+      .map(function(o){ var c=o.c, addr=Math.round(c.potential||0), w=pipeWeight(c);
         var mods=[]; if(c.mods_prop.conf)mods.push('Conformité'); if(c.mods_prop.comm)mods.push('Commercial'); if(c.mods_prop.port)mods.push('Portefeuille');
-        var src=c.offre>0?'offre retenue':'moyenne offres';
-        return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,24)+'</strong></td>'
-          +'<td style="font-size:12px">'+addr+' <span style="color:#bbb;font-size:10px">('+src+')</span></td>'
+        var etape = c.offre>0 ? 'Offre retenue (BDC signé)' : 'Offre envoyée (proposée)';
+        var etapeBadge = '<span class="badge" style="background:'+(c.offre>0?'#E3F5EC':'#FDECEA')+';color:'+(c.offre>0?'#1E9E6A':'#D64545')+'">'+etape+' · '+Math.round(w*100)+'%</span>';
+        return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,22)+'</strong></td>'
+          +'<td>'+etapeBadge+'</td>'
+          +'<td style="font-size:12px">'+addr+'</td>'
           +'<td style="font-size:11px;color:#888">'+(mods.length?mods.join(', '):'—')+'</td>'
-          +'<td style="font-size:12px;color:#2A78D6;font-weight:700">+'+eur(o.mrr)+' €</td></tr>';
+          +'<td style="font-size:12px;color:#2A78D6;font-weight:700">+'+eur(o.mrr)+' € <span style="font-size:10px;color:#bbb;font-weight:400">(brut '+eur(o.raw)+' €)</span></td></tr>';
       }).join('');
 
-    var asis=0,tobe=0,pipe=0; AD.forEach(function(c){ asis+=clientAsIs(c); tobe+=clientToBe(c); pipe+=clientPipe(c); });
-    var body=''
-      +'<div style="font-size:12px;font-weight:700;color:#1E9E6A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Clients signés — garanti '+eur(asis)+' € → to-be '+eur(tobe)+' €/mois</div>'
-      +'<div style="font-size:11px;color:#888;margin-bottom:10px">L\'écart (rouge) = revenu mensuel à aller chercher chez chaque client déjà signé.</div>'
-      +(rows?'<div class="twrap"><table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Client <span style="font-weight:400;color:#bbb;font-size:9px">(i = détail adr./mod.)</span></th><th class="sortable" onclick="sortTableByCol(this)">Garanti</th><th class="sortable" onclick="sortTableByCol(this)">To-be</th><th class="sortable" onclick="sortTableByCol(this)">Potentiel</th><th class="sortable" onclick="sortTableByCol(this)">À activer</th><th class="sortable" onclick="sortTableByCol(this)">Adresses</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty">Aucun client signé</div>')
-      +'<div style="font-size:12px;font-weight:700;color:#2A78D6;text-transform:uppercase;letter-spacing:.05em;margin:20px 0 8px">Pipeline non signé — +'+eur(pipe)+' €/mois si ça signe</div>'
-      +'<div style="font-size:11px;color:#888;margin-bottom:10px">Prospects avec une offre en cours mais pas encore de contrat signé. Non garanti.</div>'
-      +(pipeRows?'<div class="twrap"><table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Prospect</th><th class="sortable" onclick="sortTableByCol(this)">Adresses (offre)</th><th class="sortable" onclick="sortTableByCol(this)">Modules proposés</th><th class="sortable" onclick="sortTableByCol(this)">MRR potentiel</th></tr></thead><tbody>'+pipeRows+'</tbody></table></div>':'<div class="empty">Aucun prospect avec offre en cours</div>');
+    var asis=0,tobe=0,pipe=0; AD.forEach(function(c){ asis+=clientAsIs(c); tobe+=clientToBeActive(c); pipe+=clientPipe(c); });
+    var settings=''
+      +'<div class="pscenario-settings" id="pil-settings">'
+      +'<label>Scénario personnalisé — % ETP couvert : <input type="range" id="pil-set-pct" min="0" max="100" step="10" value="'+PIL_CUSTOM.pct+'"><b id="pil-set-pct-val">'+PIL_CUSTOM.pct+'%</b></label>'
+      +'<label><input type="checkbox" id="pil-set-conf" '+(PIL_CUSTOM.mods.conf?'checked':'')+'> Conformité</label>'
+      +'<label><input type="checkbox" id="pil-set-comm" '+(PIL_CUSTOM.mods.comm?'checked':'')+'> Commercial</label>'
+      +'<label><input type="checkbox" id="pil-set-port" '+(PIL_CUSTOM.mods.port?'checked':'')+'> Portefeuille</label>'
+      +'<span style="font-size:10.5px;color:#6B7688">Modifier ces réglages active automatiquement le scénario « Personnalisé »</span>'
+      +'</div>';
+    var body=settings
+      +'<div style="font-size:12px;font-weight:700;color:#1E9E6A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Clients signés — garanti '+eur(asis)+' € → to-be ('+pilScenarioLabel()+') '+eur(tobe)+' €/mois</div>'
+      +'<div style="font-size:11px;color:#888;margin-bottom:10px">Le potentiel (bleu) = revenu mensuel à aller chercher chez chaque client déjà signé, selon le scénario ci-dessus.</div>'
+      +(rows?'<div class="twrap"><table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Client</th><th class="sortable" onclick="sortTableByCol(this)">Garanti</th><th class="sortable" onclick="sortTableByCol(this)">To-be</th><th class="sortable" onclick="sortTableByCol(this)">Potentiel</th><th class="sortable" onclick="sortTableByCol(this)">À activer</th><th class="sortable" onclick="sortTableByCol(this)">Adresses</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty">Aucun client signé</div>')
+      +'<div style="font-size:12px;font-weight:700;color:#2A78D6;text-transform:uppercase;letter-spacing:.05em;margin:20px 0 8px">Pipeline non signé — +'+eur(pipe)+' €/mois pondéré si ça signe</div>'
+      +'<div style="font-size:11px;color:#888;margin-bottom:10px">Prospects avec une offre en cours (pas encore de contrat). Pondéré par probabilité selon l\'étape : offre envoyée ×50%, offre retenue/BDC signé ×80%. Non garanti.</div>'
+      +(pipeRows?'<div class="twrap"><table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Prospect</th><th class="sortable" onclick="sortTableByCol(this)">Étape</th><th class="sortable" onclick="sortTableByCol(this)">Adresses (offre)</th><th class="sortable" onclick="sortTableByCol(this)">Modules proposés</th><th class="sortable" onclick="sortTableByCol(this)">MRR pondéré</th></tr></thead><tbody>'+pipeRows+'</tbody></table></div>':'<div class="empty">Aucun prospect avec offre en cours</div>');
     openModal('Prévision MRR — détail', 'Signé (garanti/to-be) et pipeline non signé', body);
-  });
+
+    // Branche les réglages du scénario personnalisé (mise à jour en direct, carte + tableau)
+    var pct=document.getElementById('pil-set-pct'), pctVal=document.getElementById('pil-set-pct-val');
+    var cConf=document.getElementById('pil-set-conf'), cComm=document.getElementById('pil-set-comm'), cPort=document.getElementById('pil-set-port');
+    function applyCustom(){
+      PIL_CUSTOM={pct:parseInt(pct.value)||0, mods:{conf:cConf.checked, comm:cComm.checked, port:cPort.checked}};
+      pilSaveCustom();
+      PIL_SCENARIO='perso';
+      try{ localStorage.setItem('pil_scenario_active','perso'); }catch(e){}
+      renderForecast();
+      renderForecastModal();
+    }
+    if(pct){ pct.addEventListener('input', function(){ pctVal.textContent=pct.value+'%'; }); pct.addEventListener('change', applyCustom); }
+    if(cConf){ cConf.addEventListener('change', applyCustom); }
+    if(cComm){ cComm.addEventListener('change', applyCustom); }
+    if(cPort){ cPort.addEventListener('change', applyCustom); }
+  }
+
+  el.addEventListener('click', function(){ renderForecastModal(); });
 })();
 // Clic "Contrats signés" (Pilotage) : liste des leads passés en "Contrat signé" SUR LA PERIODE
 (function(){
@@ -687,6 +762,11 @@ function renderAddresses(){
   setTxt('pil-addr-active', active);
   setTxt('pil-addr-pot', Math.round(pot));
   setTxt('pil-addr-total', Math.round(active+pot));
+  // Objectif : 500 adresses actives
+  var GOAL_ADDR=500;
+  var gpct=Math.min(100, Math.round(active/GOAL_ADDR*100));
+  var gfill=document.getElementById('pil-addr-goalfill'); if(gfill) gfill.style.width=gpct+'%';
+  setTxt('pil-addr-goaltxt', active+' / '+GOAL_ADDR+' adresses ('+gpct+'%)');
   // Évolution des adresses actives : total actuel vs snapshot d'il y a N jours (historique réel)
   var target=kpiRange(kpiDays).from;   // date = aujourd'hui - N jours
   var base=null;
@@ -697,11 +777,11 @@ function renderAddresses(){
   else if(el){ el.className='pchip flat'; el.textContent='historique en cours…'; }
 }
 
-// KPI possibilité d'évolution : ETP - adresses actives (clients signés uniquement)
+// Adresses activables en plus : ETP - adresses actives (clients signés uniquement)
 function renderUpside(){
   var total=0;
   AD.forEach(function(c){ if((c.active||0)>0){ var up=(c.etp||0)-(c.active||0); if(up>0) total+=up; } });
-  setTxt('pil-upside-val', total);
+  setTxt('pil-mrr-upside', total);
 }
 
 // ── PRÉVISION MRR ──
@@ -716,31 +796,81 @@ function tierOf(a){ if(a<=0) return null; for(var i=0;i<TIERS.length;i++){ if(a<
 function mrrBase(a){ var t=tierOf(a); return t? t.base+Math.max(0,a-t.incl)*t.sup : 0; }
 function modMRR(a,mods){ var t=tierOf(a); var base=t?t.base:0; var m=0; if(mods&&mods.conf) m+=a*10; if(mods&&mods.comm) m+=a*10; if(mods&&mods.port) m+=0.1*base; return m; }
 function clientAsIs(c){ var a=c.active||0; return a>0 ? mrrBase(a)+modMRR(a,c.mods_active) : 0; }
-function clientToBe(c){ var a=Math.max(c.active||0, c.etp||0); return a>0 ? mrrBase(a)+modMRR(a,{conf:true,comm:true,port:true}) : 0; }
-function clientPipe(c){ var a=Math.round(c.potential||0); return (a>0 && (c.active||0)<=0) ? mrrBase(a)+modMRR(a,c.mods_prop) : 0; }
+
+// ── Scénarios to-be : adresses = max(actives, ETP × pct%), modules au choix ──
+var MODS_NONE={conf:false,comm:false,port:false};
+var MODS_ALL={conf:true,comm:true,port:true};
+function scenarioAddr(c,pct){ return Math.max(c.active||0, Math.round((c.etp||0)*pct/100)); }
+function scenarioValue(c,pct,mods){
+  var a=scenarioAddr(c,pct);
+  // Un scénario ne fait JAMAIS perdre un module déjà actif : on prend l'union
+  // (déjà actif) OU (voulu par le scénario), jamais moins que le garanti actuel.
+  var ma=c.mods_active||{};
+  var eff={ conf: !!ma.conf || !!(mods&&mods.conf), comm: !!ma.comm || !!(mods&&mods.comm), port: !!ma.port || !!(mods&&mods.port) };
+  return a>0 ? mrrBase(a)+modMRR(a,eff) : 0;
+}
+function clientToBe100(c){ return scenarioValue(c,100,MODS_NONE); }  // 100% ETP, 0 module
+function clientToBeMax(c){ return scenarioValue(c,100,MODS_ALL); }   // 100% ETP, tous modules
+function clientToBePerso(c){ return scenarioValue(c,PIL_CUSTOM.pct,PIL_CUSTOM.mods); }
+function clientToBeActive(c){
+  return PIL_SCENARIO==='etp100' ? clientToBe100(c) : (PIL_SCENARIO==='max' ? clientToBeMax(c) : clientToBePerso(c));
+}
+// Paramètres (% ETP, modules) du scénario actuellement affiché — pour que le détail
+// (adresses à vendre, modules à activer) colle exactement à ce qui est sélectionné.
+function scenarioPct(){ return PIL_SCENARIO==='perso' ? PIL_CUSTOM.pct : 100; }
+function scenarioMods(){ return PIL_SCENARIO==='etp100' ? MODS_NONE : (PIL_SCENARIO==='max' ? MODS_ALL : PIL_CUSTOM.mods); }
+
+// Scénario personnalisé — mémorisé dans le navigateur
+var PIL_CUSTOM=(function(){
+  try{ var s=JSON.parse(localStorage.getItem('pil_custom_scenario')||'null'); if(s&&typeof s.pct==='number'&&s.mods) return s; }catch(e){}
+  return {pct:80, mods:{conf:false,comm:false,port:false}};
+})();
+function pilSaveCustom(){ try{ localStorage.setItem('pil_custom_scenario', JSON.stringify(PIL_CUSTOM)); }catch(e){} }
+var PIL_SCENARIO=(function(){
+  var s=localStorage.getItem('pil_scenario_active');
+  return (s==='etp100'||s==='perso'||s==='max') ? s : 'perso';
+})();
+function pilScenarioLabel(){
+  if(PIL_SCENARIO==='etp100') return '100% ETP, 0 module';
+  if(PIL_SCENARIO==='max') return 'max (100% ETP + tous modules)';
+  var m=[]; if(PIL_CUSTOM.mods.conf)m.push('Conf.'); if(PIL_CUSTOM.mods.comm)m.push('Comm.'); if(PIL_CUSTOM.mods.port)m.push('Portef.');
+  return 'personnalisé ('+PIL_CUSTOM.pct+'% ETP'+(m.length?' + '+m.join('+'):', 0 module')+')';
+}
+
+// Pipeline non signé — pondéré par probabilité selon l'étape réelle
+// (offre envoyée/proposée = 50% ; offre retenue/BDC signé = 80% ; contrat signé = déjà dans Garanti)
+function clientPipe(c){
+  var a=Math.round(c.potential||0);
+  if(!(a>0 && (c.active||0)<=0)) return 0;
+  var weight = c.offre>0 ? 0.8 : 0.5;
+  return (mrrBase(a)+modMRR(a,c.mods_prop))*weight;
+}
+function pipeWeight(c){ return c.offre>0 ? 0.8 : 0.5; }
 function eur(n){ return Math.round(n).toLocaleString('fr-BE'); }
+
 function renderForecast(){
-  // 4 niveaux, chaque levier isolé séparément (adresses vs modules) :
-  // 1) garanti adresses seules   2) garanti adresses+modules actifs (= garanti total)
-  // 3) to-be adresses seules (ETP, sans AUCUN module)   4) to-be total (ETP + tous modules)
-  var asisAddr=0, asisTot=0, toBeAddr=0, toBeTotal=0, pipe=0;
-  AD.forEach(function(c){
-    var a0=c.active||0;
-    asisAddr+=mrrBase(a0);
-    asisTot+=clientAsIs(c);
-    toBeTotal+=clientToBe(c);
-    pipe+=clientPipe(c);
-    if(a0<=0) return;
-    var a=Math.max(a0, c.etp||0);
-    toBeAddr+=mrrBase(a);   // adresses au max ETP, SANS AUCUN module
-  });
+  var asisTot=0, toBeTotal=0, pipe=0;
+  AD.forEach(function(c){ asisTot+=clientAsIs(c); toBeTotal+=clientToBeActive(c); pipe+=clientPipe(c); });
   setTxt('pil-mrr-asis', eur(asisTot));
   setTxt('pil-mrr-tobe', eur(toBeTotal));
+  setTxt('pil-scenario-label', pilScenarioLabel());
   setTxt('pil-mrr-pipe', '+'+eur(pipe)+' €');
-  // Barre de progression : part du to-be déjà garantie
   var pct = toBeTotal>0 ? Math.round(asisTot/toBeTotal*100) : 0;
   var bar=document.getElementById('pil-mrr-bar'); if(bar) bar.style.width=Math.min(100,pct)+'%';
-  setTxt('pil-mrr-pct', pct+'% déjà garanti sur le potentiel du portefeuille signé');
+  setTxt('pil-mrr-pct', pct+'% déjà garanti sur le potentiel du scénario sélectionné');
+  document.querySelectorAll('#pil-scenario-tabs .pscbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.sc===PIL_SCENARIO); });
+  // Réglages du scénario personnalisé, visibles directement sur la carte
+  var cs=document.getElementById('pil-card-settings');
+  if(cs){
+    cs.style.display = PIL_SCENARIO==='perso' ? 'flex' : 'none';
+    var p=document.getElementById('pil-csc-pct'), pv=document.getElementById('pil-csc-pct-val');
+    var cf=document.getElementById('pil-csc-conf'), cm=document.getElementById('pil-csc-comm'), pt=document.getElementById('pil-csc-port');
+    if(p && document.activeElement!==p){ p.value=PIL_CUSTOM.pct; }
+    if(pv){ pv.textContent=PIL_CUSTOM.pct+'%'; }
+    if(cf){ cf.checked=PIL_CUSTOM.mods.conf; }
+    if(cm){ cm.checked=PIL_CUSTOM.mods.comm; }
+    if(pt){ pt.checked=PIL_CUSTOM.mods.port; }
+  }
 }
 
 // Calcule les métriques clés (flux) sur une plage de dates donnée
