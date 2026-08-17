@@ -408,13 +408,21 @@ Deno.serve(async (req) => {
       const F_OFF = has("x_studio_nombre_adresses_offre") ? "x_studio_nombre_adresses_offre" : null;
       const F_O = ["x_studio_nombre_adresses_offre_1", "x_studio_nombre_adresses_offre_2", "x_studio_nombre_adresses_offre_3"].filter(has);
       const F_ETP = has("x_studio_nombre_etp_contrat") ? "x_studio_nombre_etp_contrat" : null;
-      // Modules — champs ACTIFS (signés, "_contrat") et PROPOSÉS (offre, "assistant_")
+      // Modules — champs ACTIFS (contrat reellement signe, "_contrat") et PROPOSES/RETENUS
+      // (offre signee = BDC signe mais contrat pas encore signe, champs "_offre")
       const bF = (n: string) => (has(n) ? n : null);
       const MF = {
         conf_a: bF("x_studio_ass_conformite_contrat"), comm_a: bF("x_studio_ass_commercial_contrat"), port_a: bF("x_studio_ass_portefeuille_contrat"),
-        conf_p: bF("x_studio_assistant_conformite"), comm_p: bF("x_studio_assistant_commercial"), port_p: bF("x_studio_assistant_portefeuille"),
+        conf_p: bF("x_studio_conformite_offre"), comm_p: bF("x_studio_commercial_offre"), port_p: bF("x_studio_portefeuille_offre"),
       };
-      const moduleFields = Object.values(MF).filter(Boolean) as string[];
+      // Modules PAR OFFRE en attente (1/2/3) — utilisés tant qu'aucune offre n'est retenue,
+      // comme pour les adresses (offre_1/2/3) : on regarde ce qui est coché sur les offres en cours.
+      const F_MOD = {
+        conf: ["x_studio_conformite_offre_1", "x_studio_conformite_offre_2", "x_studio_conformite_offre_3"].filter(has),
+        comm: ["x_studio_commercial_offre_1", "x_studio_commercial_offre_2", "x_studio_commercial_offre_3"].filter(has),
+        port: ["x_studio_portefeuille_offre_1", "x_studio_portefeuille_offre_2", "x_studio_portefeuille_offre_3"].filter(has),
+      };
+      const moduleFields = (Object.values(MF).filter(Boolean) as string[]).concat(F_MOD.conf, F_MOD.comm, F_MOD.port);
 
       const conds: any[] = [];
       if (F_ACT) conds.push([F_ACT, ">", 0]);
@@ -432,16 +440,21 @@ Deno.serve(async (req) => {
         const offers = F_O.map((f) => numOf(c[f]));
         const etp = F_ETP ? numOf(c[F_ETP]) : 0;
         const mods_active = { conf: boolOf(c, MF.conf_a), comm: boolOf(c, MF.comm_a), port: boolOf(c, MF.port_a) };
-        const mods_prop = { conf: boolOf(c, MF.conf_p), comm: boolOf(c, MF.comm_p), port: boolOf(c, MF.port_p) };
+        const anyOf = (fields: string[]) => fields.some((f) => !!c[f]);
+        let mods_prop = { conf: boolOf(c, MF.conf_p), comm: boolOf(c, MF.comm_p), port: boolOf(c, MF.port_p) };
         let potential = 0, statut = "";
         if (active > 0) {
           statut = "Actif";
         } else if (offre > 0) {
+          // Offre retenue (BDC signe) -> champs promus, valeur directe (pas de moyenne)
           potential = offre; statut = "Offre retenue";
         } else {
+          // Encore plusieurs offres en discussion -> moyenne des adresses ET modules
+          // cochés sur AU MOINS une des offres en cours (comme pour les adresses).
           const nz = offers.filter((x) => x > 0);
           potential = nz.length ? nz.reduce((a, b) => a + b, 0) / nz.length : 0;
           statut = nz.length ? (nz.length + " offre(s) proposée(s)") : "—";
+          mods_prop = { conf: anyOf(F_MOD.conf), comm: anyOf(F_MOD.comm), port: anyOf(F_MOD.port) };
         }
         return { id: c.id, name: c.name, active, potential, offre, offers, statut, etp, mods_active, mods_prop };
       }).filter((x) => x.active > 0 || x.potential > 0);

@@ -139,10 +139,14 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
 .pchip.flat{background:var(--soft);color:var(--muted)}
 .pdelta{font-size:10px;margin-top:4px;font-weight:700}
 .pdelta .pin{color:var(--green)}.pdelta .pout{color:var(--red)}
+.pdelta.ptotal{margin-top:2px;padding-top:3px;border-top:1px dashed var(--border);font-weight:800}
+.pdelta.ptotal span:not(.pin):not(.pout){color:var(--muted);font-weight:600}
 .pinfo{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--soft);color:var(--muted);font-size:10px;font-weight:700;font-style:italic;cursor:help;position:relative;margin-left:5px;vertical-align:middle}
 .pinfo .ptip{display:none;position:absolute;left:0;top:135%;width:250px;background:#1E2733;color:#fff;font-size:11px;font-weight:400;font-style:normal;line-height:1.5;padding:11px 13px;border-radius:9px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.28);text-transform:none;letter-spacing:normal}
 .pinfo .ptip b{color:#8FD0FF}
 .pinfo:hover .ptip,.pinfo:focus .ptip{display:block}
+.pmrrbar{height:9px;border-radius:5px;background:#E6F1FB;overflow:hidden}
+.pmrrfill{height:100%;border-radius:5px;background:#1E9E6A;transition:width .3s}
 .ptile-sec{font-size:12px;color:var(--muted);font-weight:600}
 </style>
 </head>
@@ -252,22 +256,24 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
         <div class="pcard-lbl" style="color:#6B7688">Prévision financière — MRR</div>
         <span class="ptile-link">Voir le détail →</span>
       </div>
+      <div style="display:flex;gap:30px;flex-wrap:wrap;align-items:baseline">
+        <div>
+          <div class="ptile-sub">Garanti (contrat)</div>
+          <div class="pfore-big" style="color:#1E9E6A"><span id="pil-mrr-asis">—</span><span class="cur"> €/mois</span></div>
+        </div>
+        <div>
+          <div class="ptile-sub">To-be (potentiel)</div>
+          <div class="pfore-big" style="color:#2A78D6;font-size:24px"><span id="pil-mrr-tobe">—</span><span class="cur"> €/mois</span></div>
+        </div>
+      </div>
       <div>
-        <div class="ptile-sub">MRR garanti (contrat) — dès l'onboarding terminé</div>
-        <div class="pfore-big" style="color:#1E9E6A"><span id="pil-mrr-asis">—</span><span class="cur"> €/mois</span></div>
+        <div class="pmrrbar"><div class="pmrrfill" id="pil-mrr-bar" style="width:0%"></div></div>
+        <div class="ptile-sub" id="pil-mrr-pct" style="margin-top:5px">—</div>
       </div>
-      <div style="border-top:1px solid var(--soft);padding-top:10px">
-        <div class="ptile-sub" style="margin-bottom:6px">Potentiel du portefeuille signé (to-be)</div>
-        <div class="pfore-row"><span>MRR to-be adresses (max ETP)</span><b id="pil-mrr-tobeaddr">—</b></div>
-        <div class="pfore-row"><span>+ tous modules (extra)</span><b id="pil-mrr-mod">—</b></div>
-        <div class="pfore-row" style="font-weight:700"><span style="color:#2A78D6">= MRR to-be total</span><b style="color:#2A78D6;font-size:15px" id="pil-mrr-tobe">—</b></div>
+      <div style="border-top:1px solid var(--soft);padding-top:9px">
+        <div class="pfore-row" style="color:#9AA4B2"><span>Pipeline non signé — en plus si ça signe</span><b style="color:#6B7688" id="pil-mrr-pipe">—</b></div>
       </div>
-      <div style="border-top:1px solid var(--soft);padding-top:10px">
-        <div class="pfore-row" style="color:#9AA4B2"><span>Pipeline non signé — en plus si ça signe (non garanti)</span><b style="color:#6B7688" id="pil-mrr-pipe">—</b></div>
-      </div>
-      <div style="font-size:10.5px;color:#c9a227;background:#FFF7E6;border:1px solid #F0D28A;border-radius:7px;padding:7px 10px">
-        ⚠️ Montants bruts HTVA. Les réductions commerciales (1 mois offert, −15%/mois…) ne sont <b>pas encore</b> prises en compte — en attente de données.
-      </div>
+      <div style="font-size:10px;color:#c9a227">⚠️ Montants bruts HTVA, hors réductions commerciales (données à venir).</div>
     </div>
     <div class="pcard click" id="pil-funnelcard">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -449,6 +455,39 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
 </div><!-- /app-root -->
 
 <script>
+// Tri générique d'une colonne de tableau (clic sur l'en-tête) : détecte
+// automatiquement si la colonne est numérique (tri croissant/décroissant)
+// ou textuelle (tri alphabétique) — fonctionne aussi pour les dates
+// (format AAAA-MM-JJ, triable comme du texte).
+function sortTableByCol(th){
+  var table=th.closest('table');
+  var tbody=table.querySelector('tbody');
+  var idx=Array.prototype.indexOf.call(th.parentNode.children, th);
+  var rows=Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+  var asc = !th.classList.contains('sort-asc');
+  function key(r){
+    var cell=r.children[idx]; if(!cell) return '';
+    return (cell.textContent||'').trim();
+  }
+  var allNum = rows.length>0 && rows.every(function(r){
+    var k=key(r).replace(/[^0-9.,\-]/g,'').replace(',', '.');
+    return k===''||!isNaN(parseFloat(k));
+  });
+  rows.sort(function(a,b){
+    var ka=key(a), kb=key(b);
+    if(allNum){
+      var na=parseFloat(ka.replace(/[^0-9.,\-]/g,'').replace(',', '.'))||0;
+      var nb=parseFloat(kb.replace(/[^0-9.,\-]/g,'').replace(',', '.'))||0;
+      return asc?(na-nb):(nb-na);
+    }
+    ka=ka.toLowerCase(); kb=kb.toLowerCase();
+    if(ka===kb) return 0;
+    return asc ? (ka<kb?-1:1) : (ka>kb?-1:1);
+  });
+  rows.forEach(function(r){ tbody.appendChild(r); });
+  table.querySelectorAll('th.sortable').forEach(function(h){ h.classList.remove('sort-asc','sort-desc'); });
+  th.classList.add(asc?'sort-asc':'sort-desc');
+}
 function sortTableByDate(th){
   var table=th.closest('table');
   var tbody=table.querySelector('tbody');
@@ -513,7 +552,7 @@ pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('p
     }).join('');
     var act=0,pot=0; AD.forEach(function(c){act+=c.active||0;pot+=c.potential||0;});
     openModal('Portefeuille — adresses', AD.length+' clients — '+act+' actives + '+Math.round(pot)+' potentielles = '+Math.round(act+pot)+' au total',
-      rows?'<table class="tbl"><thead><tr><th>Client</th><th>Type</th><th>Adresses</th><th>Statut</th><th>Détail</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucune donnée d\'adresses</div>');
+      rows?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Client</th><th class="sortable" onclick="sortTableByCol(this)">Type</th><th class="sortable" onclick="sortTableByCol(this)">Adresses</th><th class="sortable" onclick="sortTableByCol(this)">Statut</th><th class="sortable" onclick="sortTableByCol(this)">Détail</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucune donnée d\'adresses</div>');
   });
 })();
 // Carte "Possibilité d'évolution" : détail au clic
@@ -530,7 +569,7 @@ pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('p
       }).join('');
     var total=0; AD.forEach(function(c){ if((c.active||0)>0){ var u=(c.etp||0)-(c.active||0); if(u>0) total+=u; } });
     openModal("Possibilité d'évolution", total+" adresses activables en plus (ETP > adresses actives)",
-      rows?'<table class="tbl"><thead><tr><th>Client</th><th>ETP</th><th>Adresses actives</th><th>Potentiel</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun client signé</div>');
+      rows?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Client</th><th class="sortable" onclick="sortTableByCol(this)">ETP</th><th class="sortable" onclick="sortTableByCol(this)">Adresses actives</th><th class="sortable" onclick="sortTableByCol(this)">Potentiel</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun client signé</div>');
   });
 })();
 // Prévision MRR : détail par client au clic
@@ -538,7 +577,15 @@ pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('p
   var el=document.getElementById('pil-forecast'); if(!el) return;
   el.addEventListener('click', function(){
     var rows=AD.filter(function(c){ return (c.active||0)>0; })
-      .map(function(c){ return {c:c, asis:clientAsIs(c), tobe:clientToBe(c)}; })
+      .map(function(c){
+        var a0=c.active||0, aMax=Math.max(a0,c.etp||0);
+        return {c:c,
+          asisAddr: mrrBase(a0),                                   // garanti, adresses seules
+          asis: clientAsIs(c),                                     // garanti total (adresses + modules actifs)
+          tobeAddr: mrrBase(aMax),                                 // to-be, adresses seules (sans modules)
+          tobe: clientToBe(c)                                      // to-be total (adresses ETP + tous modules)
+        };
+      })
       .sort(function(a,b){ return (b.tobe-b.asis)-(a.tobe-a.asis); })
       .map(function(o){ var c=o.c, gap=o.tobe-o.asis;
         var miss=[]; if(!c.mods_active.conf)miss.push('Conformité'); if(!c.mods_active.comm)miss.push('Commercial'); if(!c.mods_active.port)miss.push('Portefeuille');
@@ -550,12 +597,17 @@ pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('p
         var todoTxt = noEtp ? '<span style="color:#c9a227">ETP inconnu (potentiel non calculable)</span>'
                      : (todo.length ? todo.join(' + ') : '<span style="color:#1E9E6A">portefeuille complet ✓</span>');
         var adrTxt = (c.active||0)+' → '+(noEtp?'?':Math.max(c.active||0,c.etp||0));
-        return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,24)+'</strong></td>'
-          +'<td style="font-size:12px">'+eur(o.asis)+' €</td>'
-          +'<td style="font-size:12px;color:#2A78D6">'+eur(o.tobe)+' €</td>'
-          +'<td style="font-size:12px;font-weight:700;color:#D64545">+'+eur(gap)+' €</td>'
-          +'<td style="font-size:11px;color:#666">'+adrTxt+'</td>'
-          +'<td style="font-size:11px;color:#888">'+todoTxt+'</td></tr>';
+        var asisModPart = o.asis - o.asisAddr;   // ce que rapportent les modules actifs, isolé (garanti)
+        var tobeModPart = o.tobe - o.tobeAddr;   // ce que rapporteraient tous les modules à ETP, isolé (to-be)
+        var tip = '<b>Garanti</b> : '+eur(o.asisAddr)+' € adresses + '+eur(asisModPart)+' € modules<br><b>To-be</b> : '+eur(o.tobeAddr)+' € adresses + '+eur(tobeModPart)+' € modules';
+        var nameCell = '<strong style="font-size:11px">'+(c.name||'').slice(0,22)+'</strong><span class="pinfo" onclick="event.stopPropagation()" tabindex="0">i<span class="ptip">'+tip+'</span></span>';
+        var potBadge = gap>0 ? ('<span class="badge" style="background:#E6F1FB;color:#2A78D6;font-weight:800">+'+eur(gap)+' €</span>') : '<span style="color:#bbb">—</span>';
+        return '<tr><td>'+nameCell+'</td>'
+          +'<td style="font-size:12px;font-weight:700;color:#1E9E6A">'+eur(o.asis)+' €</td>'
+          +'<td style="font-size:12px;font-weight:700;color:#2A78D6">'+eur(o.tobe)+' €</td>'
+          +'<td>'+potBadge+'</td>'
+          +'<td style="font-size:11px;color:#888">'+todoTxt+'</td>'
+          +'<td style="font-size:11px;color:#666">'+adrTxt+'</td></tr>';
       }).join('');
     // Section pipeline non signé (prospects avec offre, pas encore signés)
     var pipeRows=AD.filter(function(c){ return (c.active||0)<=0 && (c.potential||0)>0; })
@@ -574,10 +626,10 @@ pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('p
     var body=''
       +'<div style="font-size:12px;font-weight:700;color:#1E9E6A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Clients signés — garanti '+eur(asis)+' € → to-be '+eur(tobe)+' €/mois</div>'
       +'<div style="font-size:11px;color:#888;margin-bottom:10px">L\'écart (rouge) = revenu mensuel à aller chercher chez chaque client déjà signé.</div>'
-      +(rows?'<div class="twrap"><table class="tbl"><thead><tr><th>Client</th><th>Garanti</th><th>To-be</th><th>Écart</th><th>Adresses</th><th>À activer</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty">Aucun client signé</div>')
+      +(rows?'<div class="twrap"><table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Client <span style="font-weight:400;color:#bbb;font-size:9px">(i = détail adr./mod.)</span></th><th class="sortable" onclick="sortTableByCol(this)">Garanti</th><th class="sortable" onclick="sortTableByCol(this)">To-be</th><th class="sortable" onclick="sortTableByCol(this)">Potentiel</th><th class="sortable" onclick="sortTableByCol(this)">À activer</th><th class="sortable" onclick="sortTableByCol(this)">Adresses</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty">Aucun client signé</div>')
       +'<div style="font-size:12px;font-weight:700;color:#2A78D6;text-transform:uppercase;letter-spacing:.05em;margin:20px 0 8px">Pipeline non signé — +'+eur(pipe)+' €/mois si ça signe</div>'
       +'<div style="font-size:11px;color:#888;margin-bottom:10px">Prospects avec une offre en cours mais pas encore de contrat signé. Non garanti.</div>'
-      +(pipeRows?'<div class="twrap"><table class="tbl"><thead><tr><th>Prospect</th><th>Adresses (offre)</th><th>Modules proposés</th><th>MRR potentiel</th></tr></thead><tbody>'+pipeRows+'</tbody></table></div>':'<div class="empty">Aucun prospect avec offre en cours</div>');
+      +(pipeRows?'<div class="twrap"><table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Prospect</th><th class="sortable" onclick="sortTableByCol(this)">Adresses (offre)</th><th class="sortable" onclick="sortTableByCol(this)">Modules proposés</th><th class="sortable" onclick="sortTableByCol(this)">MRR potentiel</th></tr></thead><tbody>'+pipeRows+'</tbody></table></div>':'<div class="empty">Aucun prospect avec offre en cours</div>');
     openModal('Prévision MRR — détail', 'Signé (garanti/to-be) et pipeline non signé', body);
   });
 })();
@@ -591,7 +643,7 @@ pilClickProxy('pil-c9','kc9'); pilClickProxy('pil-c10','kc10'); pilClickProxy('p
       return '<tr data-date="'+(c.date||'')+'"><td style="white-space:nowrap;font-size:11px">'+(c.when||c.date||'-')+'</td><td><strong style="font-size:11px">'+(c.reference||'').slice(0,44)+'</strong></td><td style="font-size:11px">'+(c.bureau||'-')+'</td><td style="font-size:11px">'+v+'</td><td style="font-size:10px;color:#bbb">#'+(c.lead_id||'?')+'</td></tr>';
     });
     openModal('Contrats signés — sur la période', rows.length+' contrat(s) signé(s) du '+r.from+' au '+r.to+' (module Sign)',
-      rows.length?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByDate(this)">Date signature</th><th>Contrat</th><th>Bureau</th><th>Vendeur</th><th>Lead</th></tr></thead><tbody>'+rows.join('')+'</tbody></table>':'<div class="empty">Aucun contrat signé sur la période</div>');
+      rows.length?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Date signature</th><th class="sortable" onclick="sortTableByCol(this)">Contrat</th><th class="sortable" onclick="sortTableByCol(this)">Bureau</th><th class="sortable" onclick="sortTableByCol(this)">Vendeur</th><th class="sortable" onclick="sortTableByCol(this)">Lead</th></tr></thead><tbody>'+rows.join('')+'</tbody></table>':'<div class="empty">Aucun contrat signé sur la période</div>');
   });
 })();
 
@@ -665,19 +717,27 @@ function clientToBe(c){ var a=Math.max(c.active||0, c.etp||0); return a>0 ? mrrB
 function clientPipe(c){ var a=Math.round(c.potential||0); return (a>0 && (c.active||0)<=0) ? mrrBase(a)+modMRR(a,c.mods_prop) : 0; }
 function eur(n){ return Math.round(n).toLocaleString('fr-BE'); }
 function renderForecast(){
-  var asis=0, toBeAddr=0, toBeTotal=0, pipe=0;
+  // 4 niveaux, chaque levier isolé séparément (adresses vs modules) :
+  // 1) garanti adresses seules   2) garanti adresses+modules actifs (= garanti total)
+  // 3) to-be adresses seules (ETP, sans AUCUN module)   4) to-be total (ETP + tous modules)
+  var asisAddr=0, asisTot=0, toBeAddr=0, toBeTotal=0, pipe=0;
   AD.forEach(function(c){
-    asis+=clientAsIs(c); toBeTotal+=clientToBe(c); pipe+=clientPipe(c);
-    var a0=c.active||0; if(a0<=0) return;
+    var a0=c.active||0;
+    asisAddr+=mrrBase(a0);
+    asisTot+=clientAsIs(c);
+    toBeTotal+=clientToBe(c);
+    pipe+=clientPipe(c);
+    if(a0<=0) return;
     var a=Math.max(a0, c.etp||0);
-    toBeAddr+=(mrrBase(a)+modMRR(a,c.mods_active));   // adresses au max ETP, modules actuels
+    toBeAddr+=mrrBase(a);   // adresses au max ETP, SANS AUCUN module
   });
-  var modExtra=toBeTotal-toBeAddr;                     // apport des modules non activés
-  setTxt('pil-mrr-asis', eur(asis));
-  setTxt('pil-mrr-tobeaddr', eur(toBeAddr)+' €');
-  setTxt('pil-mrr-mod', '+'+eur(modExtra)+' €');
-  setTxt('pil-mrr-tobe', eur(toBeTotal)+' €');
+  setTxt('pil-mrr-asis', eur(asisTot));
+  setTxt('pil-mrr-tobe', eur(toBeTotal));
   setTxt('pil-mrr-pipe', '+'+eur(pipe)+' €');
+  // Barre de progression : part du to-be déjà garantie
+  var pct = toBeTotal>0 ? Math.round(asisTot/toBeTotal*100) : 0;
+  var bar=document.getElementById('pil-mrr-bar'); if(bar) bar.style.width=Math.min(100,pct)+'%';
+  setTxt('pil-mrr-pct', pct+'% déjà garanti sur le potentiel du portefeuille signé');
 }
 
 // Calcule les métriques clés (flux) sur une plage de dates donnée
@@ -752,12 +812,15 @@ function syncPilote(){
   var mx=Math.max.apply(null, vals.concat([1]));
   document.getElementById('pil-funnel').innerHTML=PIL_FUNNEL.map(function(s,i){
     var h=40+Math.round((vals[i]/mx)*90);
-    var ins=parseInt(g(s.i))||0, outs=parseInt(g(s.o))||0;
+    var ins=parseInt(g(s.i))||0, outs=parseInt(g(s.o))||0, net=ins-outs;
+    var netCls=net>0?'pin':(net<0?'pout':'');
+    var netTxt=(net>0?'+':'')+net+' vs '+(LBL[kpiDays]||'période préc.');
     return '<div class="pstage" data-kc="'+s.kc+'">'
       +'<div class="pcnt" style="color:'+s.a+'">'+vals[i]+'</div>'
       +'<div class="pbar" style="height:'+h+'px"><div class="pfill" style="height:'+Math.round((vals[i]/mx)*100)+'%;background:'+s.a+'"></div></div>'
       +'<div class="pnm">'+s.nm+'</div>'
-      +'<div class="pdelta"><span class="pin">+'+ins+'</span> / <span class="pout">-'+outs+'</span></div></div>';
+      +'<div class="pdelta"><span class="pin">+'+ins+'</span> / <span class="pout">-'+outs+'</span></div>'
+      +'<div class="pdelta ptotal"><span class="'+netCls+'">'+netTxt+'</span></div></div>';
   }).join('');
   document.querySelectorAll('#pil-funnel .pstage').forEach(function(st){
     st.addEventListener('click', function(e){ e.stopPropagation(); var t=document.getElementById(st.dataset.kc); if(t) t.click(); });
@@ -925,8 +988,8 @@ function stageModalBody(cfg, r) {
     if(isNegStage(m.vers)) col='#a32d2d';
     return '<tr data-date="'+m.date+'"><td style="white-space:nowrap;font-size:11px">'+m.date.slice(0,16)+'</td><td><strong style="font-size:11px">'+(m.opportunite||'').slice(0,25)+'</strong><br><span style="color:#bbb;font-size:10px">#'+m.lead_id+'</span></td><td style="font-size:11px">'+(m.nom_contact||'-')+'</td><td style="font-size:11px">'+(m.vendeur||'-')+'</td><td><span style="background:'+col+'22;color:'+col+';font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">'+(isIn?'depuis':'vers')+' '+other+'</span></td></tr>';
   }
-  var th1='<thead><tr><th>Lead</th><th>Contact</th><th>Vendeur</th><th class="sortable" onclick="sortTableByDate(this)">Entre le</th><th>Depuis</th></tr></thead>';
-  var th2='<thead><tr><th class="sortable" onclick="sortTableByDate(this)">Date</th><th>Lead</th><th>Contact</th><th>Vendeur</th><th>Mouvement</th></tr></thead>';
+  var th1='<thead><tr><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">Vendeur</th><th class="sortable" onclick="sortTableByCol(this)">Entre le</th><th class="sortable" onclick="sortTableByCol(this)">Depuis</th></tr></thead>';
+  var th2='<thead><tr><th class="sortable" onclick="sortTableByCol(this)">Date</th><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">Vendeur</th><th class="sortable" onclick="sortTableByCol(this)">Mouvement</th></tr></thead>';
   return '<div style="margin-bottom:18px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:'+cfg.col+';margin-bottom:8px">Actuellement ('+cur.length+')</div>'+(cur.length?'<div class="twrap" style="max-height:200px"><table class="tbl">'+th1+'<tbody>'+cur.map(curRow).join('')+'</tbody></table></div>':'<div class="empty">Aucun</div>')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;border-top:1px solid #eee;padding-top:16px"><div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#0F6E56;margin-bottom:8px">Entres ('+mvIn.length+')</div>'+(mvIn.length?'<div class="twrap" style="max-height:180px"><table class="tbl">'+th2+'<tbody>'+mvIn.map(function(m){return mvRow(m,true);}).join('')+'</tbody></table></div>':'<div style="color:#ccc;font-size:12px;padding:8px 0">Aucun</div>')+'</div><div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#2A78D6;margin-bottom:8px">Sortis ('+mvOut.length+')</div>'+(mvOut.length?'<div class="twrap" style="max-height:180px"><table class="tbl">'+th2+'<tbody>'+mvOut.map(function(m){return mvRow(m,false);}).join('')+'</tbody></table></div>':'<div style="color:#ccc;font-size:12px;padding:8px 0">Aucun</div>')+'</div></div>';
 }
 
@@ -935,7 +998,7 @@ document.getElementById('kc1').addEventListener('click', function(){
   var r=kpiRange(kpiDays);
   var leads=ALL.filter(function(l){ var d=(l.create_date||'').slice(0,10); return d>=r.from&&d<=r.to&&(!kpiVend||l.vendeur===kpiVend); }).sort(function(a,b){ return b.create_date<a.create_date?-1:1; });
   var rows=leads.map(function(l){ return '<tr data-date="'+(l.create_date||'')+'"><td><strong style="font-size:11px">'+(l.name||'').slice(0,30)+'</strong><br><span style="color:#bbb;font-size:10px">#'+l.id+'</span></td><td style="font-size:11px">'+(l.contact||'-')+'</td><td style="font-size:11px">'+(l.vendeur||'-')+'</td><td style="font-size:11px">'+(l.etape||'-')+'</td><td style="font-size:11px;white-space:nowrap">'+(l.create_date||'').slice(0,16)+'</td></tr>'; }).join('');
-  openModal('Nouveaux prospects', leads.length+' leads — du '+r.from+' au '+r.to, rows.length?'<table class="tbl"><thead><tr><th>Lead</th><th>Contact</th><th>Vendeur</th><th>Etape</th><th class="sortable" onclick="sortTableByDate(this)">Cree le</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun</div>');
+  openModal('Nouveaux prospects', leads.length+' leads — du '+r.from+' au '+r.to, rows.length?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">Vendeur</th><th class="sortable" onclick="sortTableByCol(this)">Etape</th><th class="sortable" onclick="sortTableByCol(this)">Cree le</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun</div>');
 });
 
 STAGE_CFGS.forEach(function(cfg){
@@ -953,7 +1016,7 @@ document.getElementById('kc9').addEventListener('click', function(){
     return d>=r.from&&d<=r.to&&(!kpiVend||l.vendeur===kpiVend);
   }).sort(function(a,b){ var da=(a.date_closed||a.write_date||''), db=(b.date_closed||b.write_date||''); return db<da?-1:1; });
   var rows=lost.map(function(l){ var dc=((l.date_closed&&l.date_closed!=='')?l.date_closed:(l.write_date||'')).slice(0,16); return '<tr data-date="'+dc+'"><td style="white-space:nowrap;font-size:11px">'+dc+'</td><td><strong style="font-size:11px">'+(l.name||'').slice(0,28)+'</strong><br><span style="color:#bbb;font-size:10px">#'+l.id+'</span></td><td style="font-size:11px">'+(l.contact||'-')+'</td><td style="font-size:11px">'+(l.vendeur||'-')+'</td><td style="font-size:11px">'+(l.etape||'-')+'</td><td><span style="background:#fdecea;color:#a32d2d;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">'+(l.lost_reason||'Non specifie')+'</span></td></tr>'; }).join('');
-  openModal('Leads marques comme perdus', lost.length+' leads — du '+r.from+' au '+r.to, rows.length?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByDate(this)">Date perdu</th><th>Lead</th><th>Contact</th><th>Vendeur</th><th>Derniere etape</th><th>Raison</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun</div>');
+  openModal('Leads marques comme perdus', lost.length+' leads — du '+r.from+' au '+r.to, rows.length?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Date perdu</th><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">Vendeur</th><th class="sortable" onclick="sortTableByCol(this)">Derniere etape</th><th class="sortable" onclick="sortTableByCol(this)">Raison</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun</div>');
 });
 
 // KPI 10 — click
@@ -970,7 +1033,7 @@ document.getElementById('kc10').addEventListener('click', function(){
       +'</tr>';
   }).join('');
   openModal('Leads sans activite planifiee', leads.length+' leads actifs sans tache',
-    rows ? '<table class="tbl"><thead><tr><th>Lead</th><th>Contact</th><th>Vendeur</th><th>Etape</th><th>Bloque depuis</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    rows ? '<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">Vendeur</th><th class="sortable" onclick="sortTableByCol(this)">Etape</th><th class="sortable" onclick="sortTableByCol(this)">Bloque depuis</th></tr></thead><tbody>'+rows+'</tbody></table>'
          : '<div class="empty">Aucun lead sans activite.</div>');
 });
 
@@ -996,7 +1059,7 @@ document.getElementById('kc11').addEventListener('click', function(){
       +'</tr>';
   }).join('');
   openModal('Taches en retard', ovd.length+' taches — du moins au plus en retard',
-    rows ? '<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByDate(this)">Echeance</th><th>Lead</th><th>Contact</th><th>Vendeur</th><th>Etape</th><th>Type</th><th>Sujet</th><th>Note</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    rows ? '<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Echeance</th><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">Vendeur</th><th class="sortable" onclick="sortTableByCol(this)">Etape</th><th class="sortable" onclick="sortTableByCol(this)">Type</th><th class="sortable" onclick="sortTableByCol(this)">Sujet</th><th>Note</th></tr></thead><tbody>'+rows+'</tbody></table>'
          : '<div class="empty">Aucune tache en retard.</div>');
 });
 
@@ -1022,7 +1085,7 @@ document.getElementById('kc12').addEventListener('click', function(){
       +'</tr>';
   }).join('');
   openModal('Leads sans mouvement', leads.length+' leads actifs sans mouvement du '+r.from+' au '+r.to,
-    rows ? '<table class="tbl"><thead><tr><th>Lead</th><th>Contact</th><th>Vendeur</th><th>Etape</th><th class="sortable" onclick="sortTableByDate(this)">Dernier mouvement</th><th>Depuis</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    rows ? '<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">Vendeur</th><th class="sortable" onclick="sortTableByCol(this)">Etape</th><th class="sortable" onclick="sortTableByCol(this)">Dernier mouvement</th><th class="sortable" onclick="sortTableByCol(this)">Depuis</th></tr></thead><tbody>'+rows+'</tbody></table>'
          : '<div class="empty">Aucun.</div>');
 });
 
@@ -1072,7 +1135,7 @@ function renderGen() {
       var ec=ech&&ech<new Date().toISOString().slice(0,10)?'#a32d2d':'#888';
       return '<tr data-date="'+ech+'"><td><strong style="font-size:11px">'+(m.opportunite||'').slice(0,28)+'</strong><br><span style="color:#bbb;font-size:10px">#'+m.lead_id+'</span></td><td style="font-size:11px">'+(m.nom_contact||'-')+'</td><td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(m.etape_actuelle||'-')+'</td><td><span style="background:'+bl.b+';color:'+bl.c+';font-weight:700;font-size:10px;padding:2px 8px;border-radius:20px;white-space:nowrap">'+bl.l+'</span></td><td style="font-size:11px;color:#888">'+(m.activite_type||'-')+'</td><td style="font-size:11px">'+(m.activite_sujet||'-')+'</td><td class="wrap" style="font-size:11px">'+(note||'-')+'</td><td style="font-size:11px;color:'+ec+';white-space:nowrap">'+(ech||'-')+'</td></tr>';
     }).join('');
-    return '<div class="vcard"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px"><div><span style="font-size:14px;font-weight:700">'+vend+'</span><span style="font-size:11px;color:#aaa;margin-left:10px"><strong style="color:#2A78D6">'+vls.length+'</strong> leads'+(blq90>0?' &bull; <strong style="color:#a32d2d">'+blq90+' +90j</strong>':'')+(withAct>0?' &bull; <strong style="color:#0F6E56">'+withAct+' activ.</strong>':'')+' &bull; moy. <strong>'+avg+'</strong>j</span></div><button class="show-btn" data-t="'+cid+'">Voir leads</button></div><div id="'+cid+'" style="display:none;overflow-x:auto"><table class="tbl"><thead><tr><th>Lead</th><th>Contact</th><th>Etape</th><th>Bloque depuis</th><th>Type activ.</th><th>Sujet</th><th>Note</th><th class="sortable" onclick="sortTableByDate(this)">Echeance</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+    return '<div class="vcard"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px"><div><span style="font-size:14px;font-weight:700">'+vend+'</span><span style="font-size:11px;color:#aaa;margin-left:10px"><strong style="color:#2A78D6">'+vls.length+'</strong> leads'+(blq90>0?' &bull; <strong style="color:#a32d2d">'+blq90+' +90j</strong>':'')+(withAct>0?' &bull; <strong style="color:#0F6E56">'+withAct+' activ.</strong>':'')+' &bull; moy. <strong>'+avg+'</strong>j</span></div><button class="show-btn" data-t="'+cid+'">Voir leads</button></div><div id="'+cid+'" style="display:none;overflow-x:auto"><table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">Etape</th><th class="sortable" onclick="sortTableByCol(this)">Bloque depuis</th><th class="sortable" onclick="sortTableByCol(this)">Type activ.</th><th class="sortable" onclick="sortTableByCol(this)">Sujet</th><th>Note</th><th class="sortable" onclick="sortTableByCol(this)">Echeance</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
   }).join('');
   document.getElementById('vOut').querySelectorAll('.show-btn').forEach(function(b){ b.addEventListener('click', function(){ var d=document.getElementById(b.dataset.t); d.style.display=d.style.display==='none'?'block':'none'; }); });
 }
@@ -1116,7 +1179,7 @@ function renderActeurs(){
     var moves=filteredMV.filter(function(m){return !m.dirty&&m.auteur===a;}).sort(function(a,b){return b.date<a.date?-1:1;});
     var rows=moves.map(function(m){ var p=m.date.split(' '); return '<tr data-date="'+m.date+'"><td style="white-space:nowrap;font-size:11px">'+p[0]+(p[1]?'<br><span style="color:#bbb;font-size:10px">'+p[1]+'</span>':'')+'</td><td><strong style="font-size:11px">'+(m.opportunite||'').slice(0,25)+'</strong><br><span style="color:#bbb;font-size:10px">#'+m.lead_id+'</span></td><td style="font-size:11px;color:#888">'+(m.nom_contact||'-')+'</td><td style="font-size:11px;color:#999;white-space:nowrap">'+m.de+'</td><td style="color:#ddd">&gt;</td><td style="font-size:11px;font-weight:600;white-space:nowrap;'+(isNegStage(m.vers)?'color:#a32d2d':'')+'">'+m.vers+'</td><td style="font-size:11px">'+(m.etape_actuelle||'-')+'</td></tr>'; }).join('');
     var cid='act_'+a.replace(/[^a-z0-9]/gi,'_');
-    return '<div class="vcard"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div><div style="font-size:14px;font-weight:700">'+a+'</div><div style="font-size:11px;color:#aaa;margin-top:2px">'+ac[a]+' mouvements &bull; '+al[a].size+' leads &bull; '+ast[a].size+' etapes</div></div><div style="display:flex;gap:10px;align-items:center"><div style="text-align:right"><div style="font-size:10px;color:#bbb">Derniere action</div><div style="font-size:12px;font-weight:700;color:'+lc+'">'+ll+'</div><div style="font-size:10px;color:#bbb">'+adate[a].slice(0,16)+'</div></div><button class="show-btn" data-t="'+cid+'">Voir</button></div></div><div class="btrk" style="height:5px;border-radius:3px;margin-bottom:4px"><div class="bfil" style="width:'+pct+'%;background:linear-gradient(90deg,#2a78d6,#1baf7a)"></div></div><div id="'+cid+'" style="display:none;overflow-x:auto;margin-top:8px"><table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByDate(this)">Date</th><th>Lead</th><th>Contact</th><th>De</th><th></th><th>Vers</th><th>Etape act.</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+    return '<div class="vcard"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div><div style="font-size:14px;font-weight:700">'+a+'</div><div style="font-size:11px;color:#aaa;margin-top:2px">'+ac[a]+' mouvements &bull; '+al[a].size+' leads &bull; '+ast[a].size+' etapes</div></div><div style="display:flex;gap:10px;align-items:center"><div style="text-align:right"><div style="font-size:10px;color:#bbb">Derniere action</div><div style="font-size:12px;font-weight:700;color:'+lc+'">'+ll+'</div><div style="font-size:10px;color:#bbb">'+adate[a].slice(0,16)+'</div></div><button class="show-btn" data-t="'+cid+'">Voir</button></div></div><div class="btrk" style="height:5px;border-radius:3px;margin-bottom:4px"><div class="bfil" style="width:'+pct+'%;background:linear-gradient(90deg,#2a78d6,#1baf7a)"></div></div><div id="'+cid+'" style="display:none;overflow-x:auto;margin-top:8px"><table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Date</th><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">De</th><th></th><th class="sortable" onclick="sortTableByCol(this)">Vers</th><th class="sortable" onclick="sortTableByCol(this)">Etape act.</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
   }).join('');
   out.querySelectorAll('.show-btn').forEach(function(b){ b.addEventListener('click', function(){ var d=document.getElementById(b.dataset.t); d.style.display=d.style.display==='none'?'block':'none'; }); });
 }
