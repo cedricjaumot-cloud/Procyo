@@ -28,7 +28,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;ba
 .pbtn{padding:6px 14px;font-size:12px;font-weight:600;color:#888;border:none;background:none;cursor:pointer;border-right:1px solid #e0e0e0}
 .pbtn:last-child{border-right:none}
 .pbtn.on{background:#2A78D6;color:#fff}
-.kgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:12px;height:calc(100vh - 130px)}
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:12px;height:calc(100vh - 130px)}
 /* KPI CARD */
 .kcard{background:#fff;border-radius:11px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:box-shadow .2s;border:none}
 .kcard:hover{box-shadow:0 4px 16px rgba(0,0,0,.14)}
@@ -47,7 +47,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;ba
 .gkpi{background:#fff;border-radius:10px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 .gkpi-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#bbb;margin-bottom:4px}
 .gkpi-v{font-size:22px;font-weight:700}
-.g2{display:grid;grid-template-columns:3fr 2fr;gap:13px;margin-bottom:13px}
+.g2{display:grid;grid-template-columns:2.4fr 1.8fr 1.8fr;gap:13px;margin-bottom:13px}
 .card{background:#fff;border-radius:10px;padding:16px 20px;box-shadow:0 1px 3px rgba(0,0,0,.07);margin-bottom:13px}
 .ctitle{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#bbb;margin-bottom:12px}
 .ctrl{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
@@ -150,17 +150,18 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
 .pinfo:hover .ptip,.pinfo:focus .ptip{display:block}
 .pmrrbar{height:9px;border-radius:5px;background:#E6F1FB;overflow:hidden}
 .pmrrfill{height:100%;border-radius:5px;background:#1E9E6A;transition:width .3s}
-.pgoalwrap{margin-top:7px}
-.pgoalbar{height:6px;border-radius:4px;background:var(--soft);overflow:hidden}
-.pgoalfill{height:100%;border-radius:4px;background:var(--green);transition:width .3s}
-.pgoaltxt{font-size:10px;color:var(--muted);margin-top:3px}
+.pgoalwrap{margin-top:9px}
+.pgoalbar{height:7px;border-radius:4px;background:var(--soft);overflow:visible;position:relative}
+.pgoalfill{height:100%;border-radius:4px;background:var(--green);transition:width .3s;overflow:hidden}
+.pgoaltick{position:absolute;top:-1px;bottom:-1px;width:1px;background:rgba(30,39,51,.22)}
+.pgoaltxt{font-size:10px;color:var(--muted);margin-top:4px}
 .pupsidebtn{margin-left:auto;text-align:right;cursor:pointer;background:#E6F1FB;border:1px solid #BcD6F2;border-radius:10px;padding:9px 15px;font-family:inherit;display:block;outline:none}
 .pupsidebtn:hover{background:#D5E7FB;border-color:#8fbdea}
 .pupsidebtn-link{font-size:10px;font-weight:700;color:#2A78D6;margin-top:2px}
-.pscenario-tabs{display:inline-flex;background:#fff;border:1px solid var(--border);border-radius:7px;overflow:hidden;margin:2px 0 4px;cursor:default}
-.pscbtn{padding:4px 10px;font-size:10.5px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-right:1px solid var(--border)}
+.pscenario-tabs{display:inline-flex;background:#fff;border:1px solid var(--border,#E4E8EE);border-radius:7px;overflow:hidden;margin:2px 0 4px;cursor:default}
+.pscbtn{padding:4px 10px;font-size:10.5px;font-weight:600;color:var(--muted,#6B7688);border:none;background:none;cursor:pointer;border-right:1px solid var(--border,#E4E8EE)}
 .pscbtn:last-child{border-right:none}
-.pscbtn.on{background:var(--blue);color:#fff}
+.pscbtn.on{background:var(--blue,#2A78D6);color:#fff}
 .pscenario-settings{background:#F4F8FE;border:1px solid #D3E2F6;border-radius:9px;padding:12px 14px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center}
 .pscenario-settings label{font-size:12px;color:#1E2733;display:flex;align-items:center;gap:6px}
 .pscenario-settings input[type=range]{width:130px}
@@ -239,13 +240,16 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
     <div class="pcard click ptile pgreen" id="pil-addr">
       <div class="ptile-top"><div class="pcard-lbl">Adresses signées</div><div class="pico">🏢</div></div>
       <div>
-        <div style="display:flex;align-items:baseline;gap:8px">
-          <div class="ptile-num" id="pil-addr-active">-</div>
-          <div class="ptile-sec"><span id="pil-addr-pot">-</span> pot. · <span id="pil-addr-total">-</span> tot.</div>
-        </div>
-        <div class="ptile-sub">actives · +potentielles · total</div>
+        <div class="ptile-num" id="pil-addr-active" style="font-size:40px">-</div>
+        <div class="ptile-sub" style="margin-top:2px"><span id="pil-addr-pot">-</span> potentielles · <span id="pil-addr-total">-</span> total</div>
         <div class="pgoalwrap">
-          <div class="pgoalbar"><div class="pgoalfill" id="pil-addr-goalfill" style="width:0%"></div></div>
+          <div class="pgoalbar">
+            <div class="pgoalfill" id="pil-addr-goalfill" style="width:0%"></div>
+            <div class="pgoaltick" style="left:20%"></div>
+            <div class="pgoaltick" style="left:40%"></div>
+            <div class="pgoaltick" style="left:60%"></div>
+            <div class="pgoaltick" style="left:80%"></div>
+          </div>
           <div class="pgoaltxt" id="pil-addr-goaltxt">— / 500 adresses</div>
         </div>
       </div>
@@ -303,7 +307,7 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
       <div style="border-top:1px solid var(--soft);padding-top:9px">
         <div class="pfore-row" style="color:#6B7688;font-size:14px"><span>Pipeline non signé — pondéré par probabilité</span><b style="color:#2A78D6;font-size:17px" id="pil-mrr-pipe">—</b></div>
       </div>
-      <div style="font-size:10px;color:#c9a227">⚠️ Montants bruts HTVA, hors réductions commerciales (données à venir).</div>
+      <div style="font-size:10px;color:#c9a227;line-height:1.5">⚠️ Montants bruts HTVA. « Signé » = adresses <b>signées</b>, pas forcément encore <b>onboardées</b> — l'abonnement ne démarre vraiment qu'une fois le client en Go Live. Le revenu <b>réellement encaissé aujourd'hui</b> sera bientôt disponible.</div>
     </div>
     <div class="pcard click" id="pil-funnelcard">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -391,6 +395,12 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
       <div><div class="kinout"><div class="kinout-pill" style="background:#E6F1FB;color:#2A78D6">Entres <span id="k7i">-</span></div><div class="kinout-pill" style="background:#EEF1F5;color:#8A94A6">Sortis <span id="k7o">-</span></div></div>
       <div class="kfooter"><span class="kstuck" id="k7stk"></span><span class="kfooter-link" style="color:#2A78D6">Voir →</span></div></div>
     </div>
+    <div class="kcard" id="kc13" style="--col:#2A78D6">
+      <div class="klabel" style="font-size:9px">Leads GoLive - Suivi 3 mois</div>
+      <div class="knum" id="k13v" style="color:#2A78D6">-</div>
+      <div><div class="kinout"><div class="kinout-pill" style="background:#E6F1FB;color:#2A78D6">Entres <span id="k13i">-</span></div><div class="kinout-pill" style="background:#EEF1F5;color:#8A94A6">Sortis <span id="k13o">-</span></div></div>
+      <div class="kfooter"><span class="kstuck" id="k13stk"></span><span class="kfooter-link" style="color:#2A78D6">Voir →</span></div></div>
+    </div>
     <div class="kcard" id="kc8" style="--col:#1E9E6A">
       <div class="klabel" style="font-size:9px">Leads Onboarding Fini</div>
       <div class="knum" id="k8v" style="color:#1E9E6A">-</div>
@@ -444,6 +454,16 @@ select{font-size:12px;padding:5px 9px;border-radius:6px;border:1px solid #e0e0e0
   </div>
   <div class="g2">
     <div class="card"><div class="ctitle">Repartition par vendeur</div><div id="gBars"></div></div>
+    <div class="card"><div class="ctitle" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><span>Repartition par taille (ETP)</span><span style="text-transform:none;letter-spacing:normal;font-size:11px" id="gTierSummary">—</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+        <div class="pscenario-tabs" id="gTierFilterTabs">
+          <button data-f="active" class="pscbtn on">Actifs</button>
+          <button data-f="nonactive" class="pscbtn">Non actifs</button>
+          <button data-f="all" class="pscbtn">Tous</button>
+        </div>
+        <span style="font-size:11px;color:#6B7688;font-weight:600" id="gTierFilterTotal">Total : —</span>
+      </div>
+      <div style="height:220px;position:relative"><canvas id="gTierChart"></canvas></div></div>
     <div class="card"><div class="ctitle">Charge par vendeur</div><div style="height:220px;position:relative"><canvas id="gChart"></canvas></div></div>
   </div>
   <div class="card">
@@ -741,7 +761,8 @@ var PIL_FUNNEL=[
   {kc:'kc4',v:'k4v',i:'k4i',o:'k4o',nm:'Offre signée',a:'#1E9E6A'},
   {kc:'kc5',v:'k5v',i:'k5i',o:'k5o',nm:'Contrat envoyé',a:'#2A78D6'},
   {kc:'kc6',v:'k6v',i:'k6i',o:'k6o',nm:'Contrat signé',a:'#1E9E6A'},
-  {kc:'kc7',v:'k7v',i:'k7i',o:'k7o',nm:'Onboarding',a:'#2A78D6'}
+  {kc:'kc7',v:'k7v',i:'k7i',o:'k7o',nm:'Onboarding',a:'#2A78D6'},
+  {kc:'kc13',v:'k13v',i:'k13i',o:'k13o',nm:'GoLive 3 mois',a:'#2A78D6'}
 ];
 
 // Contrats signés = documents réellement SIGNÉS via le module Sign (source fiable).
@@ -850,7 +871,13 @@ function eur(n){ return Math.round(n).toLocaleString('fr-BE'); }
 
 function renderForecast(){
   var asisTot=0, toBeTotal=0, pipe=0;
-  AD.forEach(function(c){ asisTot+=clientAsIs(c); toBeTotal+=clientToBeActive(c); pipe+=clientPipe(c); });
+  // Garanti/To-be = uniquement le portefeuille SIGNÉ (active>0). Pipeline = uniquement les prospects.
+  // (avant, les prospects avaient un ETP à 0 par accident donc ne comptaient jamais dans le to-be ;
+  // maintenant qu'ils ont un vrai ETP, il faut les exclure explicitement.)
+  AD.forEach(function(c){
+    if((c.active||0)>0){ asisTot+=clientAsIs(c); toBeTotal+=clientToBeActive(c); }
+    else { pipe+=clientPipe(c); }
+  });
   setTxt('pil-mrr-asis', eur(asisTot));
   setTxt('pil-mrr-tobe', eur(toBeTotal));
   setTxt('pil-scenario-label', pilScenarioLabel());
@@ -878,7 +905,7 @@ function pilMetrics(from,to){
   var inR=function(d){ return d>=from && d<=to; };
   var vend=function(x){ return !kpiVend || x===kpiVend; };
   // étapes "gagnantes" (offre signée et au-delà) et "contrat gagné" (contrat signé et au-delà)
-  var WON=['Offre signée','Contrat envoyé','DocuSign (Contrat envoyé)','Contrat signé','Onboarding en cours','Onboarding Fini'];
+  var WON=['Offre signée','Contrat envoyé','DocuSign (Contrat envoyé)','Contrat signé','Onboarding en cours','GoLive - Suivi de 3 mois','Onboarding Fini'];
   var prospects=ALL.filter(function(l){ var d=(l.create_date||'').slice(0,10); return inR(d)&&vend(l.vendeur); }).length;
   // Conversion par COHORTE : parmi les leads passés en "Offre envoyée" pendant
   // la période, combien ont atteint une étape gagnante (à tout moment). Borné à 100%.
@@ -997,11 +1024,14 @@ function mkBar(id,labels,data){
   new Chart(ctx,{type:'bar',data:{labels:labels,datasets:[{data:data,backgroundColor:data.map(function(_,i){return CL[i%CL.length];}),borderWidth:0}]},
   options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f0f0f0'}},y:{ticks:{font:{size:10}}}}}});
 }
-function mkDough(id,labels,data,key){
+function mkDough(id,labels,data,key,onSliceClick){
   var ctx=document.getElementById(id); if(!ctx) return;
   if(key&&window[key]) window[key].destroy();
   var ch=new Chart(ctx,{type:'doughnut',data:{labels:labels,datasets:[{data:data,backgroundColor:CL,borderWidth:2,borderColor:'#fff'}]},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:11,padding:6}}}}});
+  options:{responsive:true,maintainAspectRatio:false,
+    onClick:function(evt,els){ if(onSliceClick && els && els.length) onSliceClick(els[0].index); },
+    onHover:function(evt,els){ evt.native.target.style.cursor = (onSliceClick && els && els.length) ? 'pointer' : 'default'; },
+    plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:11,padding:6}}}}});
   if(key) window[key]=ch;
 }
 
@@ -1037,6 +1067,7 @@ var STAGE_CFGS = [
   {n:5, names:['Contrat envoy\u00e9','DocuSign (Contrat envoy\u00e9)'], col:'#BA7517', stuckDays:7, stuckLabel:'1+ sem.'},
   {n:6, names:['Contrat sign\u00e9'],                         col:'#1A5DAB', stuckDays:2, stuckLabel:'2+ j.'},
   {n:7, names:['Onboarding en cours'],                       col:'#008300', stuckDays:7, stuckLabel:'1+ sem.'},
+  {n:13,names:['GoLive - Suivi de 3 mois'],                  col:'#2A78D6', stuckDays:7, stuckLabel:'1+ sem.'},
   {n:8, names:['Onboarding Fini'],                           col:'#e87ba4', stuckDays:7, stuckLabel:'1+ sem.'},
 ];
 
@@ -1239,6 +1270,14 @@ document.getElementById('gfVend').addEventListener('change', renderGen);
 document.getElementById('gfEtape').addEventListener('change', renderGen);
 document.getElementById('gfBloque').addEventListener('change', renderGen);
 
+var gTierFilter='active'; // filtre du camembert "Repartition par taille (ETP)" : active / nonactive / all
+document.querySelectorAll('#gTierFilterTabs .pscbtn').forEach(function(b){
+  b.addEventListener('click', function(){
+    gTierFilter=b.dataset.f;
+    document.querySelectorAll('#gTierFilterTabs .pscbtn').forEach(function(x){ x.classList.toggle('on', x===b); });
+    renderGen();
+  });
+});
 function renderGen() {
   var fv=document.getElementById('gfVend').value;
   var fe=document.getElementById('gfEtape').value;
@@ -1253,7 +1292,70 @@ function renderGen() {
   var vList=Object.entries(byV).sort(function(a,b){ return b[1].length-a[1].length; });
   var maxL=vList.length?vList[0][1].length:1;
   document.getElementById('gBars').innerHTML=vList.map(function(e){ var v=e[0],ls=e[1]; var blq=ls.filter(function(l){ return l.jours_bloque>=30; }).length; return '<div class="brow" style="margin-bottom:7px"><div class="blbl" style="width:160px;font-size:12px;font-weight:600">'+v+'</div><div class="btrk"><div class="bfil" style="width:'+Math.round(ls.length/maxL*100)+'%;background:#2a78d6"></div></div><div class="bnum">'+ls.length+'</div><div style="min-width:85px;text-align:right;font-size:10px">'+(blq>0?'<span style="color:#a32d2d">'+blq+' bloques</span>':'<span style="color:#0F6E56">OK</span>')+'</div></div>'; }).join('');
-  mkDough('gChart',vList.map(function(e){ return e[0]; }),vList.map(function(e){ return e[1].length; }),'_vc');
+  mkDough('gChart',vList.map(function(e){ return e[0]; }),vList.map(function(e){ return e[1].length; }),'_vc',function(idx){
+    var vend=vList[idx][0], ls=vList[idx][1];
+    var rows=ls.slice().sort(function(a,b){ return (b.jours_bloque||0)-(a.jours_bloque||0); }).map(function(m){
+      var bl=blqLabel(m.jours_bloque);
+      return '<tr><td><strong style="font-size:11px">'+(m.opportunite||'').slice(0,30)+'</strong><br><span style="color:#bbb;font-size:10px">#'+m.lead_id+'</span></td>'
+        +'<td style="font-size:11px">'+(m.nom_contact||'-')+'</td>'
+        +'<td style="font-size:11px">'+(m.etape_actuelle||'-')+'</td>'
+        +'<td style="font-size:11px">'+(m.activite_type||'<span style="color:#bbb">aucune</span>')+'</td>'
+        +'<td><span style="background:'+bl.b+';color:'+bl.c+';font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">'+bl.l+'</span></td></tr>';
+    }).join('');
+    openModal('Vendeur : '+vend, ls.length+' leads',
+      rows?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Lead</th><th class="sortable" onclick="sortTableByCol(this)">Contact</th><th class="sortable" onclick="sortTableByCol(this)">Etape</th><th class="sortable" onclick="sortTableByCol(this)">Activite</th><th class="sortable" onclick="sortTableByCol(this)">Bloque depuis</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun</div>');
+  });
+  // Répartition par TAILLE D'ENTREPRISE (ETP) — filtrable Actifs / Non actifs / Tous
+  // (la tranche de prix/MRR facturée, elle, reste basée sur les adresses actives — règle différente, inchangée)
+  var nbActifs=AD.filter(function(c){ return (c.active||0)>0; }).length;
+  var nbNonActifs=AD.filter(function(c){ return (c.active||0)<=0 && (c.potential||0)>0; }).length;
+  var elSum=document.getElementById('gTierSummary');
+  if(elSum) elSum.innerHTML='<span class="glink" data-role="actifs" style="cursor:pointer;color:#1E9E6A;font-weight:700">'+nbActifs+' actifs</span> · <span class="glink" data-role="nonactifs" style="cursor:pointer;color:#2A78D6;font-weight:700">'+nbNonActifs+' non actifs</span>';
+  function statusBadge(c){ return (c.active||0)>0 ? '<span class="badge bok">Actif</span>' : '<span class="badge" style="background:#E6F1FB;color:#2A78D6">Non actif</span>'; }
+  function mrrOrDash(c){ return (c.active||0)>0 ? (eur(mrrBase(c.active||0)+modMRR(c.active||0,c.mods_active))+' €') : '<span style="color:#bbb">—</span>'; }
+  function matchesTierFilter(c){ var isAct=(c.active||0)>0; return gTierFilter==='all' || (gTierFilter==='active'&&isAct) || (gTierFilter==='nonactive'&&!isAct); }
+  var tierCounts={}; TIERS.forEach(function(t){ tierCounts[t.name]=0; }); var nbUnknownEtp=0;
+  AD.forEach(function(c){ if(!matchesTierFilter(c)) return; var etp=c.etp||0; if(etp<=0){ nbUnknownEtp++; return; } var t=tierOf(etp); if(t) tierCounts[t.name]++; });
+  var tierLabels=TIERS.map(function(t){ return t.name+' ('+t.incl+(t.max>=999999?'+':' à '+t.max)+')'; }).concat(['ETP inconnu']);
+  var tierData=TIERS.map(function(t){ return tierCounts[t.name]; }).concat([nbUnknownEtp]);
+  var elTot=document.getElementById('gTierFilterTotal');
+  if(elTot) elTot.textContent='Total : '+tierData.reduce(function(a,b){ return a+b; },0);
+  mkDough('gTierChart',tierLabels,tierData,'_tierc',function(idx){
+    var isUnknown=(idx===TIERS.length), tier=isUnknown?null:TIERS[idx];
+    var clients=AD.filter(function(c){ if(!matchesTierFilter(c)) return false; var etp=c.etp||0; return isUnknown ? etp<=0 : (etp>0 && tierOf(etp)===tier); })
+      .sort(function(a,b){ return (b.etp||0)-(a.etp||0); });
+    var rows=clients.map(function(c){
+      var etpTxt=(c.etp||0)>0?((c.etp_estime?'~':'')+c.etp):'<span style="color:#bbb">?</span>';
+      return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,26)+'</strong></td>'
+        +'<td>'+statusBadge(c)+'</td>'
+        +'<td style="font-size:12px">'+(c.active||0)+'</td>'
+        +'<td style="font-size:12px">'+etpTxt+'</td>'
+        +'<td style="font-size:12px;font-weight:700">'+mrrOrDash(c)+'</td></tr>';
+    }).join('');
+    var title=isUnknown ? 'ETP inconnu' : ('Taille (ETP) : '+tier.name+' ('+tier.incl+(tier.max>=999999?'+':' à '+tier.max)+')');
+    openModal(title, clients.length+' contact(s) — actifs et non actifs',
+      rows?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Client</th><th class="sortable" onclick="sortTableByCol(this)">Statut</th><th class="sortable" onclick="sortTableByCol(this)">Adresses actives</th><th class="sortable" onclick="sortTableByCol(this)">ETP</th><th class="sortable" onclick="sortTableByCol(this)">MRR garanti</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun contact dans cette tranche</div>');
+  });
+  if(elSum && !elSum._wired){
+    elSum._wired=true;
+    elSum.addEventListener('click', function(e){
+      var role=e.target && e.target.dataset && e.target.dataset.role; if(!role) return;
+      if(role==='actifs'){
+        var cl=AD.filter(function(c){ return (c.active||0)>0; }).sort(function(a,b){ return (b.active||0)-(a.active||0); });
+        var rows=cl.map(function(c){ var etpTxt=(c.etp||0)>0?c.etp:'<span style="color:#bbb">?</span>';
+          return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,26)+'</strong></td><td style="font-size:12px">'+(c.active||0)+'</td><td style="font-size:12px">'+etpTxt+'</td><td style="font-size:12px;font-weight:700;color:#1E9E6A">'+mrrOrDash(c)+'</td></tr>'; }).join('');
+        openModal('Contacts actifs (clients signés)', cl.length+' client(s)',
+          rows?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Client</th><th class="sortable" onclick="sortTableByCol(this)">Adresses actives</th><th class="sortable" onclick="sortTableByCol(this)">ETP</th><th class="sortable" onclick="sortTableByCol(this)">MRR garanti</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun</div>');
+      } else if(role==='nonactifs'){
+        var cl=AD.filter(function(c){ return (c.active||0)<=0 && (c.potential||0)>0; }).sort(function(a,b){ return (b.potential||0)-(a.potential||0); });
+        var rows=cl.map(function(c){ var mods=[]; if(c.mods_prop.conf)mods.push('Conformité'); if(c.mods_prop.comm)mods.push('Commercial'); if(c.mods_prop.port)mods.push('Portefeuille');
+          var etpTxt=(c.etp||0)>0?((c.etp_estime?'~':'')+Math.round(c.etp*10)/10):'<span style="color:#bbb">?</span>';
+          return '<tr><td><strong style="font-size:11px">'+(c.name||'').slice(0,26)+'</strong></td><td style="font-size:12px">'+Math.round(c.potential||0)+'</td><td style="font-size:12px">'+etpTxt+'</td><td style="font-size:11px;color:#888">'+(mods.length?mods.join(', '):'—')+'</td><td style="font-size:12px">'+c.statut+'</td></tr>'; }).join('');
+        openModal('Contacts non actifs (prospects, offre en cours)', cl.length+' prospect(s)',
+          rows?'<table class="tbl"><thead><tr><th class="sortable" onclick="sortTableByCol(this)">Prospect</th><th class="sortable" onclick="sortTableByCol(this)">Adresses (offre)</th><th class="sortable" onclick="sortTableByCol(this)">ETP</th><th class="sortable" onclick="sortTableByCol(this)">Modules proposés</th><th class="sortable" onclick="sortTableByCol(this)">Statut</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="empty">Aucun</div>');
+      }
+    });
+  }
   var vFiltered=fv?vList.filter(function(e){ return e[0]===fv; }):vList;
   document.getElementById('vOut').innerHTML=vFiltered.map(function(e){
     var vend=e[0],vls=e[1];
