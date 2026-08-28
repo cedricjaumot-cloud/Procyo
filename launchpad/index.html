@@ -1294,7 +1294,7 @@ const MODULES_DATA = {
     ]},
     {id:'module2',title:'Contractualisation',desc:'Informations nécessaires à la préparation du contrat et à l\'identification des référents.',icon:'📋',sections:[
       {id:'M2A',name:'Configuration & licences',questions:[
-        {id:'M2Q1',type:'slider',label:'Combien d\'adresses email à activer dans l\'Assistant mail (Inboxia) ?',required:true,min:1,max:20,default:3,dynamicRange:'M1Q1'},
+        {id:'M2Q1',type:'slider',label:'Combien d\'adresses email à activer dans l\'Assistant mail (Inboxia) ?',required:true,min:1,max:20,default:3,dynamicRange:'M2Q1'},
         {id:'M2Q3',type:'checkbox',label:'Quels assistants complémentaires souhaitez-vous activer ?',required:false,options:['Assistant conformité (Regulia) — KYC / AML / IDD','Assistant portefeuille (Portfolia) — analyse et tableaux de bord','Assistant commercial (Relancia) — opportunités et campagnes','Aucun pour l\'instant — uniquement l\'Assistant mail']},
       ]},
       {id:'M2B',name:'Identification juridique',questions:[
@@ -1366,7 +1366,7 @@ const MODULES_DATA = {
     ]},
     {id:'module2',title:'Contractualisatie',desc:'Informatie nodig voor de voorbereiding van het contract en de identificatie van de referenten.',icon:'📋',sections:[
       {id:'M2A',name:'Configuratie & licenties',questions:[
-        {id:'M2Q1',type:'slider',label:'Hoeveel e-mailadressen activeren in de E-mailassistent (Inboxia)?',required:true,min:1,max:20,default:3,dynamicRange:'M1Q1'},
+        {id:'M2Q1',type:'slider',label:'Hoeveel e-mailadressen activeren in de E-mailassistent (Inboxia)?',required:true,min:1,max:20,default:3,dynamicRange:'M2Q1'},
         {id:'M2Q3',type:'checkbox',label:'Welke aanvullende assistenten wilt u activeren?',required:false,options:['Conformiteitsassistent (Regulia) — KYC / AML / IDD','Portefeuilleassistent (Portfolia) — analyse en dashboards','Commerciële assistent (Relancia) — kansen en campagnes','Geen voor nu — alleen de E-mailassistent']},
       ]},
       {id:'M2B',name:'Juridische identificatie',questions:[
@@ -1438,7 +1438,7 @@ const MODULES_DATA = {
     ]},
     {id:'module2',title:'Vertragsabschluss',desc:'Für die Vertragsvorbereitung und Identifizierung der Ansprechpartner erforderliche Informationen.',icon:'📋',sections:[
       {id:'M2A',name:'Konfiguration & Lizenzen',questions:[
-        {id:'M2Q1',type:'slider',label:'Wie viele E-Mail-Adressen im E-Mail-Assistenten (Inboxia) aktivieren?',required:true,min:1,max:20,default:3,dynamicRange:'M1Q1'},
+        {id:'M2Q1',type:'slider',label:'Wie viele E-Mail-Adressen im E-Mail-Assistenten (Inboxia) aktivieren?',required:true,min:1,max:20,default:3,dynamicRange:'M2Q1'},
         {id:'M2Q3',type:'checkbox',label:'Welche zusätzlichen Assistenten möchten Sie aktivieren?',required:false,options:['Compliance-Assistent (Regulia) — KYC / AML / IDD','Portfolio-Assistent (Portfolia) — Analyse und Dashboards','Vertriebsassistent (Relancia) — Chancen und Kampagnen','Keiner für jetzt — nur der E-Mail-Assistent']},
       ]},
       {id:'M2B',name:'Rechtliche Identifizierung',questions:[
@@ -1510,7 +1510,7 @@ const MODULES_DATA = {
     ]},
     {id:'module2',title:'Contractualisation',desc:'Information needed to prepare the contract and identify the key contacts.',icon:'📋',sections:[
       {id:'M2A',name:'Configuration & licences',questions:[
-        {id:'M2Q1',type:'slider',label:'How many email addresses to activate in the Mail assistant (Inboxia)?',required:true,min:1,max:20,default:3,dynamicRange:'M1Q1'},
+        {id:'M2Q1',type:'slider',label:'How many email addresses to activate in the Mail assistant (Inboxia)?',required:true,min:1,max:20,default:3,dynamicRange:'M2Q1'},
         {id:'M2Q3',type:'checkbox',label:'Which additional assistants would you like to activate?',required:false,options:['Compliance assistant (Regulia) — KYC / AML / IDD','Portfolio assistant (Portfolia) — analysis and dashboards','Commercial assistant (Relancia) — opportunities and campaigns','None for now — Mail assistant only']},
       ]},
       {id:'M2B',name:'Legal identification',questions:[
@@ -2355,6 +2355,14 @@ function sliderRangeFor(refQid, refVal){
     if(refVal==='11 à 30')    return{min:4, max:30, def:10};
     if(refVal==='31 à 50')    return{min:11,max:50, def:20};
     if(refVal==='Plus de 50') return{min:31,max:100,def:50};
+  }
+  if(refQid==='M2Q1'){
+    // Auto-rempli avec le vrai nombre d'adresses signées -> la plage suit CE chiffre,
+    // pas la tranche de découverte ETP (sinon une valeur réelle plus haute que la
+    // tranche se fait écraser/clamp par le slider — c'était le bug).
+    const n=parseInt(refVal)||0;
+    const max = n<=3?3 : n<=10?10 : n<=30?30 : n<=50?50 : 250;
+    return {min:1, max:max, def:Math.min(n||3, max)};
   }
   return null;
 }
