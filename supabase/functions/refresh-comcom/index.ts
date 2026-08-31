@@ -531,6 +531,35 @@ Deno.serve(async (req) => {
       payload._addrError = String((e as Error).message || e);
     }
 
+    // 2quater) Raison de perte : repli sur le commentaire libre du chatter
+    // (message "Opportunity Lost" -> "Commentaire perdu: ...") quand lost_reason_id est vide
+    try {
+      const lostLeads = (payload.all_leads as any[]).filter((l) => !l.active && !l.lost_reason);
+      const lostLeadIds = lostLeads.map((l) => l.id);
+      if (lostLeadIds.length) {
+        const lostMsgs: any[] = [];
+        for (let i = 0; i < lostLeadIds.length; i += 200) {
+          const res: any[] = await execKw("mail.message", "search_read",
+            [[["model", "=", "crm.lead"], ["res_id", "in", lostLeadIds.slice(i, i + 200)], ["subtype_id.name", "=", "Opportunity Lost"]]],
+            { fields: ["res_id", "body", "date"], order: "date desc" });
+          lostMsgs.push(...res);
+        }
+        const commentByLead = new Map<number, string>();
+        for (const m of lostMsgs) {
+          if (commentByLead.has(m.res_id)) continue; // le plus recent (deja trie desc)
+          const match = String(m.body || "").match(/Commentaire perdu\s*:<\/p>\s*<div[^>]*>([\s\S]*?)<\/div>/i);
+          if (match) {
+            const txt = stripHtml(match[1]).trim();
+            if (txt) commentByLead.set(m.res_id, txt);
+          }
+        }
+        for (const l of lostLeads) {
+          const c = commentByLead.get(l.id);
+          if (c) l.lost_reason = c;
+        }
+      }
+    } catch (_e) { /* raison de perte via chatter non dispo : on garde le lost_reason_id existant */ }
+
     // 3) Sauvegarde dans Supabase
     await pushToSupabase(payload, updatedAt);
 
