@@ -200,6 +200,11 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .contact-inp{padding:8px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:var(--font);outline:none;transition:border .15s;background:white}
 .contact-inp:focus{border-color:var(--blue-mid)}
 .contact-inp.ans{border-color:var(--blue-mid);background:rgba(37,99,235,.03)}
+.addr-sug{position:absolute;top:100%;left:0;right:0;z-index:50;background:white;border:1.5px solid var(--g200);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.1);margin-top:3px;max-height:240px;overflow-y:auto}
+.addr-sug-row{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--g100,#f1f5f9)}
+.addr-sug-row:last-child{border-bottom:none}
+.addr-sug-row:hover{background:rgba(37,99,235,.06)}
+.addr-sug-hint{padding:7px 12px;font-size:11px;color:var(--g400);background:var(--g50,#f8fafc)}
 .fu-wrap{width:100%}
 .fu-zone{border:2px dashed var(--g200);border-radius:12px;padding:28px 20px;text-align:center;transition:all .2s;cursor:pointer;background:var(--g50)}
 .fu-zone:hover,.fu-zone.over{border-color:var(--blue-mid);background:rgba(37,99,235,.04)}
@@ -2215,7 +2220,7 @@ function buildQuestion(q,saved){
     };
     inp='<div style="display:flex;flex-direction:column;gap:10px">'
       +'<div style="display:grid;grid-template-columns:1fr 80px 80px;gap:10px">'
-      +mkField('rue',lRue,phRue)
+      +'<div style="position:relative">'+mkField('rue',lRue,phRue)+'<div class="addr-sug" style="display:none"></div></div>'
       +mkField('numero',lNum,'10')
       +mkField('boite',lBoite,'B2')
       +'</div>'
@@ -2380,6 +2385,7 @@ function buildQuestion(q,saved){
       });
       i.addEventListener('blur',()=>debounceContact(i.dataset.qid));
     });
+    addrInit(el);
     // percent-split
     el.querySelectorAll('.pct-inp').forEach(i=>{
       i.addEventListener('input',()=>{
@@ -3391,6 +3397,179 @@ function switchAdminTab(tab){
   document.getElementById('atab-admins').className     = 'admin-tab'+(tab==='admins'?' on':'')+(isSuperAdmin(currentUser)?'':' hidden');
   if(tab==='corbeille') showTrash();
   if(tab==='admins') loadAdminsList();
+}
+
+// ══════════════════════════════════════════════════════════════
+// AIDE À LA SAISIE DE L'ADRESSE (OpenStreetMap / Nominatim)
+// La recherche part quand le courtier QUITTE le champ Rue, jamais à
+// chaque frappe : le règlement d'usage de Nominatim interdit
+// l'autocomplétion lettre par lettre.
+// Pure aide : jamais bloquante, tous les champs restent modifiables,
+// et un service lent ou en panne passe totalement inaperçu.
+// ══════════════════════════════════════════════════════════════
+const _addrCache = {};
+let _addrSeq = 0;
+
+function addrInit(root){
+  const champs = ['rue','numero','code_postal','ville'];
+  root.querySelectorAll('.contact-inp[data-field="rue"]').forEach(function(rueInp){
+    const wrap = rueInp.parentElement && rueInp.parentElement.parentElement;
+    const box  = wrap && wrap.querySelector('.addr-sug');
+    if(!box || rueInp.dataset.addrReady) return;
+    rueInp.dataset.addrReady = '1';
+    const qid = rueInp.dataset.qid;
+    champs.forEach(function(f){
+      const inp = document.querySelector('.contact-inp[data-qid="'+qid+'"][data-field="'+f+'"]');
+      if(!inp) return;
+      inp.setAttribute('autocomplete','off');
+      inp.addEventListener('blur', function(){
+        // On ne cherche qu'avec de quoi situer l'adresse : la rue + la commune
+        // ou le code postal. La rue seule renvoie toute la Belgique.
+        if(!addrPret(qid)){ box.style.display='none'; return; }
+        addrSearch(qid, box);
+      });
+    });
+    rueInp.addEventListener('focus', function(){ box.style.display='none'; });
+  });
+  if(!document.body.dataset.addrOutsideReady){
+    document.body.dataset.addrOutsideReady = '1';
+    document.addEventListener('mousedown', function(e){
+      if(e.target.closest && e.target.closest('.addr-sug')) return;
+      document.querySelectorAll('.addr-sug').forEach(function(b){ b.style.display='none'; });
+    });
+  }
+}
+
+function addrVal(qid,f){
+  const e = document.querySelector('.contact-inp[data-qid="'+qid+'"][data-field="'+f+'"]');
+  return e ? e.value.trim() : '';
+}
+
+// Assez d'informations pour situer l'adresse ? Rue + (code postal ou ville).
+function addrPret(qid){
+  return addrVal(qid,'rue').length >= 4
+      && (addrVal(qid,'code_postal').length >= 4 || addrVal(qid,'ville').length >= 2);
+}
+
+// Reconstitue la requête à partir de tout ce qui est déjà saisi (rue + n° + CP + ville)
+function addrQuery(qid){
+  const val = function(f){ return addrVal(qid,f); };
+  return [
+    [val('rue'), val('numero')].filter(Boolean).join(' '),
+    [val('code_postal'), val('ville')].filter(Boolean).join(' ')
+  ].filter(Boolean).join(', ');
+}
+
+function addrLang(){
+  return (currentLang==='nl'||currentLang==='de'||currentLang==='en') ? currentLang : 'fr';
+}
+
+// Ramène les deux formats (Nominatim / Photon) à une seule forme
+function addrNorm(src, source){
+  if(source==='photon') return {
+    rue:src.street||src.name||'', numero:src.housenumber||'', cp:src.postcode||'',
+    ville:src.city||src.district||src.county||'', pays:src.country||''
+  };
+  return {
+    rue:src.road||src.pedestrian||'', numero:src.house_number||'', cp:src.postcode||'',
+    ville:src.city||src.town||src.village||src.municipality||'', pays:src.country||''
+  };
+}
+
+// Nominatim : rapide (~0,7 s) mais exige la bonne orthographe
+async function addrViaNominatim(q){
+  const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1'
+    +'&countrycodes=be&limit=5&accept-language='+addrLang()+'&q='+encodeURIComponent(q);
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const data = await r.json();
+  return (data||[]).filter(function(x){ return x.address && (x.address.road||x.address.pedestrian); })
+                   .map(function(x){ return addrNorm(x.address,'nominatim'); });
+}
+
+// Photon : lent (~4,5 s) mais tolère les fautes de frappe — filet de secours
+async function addrViaPhoton(q){
+  const url = 'https://photon.komoot.io/api/?q='+encodeURIComponent(q)
+    +'&limit=5&lang='+addrLang()+'&bbox=2.35,49.45,6.45,51.55';
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const data = await r.json();
+  return (data.features||[]).filter(function(f){ return f.properties && (f.properties.street||f.properties.name); })
+                            .map(function(f){ return addrNorm(f.properties,'photon'); });
+}
+
+async function addrSearch(qid, box){
+  const q = addrQuery(qid);
+  if(!q) { box.style.display='none'; return; }
+  const token = ++_addrSeq;
+  try{
+    let rows = _addrCache[q];
+    if(!rows){
+      rows = await addrViaNominatim(q).catch(function(){ return []; });
+      if(!rows.length){
+        // Orthographe approximative : on tente le service tolérant aux fautes,
+        // en prévenant que c'est plus lent.
+        addrHint(box, currentLang==='nl' ? 'Adres controleren…' : currentLang==='de' ? 'Adresse wird geprüft…'
+               : currentLang==='en' ? 'Checking address…' : 'Vérification de l\'adresse…');
+        rows = await addrViaPhoton(q).catch(function(){ return []; });
+      }
+      _addrCache[q] = rows; // le règlement Nominatim demande de mettre en cache
+    }
+    if(token !== _addrSeq) return;              // une saisie plus récente a pris le relais
+    if(!rows.length){ box.style.display='none'; return; }
+    box.innerHTML='';
+    rows.forEach(function(a){
+      const row = document.createElement('div');
+      row.className = 'addr-sug-row';
+      row.textContent = addrLabel(a);
+      row.addEventListener('mousedown', function(e){
+        e.preventDefault();
+        addrApply(qid, a);
+        box.style.display='none';
+      });
+      box.appendChild(row);
+    });
+    const hint = document.createElement('div');
+    hint.className = 'addr-sug-hint';
+    hint.textContent = (currentLang==='nl' ? 'Suggesties — u kunt alles vrij aanpassen'
+                      : currentLang==='de' ? 'Vorschläge — alles frei anpassbar'
+                      : currentLang==='en' ? 'Suggestions — you can still edit everything'
+                      : 'Suggestions — vous pouvez tout modifier librement')
+                      + ' · © OpenStreetMap';
+    box.appendChild(hint);
+    box.style.display='';
+  }catch(e){
+    box.style.display='none'; // silencieux : jamais bloquant
+  }
+}
+
+function addrHint(box, texte){
+  box.innerHTML = '<div class="addr-sug-hint">'+escH(texte)+'</div>';
+  box.style.display = '';
+}
+
+function addrLabel(a){
+  return [[a.numero,a.rue].filter(Boolean).join(' '),
+          [a.cp,a.ville].filter(Boolean).join(' '),
+          a.pays].filter(Boolean).join(', ');
+}
+
+function addrApply(qid,a){
+  const vals = {
+    rue:         a.rue || '',
+    numero:      a.numero || '',
+    code_postal: a.cp || '',
+    ville:       a.ville || '',
+    pays:        a.pays || ''
+  };
+  document.querySelectorAll('.contact-inp[data-qid="'+qid+'"]').forEach(function(i){
+    const k = i.dataset.field;
+    // 'boite' n'est jamais touchée, et on n'efface jamais une valeur déjà saisie
+    if(!(k in vals) || vals[k]==='') return;
+    i.value = vals[k];
+    i.classList.toggle('ans', i.value.trim()!=='');
+  });
+  debounceContact(qid);
 }
 
 // ══════════════════════════════════════════════════════════════
