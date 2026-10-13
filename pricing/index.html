@@ -377,24 +377,28 @@ header img.logo{height:34px}
           <label id="lbl-palier-remise">Palier de remise</label>
           <div class="psub" style="margin-top:0;font-weight:600" id="palier-remise-display">1 à 5 ETP</div>
         </div>
-        <div class="frow">
+        <div class="frow" style="align-items:flex-start">
           <label id="lbl-remise-setup">Remise setup</label>
-          <div class="tab-row">
-            <div class="tab active" data-promo="none" id="tab-aucune-setup">Aucune</div>
-            <div class="tab" data-promo="pct" id="tab-pct-setup">%</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem">
+            <div class="tab-row">
+              <div class="tab active" data-promo="none" id="tab-aucune-setup">Aucune</div>
+              <div class="tab" data-promo="pct" id="tab-pct-setup">%</div>
+            </div>
+            <div class="psub hidden" id="pct-wrap" style="margin-top:0"><input type="number" id="remise-pct" value="0" min="0" max="100" step="1"/><label id="lbl-pct-remise">%</label></div>
           </div>
         </div>
-        <div class="psub hidden" id="pct-wrap"><input type="number" id="remise-pct" value="10" min="0" max="100" step="1"/><label id="lbl-pct-remise">% de remise sur le setup</label></div>
         <div id="setup-remise-warning" style="display:none;color:#DC2626;font-size:12px;padding:6px 4px;font-weight:600;background:#FEF2F2;border-radius:6px;margin-top:6px;border-left:3px solid #DC2626;"></div>
-        <div class="frow">
-          <label id="lbl-remise-abo">Remise abonnement<small id="lbl-remise-abo-small">Tarif de lancement affiché sur le PDF</small></label>
-          <div class="tab-row">
-            <div class="tab active" data-sub="0" id="tab-sub-0">Aucune</div>
-            <div class="tab" data-sub="1" id="tab-sub-1">1 mois</div>
-            <div class="tab" data-sub="2" id="tab-sub-2">2 mois</div>
+        <div class="frow" style="align-items:flex-start">
+          <label id="lbl-remise-abo">Remise abonnement</label>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem">
+            <div class="tab-row">
+              <div class="tab active" data-sub="0" id="tab-sub-0">Aucune</div>
+              <div class="tab" data-sub="1" id="tab-sub-1">1 mois</div>
+              <div class="tab" data-sub="2" id="tab-sub-2">2 mois</div>
+            </div>
+            <div class="psub hidden" id="abo-pct-wrap" style="margin-top:0"><input type="number" id="remise-abo-pct" value="0" min="0" max="100" step="1"/><label id="lbl-abo-pct-remise">%</label></div>
           </div>
         </div>
-        <div class="psub hidden" id="abo-pct-wrap"><input type="number" id="remise-abo-pct" value="50" min="0" max="100" step="1"/><label id="lbl-abo-pct-remise">% de remise sur l'abonnement</label></div>
         <div id="abo-remise-warning" style="display:none;color:#DC2626;font-size:12px;padding:6px 4px;font-weight:600;background:#FEF2F2;border-radius:6px;margin-top:6px;border-left:3px solid #DC2626;"></div>
         <div class="frow" style="display:none">
           <label id="lbl-validite">Validité de l'offre</label>
@@ -889,7 +893,7 @@ var PALIERS = [
   {"key":"corporate",  "label":"Corporate",  "etpMin":51, "etpMax":9999,"addrIncl":51, "base":6000, "prixSuppl":90,  "setup":10000, "credits":200000, "mailsMois":40000, "creditsSuppl":3000, "mailsSuppl":600, "extraCall":0.015}
 ];
 
-var S = {nbEtp:5, nbAddr:5, modules:{regulia:false,relancia:false,portfolia:false}, setupDiscType:"none", remisePct:10, subMonths:0, aboPct:50, engagement:"monthly", validite:30, bms:null, palierRemise:"1-5", groupement:""};
+var S = {nbEtp:5, nbAddr:5, modules:{regulia:false,relancia:false,portfolia:false}, setupDiscType:"none", remisePct:0, subMonths:0, aboPct:0, engagement:"monthly", validite:30, bms:null, palierRemise:"1-5", groupement:""};
 function palierFromEtp(nbEtp){
   if(nbEtp>=15) return "15+";
   if(nbEtp>=6) return "6-14";
@@ -1047,14 +1051,18 @@ function render(){
   document.getElementById("abo-pct-wrap").classList.toggle("hidden", sub<=0);
   var aboWarn=document.getElementById("abo-remise-warning");
   var aboOverMax = (sub>0 && S.aboPct>aboPctCap);
+  var aboVide    = (sub>0 && !(S.aboPct>0));
   if(aboOverMax){
     aboWarn.textContent = isNL ? ("⚠ U overschrijdt de toegestane abonnementskorting van "+aboPctCap+" % voor dit palier") : ("⚠ Vous dépassez la remise abonnement de "+aboPctCap+" % autorisée pour ce palier");
+    aboWarn.style.display="block";
+  } else if(aboVide){
+    aboWarn.textContent = isNL ? "⚠ Geef het kortingspercentage op het abonnement op" : "⚠ Indiquez le pourcentage de remise sur l'abonnement";
     aboWarn.style.display="block";
   } else {
     aboWarn.style.display="none";
   }
 
-  window._setupRemiseOver = setupOverMax || setupUnderMin || aboOverMax;
+  window._setupRemiseOver = setupOverMax || setupUnderMin || aboOverMax || aboVide;
   [0,1,2].forEach(function(m){
     var tab=document.getElementById("tab-sub-"+m);
     if(!tab) return;
@@ -1512,11 +1520,31 @@ document.getElementById("nb-addr").addEventListener("input",function(){S.nbAddr=
 document.querySelectorAll(".mod").forEach(function(b){b.addEventListener("click",function(){b.classList.toggle("active");S.modules[b.dataset.mod]=b.classList.contains("active");render();});});
 document.querySelectorAll("[data-bms]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-bms]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.bms=b.dataset.bms;document.getElementById('bms-warning').style.display='none';render();});});
 document.querySelectorAll("[data-eng]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-eng]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.engagement=b.dataset.eng;render();});});
-document.querySelectorAll("[data-promo]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-promo]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.setupDiscType=b.dataset.promo;document.getElementById("pct-wrap").classList.toggle("hidden",S.setupDiscType!=="pct");render();});});
+document.querySelectorAll("[data-promo]").forEach(function(b){b.addEventListener("click",function(){
+  document.querySelectorAll("[data-promo]").forEach(function(x){x.classList.remove("active");});
+  b.classList.add("active");
+  S.setupDiscType=b.dataset.promo;
+  if(S.setupDiscType==="pct"){
+    // On démarre au minimum autorisé : 0 %, ou 15 % si un groupement est sélectionné
+    S.remisePct=setupMinEffectif();
+    document.getElementById("remise-pct").value=S.remisePct;
+  }
+  document.getElementById("pct-wrap").classList.toggle("hidden",S.setupDiscType!=="pct");
+  render();
+});});
 document.getElementById("remise-pct").addEventListener("input",function(){S.remisePct=parseFloat(this.value)||0;render();});
 document.querySelectorAll("[data-sub]").forEach(function(b){b.addEventListener("click",function(){
   if(b.classList.contains("tab-disabled")) return;
-  document.querySelectorAll("[data-sub]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.subMonths=parseInt(b.dataset.sub)||0;render();});});
+  document.querySelectorAll("[data-sub]").forEach(function(x){x.classList.remove("active");});
+  b.classList.add("active");
+  S.subMonths=parseInt(b.dataset.sub)||0;
+  if(S.subMonths>0){
+    // On démarre au minimum autorisé : 0 %, au commercial de saisir la remise
+    S.aboPct=0;
+    document.getElementById("remise-abo-pct").value=0;
+  }
+  render();
+});});
 document.getElementById("remise-abo-pct").addEventListener("input",function(){S.aboPct=parseFloat(this.value)||0;render();});
 // Liste des groupements : gérée depuis l'admin du Launchpad (table `groupements`)
 async function chargerGroupements(){
@@ -1554,8 +1582,8 @@ document.getElementById("groupement-select").addEventListener("change",function(
   } else if(!S.groupement){
     // Retour à "Aucun" : on retire la remise setup imposée par le groupement
     S.setupDiscType="none";
-    S.remisePct=10;
-    document.getElementById("remise-pct").value=10;
+    S.remisePct=0;
+    document.getElementById("remise-pct").value=0;
     document.getElementById("pct-wrap").classList.add("hidden");
     document.querySelectorAll("[data-promo]").forEach(function(x){x.classList.remove("active");});
     document.getElementById("tab-aucune-setup").classList.add("active");
@@ -2581,13 +2609,10 @@ function applyUILang() {
   setTextIfFound('tab-3mois', lang === 'nl' ? '3 maanden opzegbaar' : '3 mois résiliable');
   setTextIfFound('lbl-remise-setup', lang === 'nl' ? 'Setupkorting' : 'Remise setup');
   setTextIfFound('tab-aucune-setup', lang === 'nl' ? 'Geen' : 'Aucune');
-  setTextIfFound('lbl-pct-remise', lang === 'nl' ? '% korting op de setup' : '% de remise sur le setup');
   setTextIfFound('lbl-remise-abo', lang === 'nl' ? 'Abonnementskorting' : 'Remise abonnement');
-  setTextIfFound('lbl-remise-abo-small', lang === 'nl' ? 'Lanceringstarief weergegeven op de PDF' : 'Tarif de lancement affiché sur le PDF');
   setTextIfFound('tab-sub-0', lang === 'nl' ? 'Geen' : 'Aucune');
   setTextIfFound('tab-sub-1', lang === 'nl' ? '1 maand' : '1 mois');
   setTextIfFound('tab-sub-2', lang === 'nl' ? '2 maanden' : '2 mois');
-  setTextIfFound('lbl-abo-pct-remise', lang === 'nl' ? '% korting op het abonnement' : "% de remise sur l'abonnement");
   setTextIfFound('lbl-palier-remise', lang === 'nl' ? 'Kortingsschijf' : 'Palier de remise');
   setTextIfFound('lbl-groupement', lang === 'nl' ? 'Groepering' : 'Groupement');
   setTextIfFound('opt-grp-aucun', lang === 'nl' ? 'Geen' : 'Aucun');
