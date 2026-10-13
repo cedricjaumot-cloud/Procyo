@@ -675,6 +675,37 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
           </div>
           <div id="newbroker-msg" style="display:none;margin-top:14px"></div>
         </div>
+        <div class="broker-card" id="groupements-card" style="margin-bottom:18px;display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3 style="margin:0">🏢 Groupements</h3>
+            <button class="btn btn-primary" style="width:auto;padding:8px 16px" onclick="grpShowForm()" id="grp-add-btn">➕ Ajouter</button>
+          </div>
+          <p style="font-size:13px;color:var(--g500);margin:8px 0 14px">Ces groupements alimentent la liste déroulante du configurateur Pricing.</p>
+          <div id="grp-form" style="display:none;background:var(--g50,#f8fafc);border:1.5px solid var(--g200);border-radius:8px;padding:14px;margin-bottom:14px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <input type="text" id="grp-nom" placeholder="Nom du groupement *"
+                style="padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none">
+              <input type="text" id="grp-resp-nom" placeholder="Nom de la personne responsable *"
+                style="padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none">
+              <input type="tel" id="grp-resp-tel" placeholder="Numéro de téléphone *"
+                style="padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none">
+              <input type="email" id="grp-resp-mail" placeholder="Adresse mail *"
+                style="padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none">
+              <textarea id="grp-note" rows="4" placeholder="Ce qui a été convenu dans l'accord *"
+                style="padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none;resize:vertical"></textarea>
+            </div>
+            <div id="grp-form-msg" style="display:none;margin-top:10px;font-size:13px"></div>
+            <div style="display:flex;gap:10px;margin-top:12px">
+              <button class="btn btn-primary" style="width:auto;padding:9px 16px" onclick="grpSave(this)" id="grp-save-btn">Enregistrer</button>
+              <button class="dossier-btn" onclick="grpHideForm()">Annuler</button>
+            </div>
+          </div>
+          <div id="grp-list"></div>
+          <div style="margin-top:14px;border-top:1px solid var(--g200);padding-top:12px">
+            <button class="dossier-btn" id="grp-trash-toggle" onclick="grpToggleTrash()">🗑️ Corbeille</button>
+            <div id="grp-trash" style="display:none;margin-top:12px"></div>
+          </div>
+        </div>
         <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
           <input type="text" id="admin-search" placeholder="🔎 Rechercher un courtier (nom ou email)…" oninput="adminSetSearch(this.value)"
             style="flex:1;min-width:220px;padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:var(--font);font-size:14px;outline:none">
@@ -821,6 +852,9 @@ const SUPER_ADMIN_EMAILS = ['cedric.jaumot@procyo.be'];
 // Un utilisateur est admin s'il porte le flag is_admin (base) OU figure dans la liste historique ADMIN_EMAILS (compat).
 function isAdmin(u){ return !!(u && (u.is_admin===true || ADMIN_EMAILS.includes((u.email||'').toLowerCase()))); }
 function isSuperAdmin(u){ return !!(u && SUPER_ADMIN_EMAILS.includes((u.email||'').toLowerCase())); }
+// Comptes habilités à gérer les groupements (liste utilisée par le configurateur Pricing).
+const GROUPEMENT_MANAGERS = ['maxime.dejean@procyo.be','antoine.moriau@procyo.be','admin@procyo.be'];
+function canManageGroupements(u){ return !!(u && GROUPEMENT_MANAGERS.includes((u.email||'').toLowerCase())); }
 
 // ══════════════════════════════════════════════════════════════
 // LANGUE
@@ -2806,6 +2840,12 @@ async function showAdmin(){
   hideAll();
   document.getElementById('screen-admin').style.display='block';
   document.getElementById('atab-admins').style.display = isSuperAdmin(currentUser)?'':'none';
+  const grpCard = document.getElementById('groupements-card');
+  if(grpCard){
+    const canGrp = canManageGroupements(currentUser);
+    grpCard.style.display = canGrp?'':'none';
+    if(canGrp) grpLoad();
+  }
   setLoading(true,'Chargement des courtiers…');
   try{
     autoPurgeTrash();
@@ -3351,6 +3391,176 @@ function switchAdminTab(tab){
   document.getElementById('atab-admins').className     = 'admin-tab'+(tab==='admins'?' on':'')+(isSuperAdmin(currentUser)?'':' hidden');
   if(tab==='corbeille') showTrash();
   if(tab==='admins') loadAdminsList();
+}
+
+// ══════════════════════════════════════════════════════════════
+// GROUPEMENTS (réservé à GROUPEMENT_MANAGERS)
+// Alimente la liste déroulante du configurateur Pricing.
+// ══════════════════════════════════════════════════════════════
+let _grpOpenId = null;
+
+// Échappe un nom pour l'injecter dans un onclick="fn('...')" — escA ne gère pas l'apostrophe
+function grpEscJs(s){return escA(s).replace(/'/g,"\\'");}
+
+function grpShowForm(){
+  document.getElementById('grp-form').style.display='';
+  document.getElementById('grp-form-msg').style.display='none';
+  ['grp-nom','grp-resp-nom','grp-resp-tel','grp-resp-mail','grp-note'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('grp-nom').focus();
+}
+function grpHideForm(){
+  document.getElementById('grp-form').style.display='none';
+}
+
+async function grpSave(btn){
+  const nom=(document.getElementById('grp-nom').value||'').trim();
+  const respNom=(document.getElementById('grp-resp-nom').value||'').trim();
+  const respTel=(document.getElementById('grp-resp-tel').value||'').trim();
+  const respMail=(document.getElementById('grp-resp-mail').value||'').trim().toLowerCase();
+  const note=(document.getElementById('grp-note').value||'').trim();
+  const msg=document.getElementById('grp-form-msg');
+  msg.style.color='var(--red)';
+  if(!nom||!respNom||!respTel||!respMail||!note){
+    msg.textContent='⚠ Tous les champs sont obligatoires.';
+    msg.style.display='block';
+    return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(respMail)){
+    msg.textContent='⚠ Adresse mail invalide.';
+    msg.style.display='block';
+    return;
+  }
+  btn.disabled=true; btn.textContent='Enregistrement…';
+  try{
+    const existing=await sbGet('groupements','select=id,deleted_at&nom=eq.'+encodeURIComponent(nom));
+    if(existing&&existing.length){
+      msg.textContent=existing[0].deleted_at
+        ? '⚠ Un groupement de ce nom est dans la corbeille. Restaure-le plutôt que d\'en créer un nouveau.'
+        : '⚠ Ce groupement existe déjà.';
+      msg.style.color='var(--red)';
+      msg.style.display='block';
+      return;
+    }
+    await sbInsert('groupements',{nom:nom,responsable_nom:respNom,responsable_tel:respTel,responsable_email:respMail,note:note,created_by:currentUser.email});
+    grpHideForm();
+    grpLoad();
+  }catch(e){
+    msg.textContent='Erreur : '+e.message;
+    msg.style.color='var(--red)';
+    msg.style.display='block';
+  }finally{
+    btn.disabled=false; btn.textContent='Enregistrer';
+  }
+}
+
+async function grpLoad(){
+  const list=document.getElementById('grp-list');
+  list.innerHTML='<p style="color:var(--g400);font-size:14px;padding:12px 0">Chargement…</p>';
+  try{
+    const rows=await sbGet('groupements','select=*&deleted_at=is.null&order=nom.asc');
+    const trashed=await sbGet('groupements','select=id&deleted_at=not.is.null');
+    document.getElementById('grp-trash-toggle').textContent='🗑️ Corbeille ('+((trashed||[]).length)+')';
+    if(!rows||!rows.length){
+      list.innerHTML='<p style="color:var(--g400);font-size:14px;padding:12px 0">Aucun groupement enregistré.</p>';
+      return;
+    }
+    list.innerHTML=rows.map(function(g){
+      const open=(_grpOpenId===g.id);
+      return '<div style="border:1.5px solid var(--g200);border-radius:8px;margin-bottom:8px;overflow:hidden">'
+        +'<div onclick="grpToggle(\''+g.id+'\')" style="padding:11px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;background:white">'
+          +'<strong style="font-size:14px">'+escH(g.nom)+'</strong>'
+          +'<span style="color:var(--g400);font-size:12px">'+(open?'▾':'▸')+'</span>'
+        +'</div>'
+        +(open?('<div style="padding:12px 14px;border-top:1px solid var(--g200);background:var(--g50,#f8fafc)">'
+          +'<div style="font-size:12px;color:var(--g500);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">Personne responsable</div>'
+          +'<div style="font-size:14px;margin-bottom:12px;line-height:1.6">'
+            +escH(g.responsable_nom||'—')+'<br>'
+            +'<a href="tel:'+escA(g.responsable_tel||'')+'" style="color:var(--blue,#2563eb);text-decoration:none">'+escH(g.responsable_tel||'—')+'</a><br>'
+            +'<a href="mailto:'+escA(g.responsable_email||'')+'" style="color:var(--blue,#2563eb);text-decoration:none">'+escH(g.responsable_email||'—')+'</a>'
+          +'</div>'
+          +'<div style="font-size:12px;color:var(--g500);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">Accord convenu</div>'
+          +'<div style="font-size:14px;margin-bottom:12px;white-space:pre-wrap">'+escH(g.note||'—')+'</div>'
+          +'<div style="font-size:12px;color:var(--g400);margin-bottom:12px">Ajouté par '+escH(g.created_by||'inconnu')+' le '+new Date(g.created_at).toLocaleDateString('fr-BE')+'</div>'
+          +'<button class="dossier-btn" style="background:var(--red-pale);color:var(--red);border-color:#fecaca" onclick="grpAskDelete(\''+g.id+'\',\''+grpEscJs(g.nom)+'\',this)">🗑️ Supprimer</button>'
+        +'</div>'):'')
+      +'</div>';
+    }).join('');
+  }catch(e){
+    list.innerHTML='<p style="color:var(--red);font-size:14px">Erreur : '+e.message+'</p>';
+  }
+}
+
+function grpToggle(id){
+  _grpOpenId = (_grpOpenId===id) ? null : id;
+  grpLoad();
+}
+
+async function grpAskDelete(id,nom,btn){
+  if(!confirm('Déplacer "'+nom+'" dans la corbeille ?\n\nLe groupement disparaîtra du configurateur Pricing, mais ses informations resteront consultables et restaurables depuis la corbeille.')) return;
+  btn.disabled=true; btn.textContent='Suppression…';
+  try{
+    await sbUpdate('groupements','id=eq.'+id,{deleted_at:new Date().toISOString(),deleted_by:currentUser.email});
+    _grpOpenId=null;
+    grpLoad();
+    if(document.getElementById('grp-trash').style.display!=='none') grpShowTrash();
+  }catch(e){
+    btn.disabled=false; btn.textContent='🗑️ Supprimer';
+    alert('Erreur : '+e.message);
+  }
+}
+
+function grpToggleTrash(){
+  const box=document.getElementById('grp-trash');
+  const hidden=(box.style.display==='none');
+  box.style.display = hidden?'':'none';
+  if(hidden) grpShowTrash();
+}
+
+async function grpShowTrash(){
+  const box=document.getElementById('grp-trash');
+  box.innerHTML='<p style="color:var(--g400);font-size:14px">Chargement…</p>';
+  try{
+    const rows=await sbGet('groupements','select=*&deleted_at=not.is.null&order=deleted_at.desc');
+    if(!rows||!rows.length){
+      box.innerHTML='<p style="color:var(--g400);font-size:14px">La corbeille est vide.</p>';
+      return;
+    }
+    box.innerHTML=rows.map(function(g){
+      return '<div style="border-left:3px solid var(--red);background:var(--g50,#f8fafc);border-radius:6px;padding:11px 14px;margin-bottom:8px;opacity:.9">'
+        +'<strong style="font-size:14px">'+escH(g.nom)+'</strong>'
+        +'<div style="font-size:12px;color:var(--g500);margin:4px 0 10px">Supprimé le '+new Date(g.deleted_at).toLocaleDateString('fr-BE')+' par '+escH(g.deleted_by||'inconnu')+'</div>'
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+          +'<button class="dossier-btn" onclick="grpRestore(\''+g.id+'\',this)">↩️ Restaurer</button>'
+          +'<button class="dossier-btn" style="background:var(--red-pale);color:var(--red);border-color:#fecaca" onclick="grpHardDelete(\''+g.id+'\',\''+grpEscJs(g.nom)+'\',this)">🗑️ Supprimer définitivement</button>'
+        +'</div>'
+      +'</div>';
+    }).join('');
+  }catch(e){
+    box.innerHTML='<p style="color:var(--red);font-size:14px">Erreur : '+e.message+'</p>';
+  }
+}
+
+async function grpRestore(id,btn){
+  btn.disabled=true; btn.textContent='Restauration…';
+  try{
+    await sbUpdate('groupements','id=eq.'+id,{deleted_at:null,deleted_by:null});
+    grpShowTrash(); grpLoad();
+  }catch(e){
+    btn.disabled=false; btn.textContent='↩️ Restaurer';
+    alert('Erreur : '+e.message);
+  }
+}
+
+async function grpHardDelete(id,nom,btn){
+  if(!confirm('Supprimer définitivement "'+nom+'" ?\n\nCette action est irréversible : les coordonnées du responsable et la note d\'accord seront effacées.')) return;
+  btn.disabled=true; btn.textContent='Suppression…';
+  try{
+    await sbFetch('groupements?id=eq.'+id,'DELETE');
+    grpShowTrash(); grpLoad();
+  }catch(e){
+    btn.disabled=false; btn.textContent='🗑️ Supprimer définitivement';
+    alert('Erreur : '+e.message);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════

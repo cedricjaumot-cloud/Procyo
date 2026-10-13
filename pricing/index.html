@@ -301,9 +301,6 @@ header img.logo{height:34px}
   <label id="lbl-groupement">Groupement</label>
   <select id="groupement-select" style="width:150px;padding:6px 8px;border-radius:6px;border:1px solid #D1D5DB;font-family:inherit;font-size:13px">
     <option value="" id="opt-grp-aucun">Aucun</option>
-    <option value="Aquilae">Aquilae</option>
-    <option value="Caspea">Caspea</option>
-    <option value="Feprabel">Feprabel</option>
   </select>
 </div>
 <div id="broker-warning" style="display:none;color:#E85D04;font-size:12px;padding:6px 2px">⚠ Ce courtier n'a pas d'ID Odoo — veuillez en sélectionner un autre ou compléter sa fiche dans Supabase.</div>
@@ -1521,6 +1518,29 @@ document.querySelectorAll("[data-sub]").forEach(function(b){b.addEventListener("
   if(b.classList.contains("tab-disabled")) return;
   document.querySelectorAll("[data-sub]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.subMonths=parseInt(b.dataset.sub)||0;render();});});
 document.getElementById("remise-abo-pct").addEventListener("input",function(){S.aboPct=parseFloat(this.value)||0;render();});
+// Liste des groupements : gérée depuis l'admin du Launchpad (table `groupements`)
+async function chargerGroupements(){
+  var sel=document.getElementById("groupement-select");
+  try{
+    var r=await fetch(SB_URL+'/rest/v1/groupements?select=nom&deleted_at=is.null&order=nom.asc',
+      {headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    var rows=await r.json();
+    (rows||[]).forEach(function(g){
+      if(!g.nom) return;
+      var o=document.createElement('option');
+      o.value=g.nom; o.textContent=g.nom;
+      sel.appendChild(o);
+    });
+  }catch(e){
+    console.warn('Groupements indisponibles :',e.message);
+    var w=document.createElement('option');
+    w.value=''; w.textContent='— liste indisponible —'; w.disabled=true;
+    sel.appendChild(w);
+  }
+}
+chargerGroupements();
+
 document.getElementById("groupement-select").addEventListener("change",function(){
   S.groupement=this.value;
   if(S.groupement && (S.setupDiscType!=="pct" || S.remisePct<15)){
