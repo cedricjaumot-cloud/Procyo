@@ -297,6 +297,15 @@ header img.logo{height:34px}
   </div>
 </div>
 <div id="bms-warning" style="display:none;color:#DC2626;font-size:12px;padding:3px 2px;margin-top:-4px;margin-bottom:2px">⚠ Veuillez choisir le BMS</div>
+<div class="frow" style="margin-top:4px">
+  <label id="lbl-groupement">Groupement</label>
+  <select id="groupement-select" style="width:150px;padding:6px 8px;border-radius:6px;border:1px solid #D1D5DB;font-family:inherit;font-size:13px">
+    <option value="" id="opt-grp-aucun">Aucun</option>
+    <option value="Aquilae">Aquilae</option>
+    <option value="Caspea">Caspea</option>
+    <option value="Feprabel">Feprabel</option>
+  </select>
+</div>
 <div id="broker-warning" style="display:none;color:#E85D04;font-size:12px;padding:6px 2px">⚠ Ce courtier n'a pas d'ID Odoo — veuillez en sélectionner un autre ou compléter sa fiche dans Supabase.</div>
     </div>
   </div>
@@ -360,7 +369,7 @@ header img.logo{height:34px}
     </button>
     <div id="cond-content" class="hidden" style="margin-top:.625rem">
       <div class="card">
-        <div class="frow">
+        <div class="frow" style="display:none">
           <label id="lbl-engagement">Engagement</label>
           <div class="tab-row">
             <div class="tab active" data-eng="monthly" id="tab-mensuel">Mensuel</div>
@@ -368,25 +377,31 @@ header img.logo{height:34px}
           </div>
         </div>
         <div class="frow">
+          <label id="lbl-palier-remise">Palier de remise</label>
+          <div class="psub" style="margin-top:0;font-weight:600" id="palier-remise-display">1 à 5 ETP</div>
+        </div>
+        <div class="frow">
           <label id="lbl-remise-setup">Remise setup</label>
           <div class="tab-row">
             <div class="tab active" data-promo="none" id="tab-aucune-setup">Aucune</div>
-            <div class="tab" data-promo="pct">%</div>
+            <div class="tab" data-promo="pct" id="tab-pct-setup">%</div>
           </div>
         </div>
         <div class="psub hidden" id="pct-wrap"><input type="number" id="remise-pct" value="10" min="0" max="100" step="1"/><label id="lbl-pct-remise">% de remise sur le setup</label></div>
+        <div id="setup-remise-warning" style="display:none;color:#DC2626;font-size:12px;padding:6px 4px;font-weight:600;background:#FEF2F2;border-radius:6px;margin-top:6px;border-left:3px solid #DC2626;"></div>
         <div class="frow">
-          <label id="lbl-remise-abo">Remise abonnement<small id="lbl-remise-abo-small">Affichée comme « X premier(s) mois offert(s) » sur le PDF</small></label>
+          <label id="lbl-remise-abo">Remise abonnement<small id="lbl-remise-abo-small">Tarif de lancement affiché sur le PDF</small></label>
           <div class="tab-row">
             <div class="tab active" data-sub="0" id="tab-sub-0">Aucune</div>
-            <div class="tab" data-sub="1" id="tab-sub-1">1 mois offert</div>
-            <div class="tab" data-sub="2" id="tab-sub-2">2 mois offerts</div>
-            <div class="tab" data-sub="3" id="tab-sub-3">3 mois offerts</div>
+            <div class="tab" data-sub="1" id="tab-sub-1">1 mois</div>
+            <div class="tab" data-sub="2" id="tab-sub-2">2 mois</div>
           </div>
         </div>
-        <div class="frow">
+        <div class="psub hidden" id="abo-pct-wrap"><input type="number" id="remise-abo-pct" value="50" min="0" max="100" step="1"/><label id="lbl-abo-pct-remise">% de remise sur l'abonnement</label></div>
+        <div id="abo-remise-warning" style="display:none;color:#DC2626;font-size:12px;padding:6px 4px;font-weight:600;background:#FEF2F2;border-radius:6px;margin-top:6px;border-left:3px solid #DC2626;"></div>
+        <div class="frow" style="display:none">
           <label id="lbl-validite">Validité de l'offre</label>
-          <div class="psub" style="margin-top:0"><input type="number" id="validite" value="30" min="1" max="365" step="1"/><label id="lbl-jours">jours</label></div>
+          <div class="psub" style="margin-top:0"><span id="validite">30</span> <label id="lbl-jours">jours</label></div>
         </div>
       </div>
     </div>
@@ -877,7 +892,36 @@ var PALIERS = [
   {"key":"corporate",  "label":"Corporate",  "etpMin":51, "etpMax":9999,"addrIncl":51, "base":6000, "prixSuppl":90,  "setup":10000, "credits":200000, "mailsMois":40000, "creditsSuppl":3000, "mailsSuppl":600, "extraCall":0.015}
 ];
 
-var S = {nbEtp:5, nbAddr:5, modules:{regulia:false,relancia:false,portfolia:false}, setupDiscType:"none", remisePct:10, subMonths:0, engagement:"monthly", validite:30, bms:null};
+var S = {nbEtp:5, nbAddr:5, modules:{regulia:false,relancia:false,portfolia:false}, setupDiscType:"none", remisePct:10, subMonths:0, aboPct:50, engagement:"monthly", validite:30, bms:null, palierRemise:"1-5", groupement:""};
+function palierFromEtp(nbEtp){
+  if(nbEtp>=15) return "15+";
+  if(nbEtp>=6) return "6-14";
+  return "1-5";
+}
+function palierLabel(p, isNL){
+  if(p==="15+") return isNL?"15+ VTE":"15+ ETP";
+  if(p==="6-14") return isNL?"6 tot 14 VTE":"6 à 14 ETP";
+  return isNL?"1 tot 5 VTE":"1 à 5 ETP";
+}
+
+var PALIERS_REMISE = {
+  "1-5":  {setupMax:10, aboMaxMonths:0, aboMaxPct:0},
+  "6-14": {setupMax:10, aboMaxMonths:1, aboMaxPct:50},
+  "15+":  {setupMax:20, aboMaxMonths:2, aboMaxPct:50}
+};
+function aboPctCapEffectif(){
+  return (PALIERS_REMISE[S.palierRemise]||{aboMaxPct:0}).aboMaxPct;
+}
+function setupCapEffectif(){
+  if(S.groupement) return 20;
+  return (PALIERS_REMISE[S.palierRemise]||{setupMax:0}).setupMax;
+}
+function setupMinEffectif(){
+  return S.groupement ? 15 : 0;
+}
+function aboMaxMoisEffectif(){
+  return (PALIERS_REMISE[S.palierRemise]||{aboMaxMonths:0}).aboMaxMonths;
+}
 
 S.offerNum = 1;
 window._offerSent = 0;
@@ -974,6 +1018,55 @@ function render(){
   var c=calcul(); var sub=S.subMonths;
   var sp=c.sp;
   var isNL = (currentUILang === 'nl');
+
+  // Palier déduit automatiquement du nombre d'ETP
+  S.palierRemise = palierFromEtp(S.nbEtp);
+  document.getElementById("palier-remise-display").textContent = palierLabel(S.palierRemise, isNL);
+
+  // Plafonds de remise (palier ETP + groupement)
+  var setupCap=setupCapEffectif();
+  var setupMin=setupMinEffectif();
+  var aboMaxMois=aboMaxMoisEffectif();
+  var aboPctCap=aboPctCapEffectif();
+  if(S.subMonths>aboMaxMois){
+    S.subMonths=0; sub=0;
+    document.querySelectorAll("[data-sub]").forEach(function(x){x.classList.remove("active");});
+    document.getElementById("tab-sub-0").classList.add("active");
+  }
+  var setupWarn=document.getElementById("setup-remise-warning");
+  var setupOverMax = (S.setupDiscType==="pct" && S.remisePct>setupCap);
+  var setupUnderMin = (setupMin>0 && (S.setupDiscType!=="pct" || S.remisePct<setupMin));
+  if(setupOverMax){
+    setupWarn.textContent = isNL ? ("⚠ U overschrijdt de toegestane korting van "+setupCap+" % voor dit palier/groepering") : ("⚠ Vous dépassez la limite de remise de "+setupCap+" % autorisée pour ce palier/groupement");
+    setupWarn.style.display="block";
+  } else if(setupUnderMin){
+    setupWarn.textContent = isNL ? ("⚠ Groepering vereist minstens "+setupMin+" % korting op de setup") : ("⚠ Le groupement impose une remise setup d'au moins "+setupMin+" %");
+    setupWarn.style.display="block";
+  } else {
+    setupWarn.style.display="none";
+  }
+
+  // Remise abonnement : % choisi, plafonné par le palier
+  document.getElementById("abo-pct-wrap").classList.toggle("hidden", sub<=0);
+  var aboWarn=document.getElementById("abo-remise-warning");
+  var aboOverMax = (sub>0 && S.aboPct>aboPctCap);
+  if(aboOverMax){
+    aboWarn.textContent = isNL ? ("⚠ U overschrijdt de toegestane abonnementskorting van "+aboPctCap+" % voor dit palier") : ("⚠ Vous dépassez la remise abonnement de "+aboPctCap+" % autorisée pour ce palier");
+    aboWarn.style.display="block";
+  } else {
+    aboWarn.style.display="none";
+  }
+
+  window._setupRemiseOver = setupOverMax || setupUnderMin || aboOverMax;
+  [0,1,2].forEach(function(m){
+    var tab=document.getElementById("tab-sub-"+m);
+    if(!tab) return;
+    var disabled = m>aboMaxMois;
+    tab.classList.toggle("tab-disabled", disabled);
+    tab.style.opacity = disabled ? "0.35" : "1";
+    tab.style.cursor = disabled ? "not-allowed" : "pointer";
+  });
+
   document.getElementById("etp-result").innerHTML=
     "<div class=\"res-top\"><span class=\"res-name\">Setup "+sp.label+"</span><span class=\"res-price\">"+money(sp.setup*TVA)+"</span><span class=\"res-unit\">"+(isNL?"incl. BTW":"unique TVAC")+"</span></div>"+
     "<div class=\"res-sub\">"+sp.etpMin+(sp.etpMax<9999?"-"+sp.etpMax:"+")+(isNL?" VTE \u00b7 installatie, integratie & opleiding":" ETP \u00b7 installation & formation incluses")+"</div>";
@@ -1024,7 +1117,7 @@ function render(){
   }
   var prevbtn = document.getElementById('prevbtn');
   if(prevbtn) {
-    if(maxAddr < 9999 && S.nbAddr > maxAddr) {
+    if((maxAddr < 9999 && S.nbAddr > maxAddr) || window._setupRemiseOver) {
       prevbtn.disabled = true;
       prevbtn.style.opacity = '0.4';
       prevbtn.style.cursor = 'not-allowed';
@@ -1052,13 +1145,22 @@ function render(){
   if(c.remiseBMS>0) h+="<div class=\"trow\"><span class=\"tl rl\">"+(isNL?"- BrokerCloud korting (10 %)":"- Remise BrokerCloud (10 %)")+"</span><span class=\"tv rv\">- "+money(c.remiseBMS*TVA)+"</span></div>";
   h+="<div class=\"ttot\"><span class=\"ttl\">"+(isNL?"Totaal maandelijks":"Total mensuel")+"</span><span class=\"ttv\">"+money(c.mensuelHT*TVA)+"</span></div>";
   h+="<div class=\"tsub\">"+(isNL?"excl. BTW ":"HTVA ")+money(c.mensuelHT)+"</div>";
-  if(sub>0) h+="<div class=\"ppill\">"+sub+(isNL?" eerste maand"+(sub>1?"en":"")+" gratis":" premier"+(sub>1?"s":"")+" mois offert"+(sub>1?"s":""))+"</div>";
+  if(sub>0){
+    var periodeRecap = isNL
+      ? (sub>1 ? "op de eerste "+sub+" volledige abonnementsmaanden" : "op de 1e volledige abonnementsmaand")
+      : (sub>1 ? "sur les "+sub+" premiers mois complets d'abonnement" : "sur le 1er mois complet d'abonnement");
+    h+="<div class=\"ppill\">−"+S.aboPct+" % "+periodeRecap
+      +"<br><span style=\"font-size:10px;font-style:italic;opacity:.8\">"+(isNL
+        ? "Exclusief de activatiemaand pro rata. Korting beperkt tot de diensten die tijdens deze periode actief zijn, zonder overdracht."
+        : "Hors mois d'activation au prorata. Remise limitée aux services actifs durant cette période, sans report possible.")
+      +"</span></div>";
+  }
   h+="<div class=\"tsep\"></div>";
   h+="<div class=\"tsec\">"+(isNL?"Eenmalige setup (incl. BTW)":"Setup unique (TVAC)")+"</div>";
   var etpLabelRecap = sp.etpMax<9999?" ("+sp.etpMin+"-"+sp.etpMax+" "+(isNL?"VTE":"ETP")+")":" ("+sp.etpMin+"+ "+(isNL?"VTE":"ETP")+")";
   h+=trow((isNL?"Platform ":"Plateforme ")+sp.label+etpLabelRecap,money(sp.setup*TVA));
   if(c.nbMod>0) h+=trow("Modules ("+c.nbMod+"\u00d7\u20ac500)",money(c.nbMod*500*TVA));
-  if(c.remise>0) h+="<div class=\"trow\"><span class=\"tl rl\">"+(isNL?"- Setupkorting":"- Remise setup")+"</span><span class=\"tv rv\">- "+money(c.remise*TVA)+"</span></div>";
+  if(c.remise>0) h+="<div class=\"trow\"><span class=\"tl rl\">"+(isNL?"- Setupkorting (":"- Remise setup (")+S.remisePct+" %)"+(S.groupement?" · "+S.groupement:"")+"</span><span class=\"tv rv\">- "+money(c.remise*TVA)+"</span></div>";
   h+="<div class=\"ttot\"><span class=\"ttl\">"+(isNL?"Totale setup":"Total setup")+"</span><span class=\"ttv\">"+money(c.setupNet*TVA)+"</span></div>";
   h+="<div class=\"tsub\">"+(isNL?"excl. BTW ":"HTVA ")+money(c.setupNet)+"</div>";
   if(S.engagement==="3months") h+="<div class=\"eng-n\">"+(isNL?"3 maanden \u00b7 opzegbaar aan het einde van de periode":"3 mois \u00b7 r\u00e9siliable en fin de p\u00e9riode")+"</div>";
@@ -1163,9 +1265,17 @@ function construirePDF(){
   if(c.remiseBMS>0) row3neg((isNL?"- BrokerCloud korting (10 %)":"- Remise BrokerCloud (10 %)"),c.remiseBMS,ORANGE);
   total3(isNL?"TOTAAL MAANDELIJKS":"TOTAL MENSUEL",c.mensuelHT);
   if(sub>0){
-    doc.setFillColor(TEAL_BG[0],TEAL_BG[1],TEAL_BG[2]);doc.rect(X,y-2,W,9,"F");
-    doc.setFont("helvetica","italic");doc.setFontSize(8.5);doc.setTextColor(TEAL[0],TEAL[1],TEAL[2]);
-    doc.text(isNL?(sub+" eerste maand"+(sub>1?"en":"")+" gratis — besparing van "+money(c.mensuelHT*(1+VATRATE)*sub)+" incl. BTW"):(sub+" premier"+(sub>1?"s":"")+" mois offert"+(sub>1?"s":"")+" - économie de "+money(c.mensuelHT*(1+VATRATE)*sub)+" TVAC"),X+4,y+4);y+=12;
+    var periode = isNL
+      ? (sub>1 ? "op de eerste "+sub+" volledige abonnementsmaanden" : "op de 1e volledige abonnementsmaand")
+      : (sub>1 ? "sur les "+sub+" premiers mois complets d'abonnement" : "sur le 1er mois complet d'abonnement");
+    doc.setFillColor(TEAL_BG[0],TEAL_BG[1],TEAL_BG[2]);doc.rect(X,y-2,W,13,"F");
+    doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(TEAL[0],TEAL[1],TEAL[2]);
+    doc.text("-"+S.aboPct+" % "+periode,X+4,y+3);
+    doc.setFont("helvetica","italic");doc.setFontSize(6.8);doc.setTextColor(MID[0],MID[1],MID[2]);
+    doc.text(isNL
+      ? "Exclusief de activatiemaand pro rata. Korting beperkt tot de diensten die tijdens deze periode actief zijn, zonder overdracht."
+      : "Hors mois d'activation au prorata. Remise limitée aux services actifs durant cette période, sans report possible.",
+      X+4,y+7.5,{maxWidth:W-8});y+=16;
   }
 
   y+=4;sh(isNL?"EENMALIGE SETUP":"SETUP UNIQUE");
@@ -1173,7 +1283,7 @@ function construirePDF(){
   var etpLabelPDF=c.sp.etpMax<9999?" ("+c.sp.etpMin+"-"+c.sp.etpMax+" "+(isNL?"VTE":"ETP")+")":" ("+c.sp.etpMin+"+ "+(isNL?"VTE":"ETP")+")";
   row3((isNL?"Platform ":"Plateforme ")+c.sp.label+etpLabelPDF+(isNL?" — installatie, integratie & opleiding":" - installation, intégration & formation"),c.sp.setup);
   if(c.nbMod>0) row3((isNL?"Setup modules (":"Setup modules (")+c.nbMod+" \u00d7 \u20ac500)",c.nbMod*500);
-  if(c.remise>0) row3neg((isNL?"- Setup-korting (":"- Remise setup (")+S.remisePct+" %)",c.remise,ORANGE);
+  if(c.remise>0) row3neg((isNL?"- Setup-korting (":"- Remise setup (")+S.remisePct+" %)"+(S.groupement?" · "+S.groupement:""),c.remise,ORANGE);
   total3(isNL?"TOTALE EENMALIGE SETUP":"TOTAL SETUP UNIQUE",c.setupNet);
   if(S.engagement==="3months"){
     doc.setFillColor(254,243,199);doc.rect(X,y-2,W,8,"F");
@@ -1199,17 +1309,20 @@ function construirePDF(){
     }
   }
 
-  y+=2;sh(isNL?"INBEGREPEN API-CREDITS":"CRÉDITS API INCLUS");
-  lr(isNL?"Credits inbegrepen / maand":"Crédits inclus / mois",intf(c.creditsTotal)+(isNL?" credits (ca. "+intf(c.mailsTotal)+" e-mails/maand)":" crédits (env. "+intf(c.mailsTotal)+" emails/mois)"));
-  lr(isNL?"Credits / extra adres":"Crédits / adresse suppl.",intf(c.abo.palier.creditsSuppl)+(isNL?" credits (ca. "+c.abo.palier.mailsSuppl+" e-mails)":" crédits (env. "+c.abo.palier.mailsSuppl+" emails)"));
-  lr(isNL?"Prijs extra call (boven forfait)":"Prix appel suppl. (hors forfait)",money3(c.abo.palier.extraCall)+(isNL?" / call":" / appel"));
+  // Crédits API : notion propre à Brio — rien n'est affiché pour BrokerCloud
+  if(S.bms !== 'brokercloud'){
+    y+=2;sh(isNL?"INBEGREPEN API-CREDITS":"CRÉDITS API INCLUS");
+    lr(isNL?"Credits inbegrepen / maand":"Crédits inclus / mois",intf(c.creditsTotal)+(isNL?" credits (ca. "+intf(c.mailsTotal)+" e-mails/maand)":" crédits (env. "+intf(c.mailsTotal)+" emails/mois)"));
+    lr(isNL?"Credits / extra adres":"Crédits / adresse suppl.",intf(c.abo.palier.creditsSuppl)+(isNL?" credits (ca. "+c.abo.palier.mailsSuppl+" e-mails)":" crédits (env. "+c.abo.palier.mailsSuppl+" emails)"));
+    lr(isNL?"Prijs extra call (boven forfait)":"Prix appel suppl. (hors forfait)",money3(c.abo.palier.extraCall)+(isNL?" / call":" / appel"));
 
-  doc.setFillColor(TEAL_BG[0],TEAL_BG[1],TEAL_BG[2]);doc.rect(X,y,W,13,"F");
-  doc.setFont("helvetica","bold");doc.setFontSize(8);doc.setTextColor(TEAL[0],TEAL[1],TEAL[2]);
-  doc.text(isNL?"Een Brio-credit = één actie in uw CRM":"Un crédit Brio = une action dans votre CRM",X+4,y+5);
-  doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(MID[0],MID[1],MID[2]);
-  doc.text(isNL?"Activiteit aanmaken, document klasseren, e-mail archiveren, schadegeval aanmaken... E-mails die zonder Brio-actie worden gelezen verbruiken geen enkel credit.":"Créer une activité, classer un document, archiver un email, créer un sinistre... Les emails lus sans action Brio ne consomment aucun crédit.",X+4,y+9.5,{maxWidth:W-8});
-  y+=17;
+    doc.setFillColor(TEAL_BG[0],TEAL_BG[1],TEAL_BG[2]);doc.rect(X,y,W,13,"F");
+    doc.setFont("helvetica","bold");doc.setFontSize(8);doc.setTextColor(TEAL[0],TEAL[1],TEAL[2]);
+    doc.text(isNL?"Een Brio-credit = één actie in uw CRM":"Un crédit Brio = une action dans votre CRM",X+4,y+5);
+    doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(MID[0],MID[1],MID[2]);
+    doc.text(isNL?"Activiteit aanmaken, document klasseren, e-mail archiveren, schadegeval aanmaken... E-mails die zonder Brio-actie worden gelezen verbruiken geen enkel credit.":"Créer une activité, classer un document, archiver un email, créer un sinistre... Les emails lus sans action Brio ne consomment aucun crédit.",X+4,y+9.5,{maxWidth:W-8});
+    y+=17;
+  }
   // ---- Conditions & mentions legales ----
  // ---- Conditions & mentions legales ----
   doc.addPage();
@@ -1388,7 +1501,9 @@ function genererPDF(){
       modules: modsArr,
       engagement: S.engagement,
       remise_setup: S.setupDiscType === 'pct' ? S.remisePct : null,
-      remise_abo: S.subMonths > 0 ? S.subMonths : null,
+      remise_abo_mois: S.subMonths > 0 ? S.subMonths : null,
+      remise_abo_pct: S.subMonths > 0 ? S.aboPct : null,
+      groupement: S.groupement || null,
       bms: S.bms,
       validite: S.validite || 30,
     })
@@ -1402,16 +1517,45 @@ document.querySelectorAll("[data-bms]").forEach(function(b){b.addEventListener("
 document.querySelectorAll("[data-eng]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-eng]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.engagement=b.dataset.eng;render();});});
 document.querySelectorAll("[data-promo]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-promo]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.setupDiscType=b.dataset.promo;document.getElementById("pct-wrap").classList.toggle("hidden",S.setupDiscType!=="pct");render();});});
 document.getElementById("remise-pct").addEventListener("input",function(){S.remisePct=parseFloat(this.value)||0;render();});
-document.querySelectorAll("[data-sub]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-sub]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.subMonths=parseInt(b.dataset.sub)||0;render();});});
+document.querySelectorAll("[data-sub]").forEach(function(b){b.addEventListener("click",function(){
+  if(b.classList.contains("tab-disabled")) return;
+  document.querySelectorAll("[data-sub]").forEach(function(x){x.classList.remove("active");});b.classList.add("active");S.subMonths=parseInt(b.dataset.sub)||0;render();});});
+document.getElementById("remise-abo-pct").addEventListener("input",function(){S.aboPct=parseFloat(this.value)||0;render();});
+document.getElementById("groupement-select").addEventListener("change",function(){
+  S.groupement=this.value;
+  if(S.groupement && (S.setupDiscType!=="pct" || S.remisePct<15)){
+    // Groupement : impose 15 % minimum sur le setup
+    S.setupDiscType="pct";
+    S.remisePct=15;
+    document.getElementById("remise-pct").value=15;
+    document.getElementById("pct-wrap").classList.remove("hidden");
+    document.querySelectorAll("[data-promo]").forEach(function(x){x.classList.remove("active");});
+    document.getElementById("tab-pct-setup").classList.add("active");
+  } else if(!S.groupement){
+    // Retour à "Aucun" : on retire la remise setup imposée par le groupement
+    S.setupDiscType="none";
+    S.remisePct=10;
+    document.getElementById("remise-pct").value=10;
+    document.getElementById("pct-wrap").classList.add("hidden");
+    document.querySelectorAll("[data-promo]").forEach(function(x){x.classList.remove("active");});
+    document.getElementById("tab-aucune-setup").classList.add("active");
+  }
+  render();
+});
 document.getElementById("cond-toggle").addEventListener("click",function(){
   var c=document.getElementById("cond-content");
   var a=document.getElementById("cond-arrow");
   c.classList.toggle("hidden");
   a.innerHTML=c.classList.contains("hidden")?"&#9654;":"&#9660;";
 });
-document.getElementById("validite").addEventListener("input",function(){S.validite=Math.max(1,parseInt(this.value)||30);render();});
 document.getElementById("prevbtn").addEventListener("click",function(){
   var isNL = (currentUILang === 'nl');
+  // Vérification remise setup : blocage strict si plafond dépassé
+  render();
+  if(window._setupRemiseOver){
+    document.getElementById('setup-remise-warning').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
   // Vérification BMS obligatoire
   if(!S.bms){
     document.getElementById('bms-warning').textContent = isNL ? '⚠ Gelieve het BMS te kiezen' : '⚠ Veuillez choisir le BMS';
@@ -2419,11 +2563,14 @@ function applyUILang() {
   setTextIfFound('tab-aucune-setup', lang === 'nl' ? 'Geen' : 'Aucune');
   setTextIfFound('lbl-pct-remise', lang === 'nl' ? '% korting op de setup' : '% de remise sur le setup');
   setTextIfFound('lbl-remise-abo', lang === 'nl' ? 'Abonnementskorting' : 'Remise abonnement');
-  setTextIfFound('lbl-remise-abo-small', lang === 'nl' ? 'Weergegeven als "X eerste maand(en) gratis" op de PDF' : 'Affichée comme « X premier(s) mois offert(s) » sur le PDF');
+  setTextIfFound('lbl-remise-abo-small', lang === 'nl' ? 'Lanceringstarief weergegeven op de PDF' : 'Tarif de lancement affiché sur le PDF');
   setTextIfFound('tab-sub-0', lang === 'nl' ? 'Geen' : 'Aucune');
-  setTextIfFound('tab-sub-1', lang === 'nl' ? '1 maand gratis' : '1 mois offert');
-  setTextIfFound('tab-sub-2', lang === 'nl' ? '2 maanden gratis' : '2 mois offerts');
-  setTextIfFound('tab-sub-3', lang === 'nl' ? '3 maanden gratis' : '3 mois offerts');
+  setTextIfFound('tab-sub-1', lang === 'nl' ? '1 maand' : '1 mois');
+  setTextIfFound('tab-sub-2', lang === 'nl' ? '2 maanden' : '2 mois');
+  setTextIfFound('lbl-abo-pct-remise', lang === 'nl' ? '% korting op het abonnement' : "% de remise sur l'abonnement");
+  setTextIfFound('lbl-palier-remise', lang === 'nl' ? 'Kortingsschijf' : 'Palier de remise');
+  setTextIfFound('lbl-groupement', lang === 'nl' ? 'Groepering' : 'Groupement');
+  setTextIfFound('opt-grp-aucun', lang === 'nl' ? 'Geen' : 'Aucun');
   setTextIfFound('lbl-validite', lang === 'nl' ? 'Geldigheid offerte' : 'Validité de l\'offre');
   setTextIfFound('lbl-jours', lang === 'nl' ? 'dagen' : 'jours');
   // Broker warning
@@ -2434,6 +2581,7 @@ function applyUILang() {
   if (prevbtn) { var svg=prevbtn.querySelector('svg'); prevbtn.innerHTML=''; if(svg)prevbtn.appendChild(svg); prevbtn.appendChild(document.createTextNode(lang==='nl'?'Voorvertoning':'Prévisualiser')); }
   var dlbtn = document.getElementById('dlbtn');
   if (dlbtn) { var svg2=dlbtn.querySelector('svg'); dlbtn.innerHTML=''; if(svg2)dlbtn.appendChild(svg2); dlbtn.appendChild(document.createTextNode(lang==='nl'?'Verzenden ter ondertekening':'Envoyer pour signature')); }
+  if (typeof render === 'function') render();
 }
 
 function setTextIfFound(id, text) {
