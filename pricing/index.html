@@ -971,8 +971,8 @@ function checkOfferValid(){
 
 function n2(v){return Math.round(v*100)/100;}
 function beNum(s){return s.replace(/,/g,"\u0001").replace(/\./g,",").replace(/\u0001/g," ");}
-function money(v){return "\u20ac "+beNum(new Intl.NumberFormat("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n2(v)));}
-function money3(v){return "\u20ac "+beNum(new Intl.NumberFormat("en-US",{minimumFractionDigits:3,maximumFractionDigits:3}).format(v));}
+function money(v){return beNum(new Intl.NumberFormat("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n2(v)))+" \u20ac";}
+function money3(v){return beNum(new Intl.NumberFormat("en-US",{minimumFractionDigits:3,maximumFractionDigits:3}).format(v))+" \u20ac";}
 function intf(v){return new Intl.NumberFormat("en-US").format(Math.round(v)).replace(/,/g," ");}
 
 function setupPalier(nbEtp){
@@ -1139,8 +1139,8 @@ function render(){
   var adrLabelRecap=" ("+abo.palier.addrIncl+" "+(isNL?"adr. incl.":"adresses incluses")+")";
   h+=trow((isNL?"Basisabonnement":"Forfait de base")+adrLabelRecap,money(abo.palier.base*TVA));
   if(abo.suppl>0) h+=trow("+"+abo.suppl+" adr. \u00d7 "+money(abo.palier.prixSuppl*TVA),money(abo.suppl*abo.palier.prixSuppl*TVA));
-  if(S.modules.regulia)   h+=trow(isNL?"Compliance ("+S.nbAddr+"\u00d7\u20ac10)":"Conformit\u00e9 ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
-  if(S.modules.relancia)  h+=trow(isNL?"Commercieel ("+S.nbAddr+"\u00d7\u20ac10)":"Commercial ("+S.nbAddr+"\u00d7\u20ac10)",money(S.nbAddr*10*TVA));
+  if(S.modules.regulia)   h+=trow(isNL?"Compliance ("+S.nbAddr+"\u00d710 \u20ac)":"Conformit\u00e9 ("+S.nbAddr+"\u00d710 \u20ac)",money(S.nbAddr*10*TVA));
+  if(S.modules.relancia)  h+=trow(isNL?"Commercieel ("+S.nbAddr+"\u00d710 \u20ac)":"Commercial ("+S.nbAddr+"\u00d710 \u20ac)",money(S.nbAddr*10*TVA));
   if(S.modules.portfolia) h+=trow(isNL?"Portefeuille (10 % basis)":"Portefeuille (10 % base)",money(abo.palier.base*0.1*TVA));
   if(c.remiseBMS>0) h+="<div class=\"trow\"><span class=\"tl rl\">"+(isNL?"- BrokerCloud korting (10 %)":"- Remise BrokerCloud (10 %)")+"</span><span class=\"tv rv\">- "+money(c.remiseBMS*TVA)+"</span></div>";
   h+="<div class=\"ttot\"><span class=\"ttl\">"+(isNL?"Totaal maandelijks":"Total mensuel")+"</span><span class=\"ttv\">"+money(c.mensuelHT*TVA)+"</span></div>";
@@ -1159,7 +1159,7 @@ function render(){
   h+="<div class=\"tsec\">"+(isNL?"Eenmalige setup (incl. BTW)":"Setup unique (TVAC)")+"</div>";
   var etpLabelRecap = sp.etpMax<9999?" ("+sp.etpMin+"-"+sp.etpMax+" "+(isNL?"VTE":"ETP")+")":" ("+sp.etpMin+"+ "+(isNL?"VTE":"ETP")+")";
   h+=trow((isNL?"Platform ":"Plateforme ")+sp.label+etpLabelRecap,money(sp.setup*TVA));
-  if(c.nbMod>0) h+=trow("Modules ("+c.nbMod+"\u00d7\u20ac500)",money(c.nbMod*500*TVA));
+  if(c.nbMod>0) h+=trow("Modules ("+c.nbMod+"\u00d7500 \u20ac)",money(c.nbMod*500*TVA));
   if(c.remise>0) h+="<div class=\"trow\"><span class=\"tl rl\">"+(isNL?"- Setupkorting (":"- Remise setup (")+S.remisePct+" %)"+(S.groupement?" · "+S.groupement:"")+"</span><span class=\"tv rv\">- "+money(c.remise*TVA)+"</span></div>";
   h+="<div class=\"ttot\"><span class=\"ttl\">"+(isNL?"Totale setup":"Total setup")+"</span><span class=\"ttv\">"+money(c.setupNet*TVA)+"</span></div>";
   h+="<div class=\"tsub\">"+(isNL?"excl. BTW ":"HTVA ")+money(c.setupNet)+"</div>";
@@ -1259,8 +1259,8 @@ function construirePDF(){
   var adrLabelPDF=" ("+c.abo.palier.addrIncl+" "+(isNL?"adr. incl.":"adresses incluses")+")";
   row3((isNL?"Basisabonnement Procyo AI":"Forfait de base Procyo AI")+adrLabelPDF,c.abo.palier.base);
   if(c.abo.suppl>0) row3((isNL?"+ "+c.abo.suppl+" extra adres"+(c.abo.suppl>1?"sen":"")+" × "+money(c.abo.palier.prixSuppl):"+ "+c.abo.suppl+" adresse"+(c.abo.suppl>1?"s":"")+" suppl. \u00d7 "+money(c.abo.palier.prixSuppl)),c.abo.suppl*c.abo.palier.prixSuppl);
-  if(S.modules.regulia)   row3(isNL?"+ Complianceassistent ("+S.nbAddr+" \u00d7 \u20ac10/adr.)":"+ Assistant Conformité ("+S.nbAddr+" \u00d7 \u20ac10/adr.)",S.nbAddr*10);
-  if(S.modules.relancia)  row3(isNL?"+ Commerciële assistent ("+S.nbAddr+" \u00d7 \u20ac10/adr.)":"+ Assistant Commercial ("+S.nbAddr+" \u00d7 \u20ac10/adr.)",S.nbAddr*10);
+  if(S.modules.regulia)   row3(isNL?"+ Complianceassistent ("+S.nbAddr+" \u00d7 10 \u20ac/adr.)":"+ Assistant Conformité ("+S.nbAddr+" \u00d7 10 \u20ac/adr.)",S.nbAddr*10);
+  if(S.modules.relancia)  row3(isNL?"+ Commerciële assistent ("+S.nbAddr+" \u00d7 10 \u20ac/adr.)":"+ Assistant Commercial ("+S.nbAddr+" \u00d7 10 \u20ac/adr.)",S.nbAddr*10);
   if(S.modules.portfolia) row3(isNL?"+ Portefeuilleassistent (10 % van de basis)":"+ Assistant Portefeuille (10 % de la base)",c.abo.palier.base*0.1);
   if(c.remiseBMS>0) row3neg((isNL?"- BrokerCloud korting (10 %)":"- Remise BrokerCloud (10 %)"),c.remiseBMS,ORANGE);
   total3(isNL?"TOTAAL MAANDELIJKS":"TOTAL MENSUEL",c.mensuelHT);
@@ -1282,7 +1282,7 @@ function construirePDF(){
   colHead();
   var etpLabelPDF=c.sp.etpMax<9999?" ("+c.sp.etpMin+"-"+c.sp.etpMax+" "+(isNL?"VTE":"ETP")+")":" ("+c.sp.etpMin+"+ "+(isNL?"VTE":"ETP")+")";
   row3((isNL?"Platform ":"Plateforme ")+c.sp.label+etpLabelPDF+(isNL?" — installatie, integratie & opleiding":" - installation, intégration & formation"),c.sp.setup);
-  if(c.nbMod>0) row3((isNL?"Setup modules (":"Setup modules (")+c.nbMod+" \u00d7 \u20ac500)",c.nbMod*500);
+  if(c.nbMod>0) row3((isNL?"Setup modules (":"Setup modules (")+c.nbMod+" \u00d7 500 \u20ac)",c.nbMod*500);
   if(c.remise>0) row3neg((isNL?"- Setup-korting (":"- Remise setup (")+S.remisePct+" %)"+(S.groupement?" · "+S.groupement:""),c.remise,ORANGE);
   total3(isNL?"TOTALE EENMALIGE SETUP":"TOTAL SETUP UNIQUE",c.setupNet);
   if(S.engagement==="3months"){
