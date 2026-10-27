@@ -111,6 +111,197 @@
   .legend-dot.comm { background: var(--comm-acc); }
   .legend-dot.ai   { background: var(--ai-acc); }
 
+  /* ── TIMELINE OPTION A (8 ÉTAPES) ── */
+  .tl-option-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+  .timeline-a {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    animation: fadeUp 0.6s 0.05s ease both;
+  }
+  .tl-a-step {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    text-align: center;
+  }
+  .tl-a-line {
+    position: absolute;
+    top: 7px;
+    left: -50%;
+    width: 100%;
+    height: 2px;
+    background: var(--paper3);
+    z-index: 0;
+  }
+  .tl-a-step:first-child .tl-a-line { display: none; }
+  .tl-a-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--paper3);
+    z-index: 1;
+    margin-bottom: 10px;
+    transition: transform 0.15s;
+  }
+  .tl-a-dot { background: var(--gold); }
+  .tl-a-step:hover .tl-a-dot { transform: scale(1.25); }
+  .tl-a-num {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--ink3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .tl-a-label {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--ink2);
+    line-height: 1.3;
+    max-width: 92px;
+  }
+  .tl-a-crm {
+    font-size: 9.5px;
+    font-weight: 500;
+    color: var(--ink3);
+    font-style: italic;
+    line-height: 1.3;
+    max-width: 96px;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px dotted var(--paper3);
+  }
+
+  /* ── TIMELINE OPTION B (3 GRANDS BLOCS) ── */
+  .timeline-b {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.6s 0.05s ease both;
+  }
+  .tl-b-block {
+    flex: 1;
+    cursor: pointer;
+    border-radius: 14px;
+    padding: 16px 18px;
+    border: 1px solid var(--paper3);
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .tl-b-block:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+  }
+  .tl-b-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+  .tl-b-bar.comm { background: linear-gradient(90deg, var(--comm-mid), var(--comm-acc)); }
+  .tl-b-bar.ai   { background: linear-gradient(90deg, var(--ai-mid), var(--ai-acc)); }
+  .tl-b-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-top: 6px;
+    margin-bottom: 4px;
+  }
+  .tl-b-phases {
+    font-size: 11px;
+    color: var(--ink3);
+    line-height: 1.5;
+  }
+  .tl-b-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink3);
+    font-size: 18px;
+    flex: 0 0 auto;
+  }
+
+  /* ── COMMUTATEUR DE PROCESSUS ── */
+  .vue { display: none; }
+  .vue.on { display: block; }
+  .vue-switch {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border: 1.5px solid var(--line);
+    border-radius: 20px;
+    background: var(--paper2);
+  }
+  .vue-switch button {
+    background: transparent;
+    border: none;
+    color: var(--ink3);
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 18px;
+    cursor: pointer;
+    letter-spacing: .03em;
+    transition: background .15s, color .15s;
+  }
+  .vue-switch button:hover { color: var(--ink2); }
+  .vue-switch button.on {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  /* ── VUE FACTURATION ── */
+  .fact-intro { margin: 0 0 28px; }
+  .fact-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 6px;
+    font-size: 12px;
+    background: #fff;
+    border: 1px solid var(--paper3);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .fact-table th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--paper3);
+    background: var(--paper);
+  }
+  .fact-table td {
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--paper2);
+    color: var(--ink2);
+  }
+  .fact-table tr:last-child td { border-bottom: 0; }
+  .fact-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .fact-table tr.tot td { font-weight: 500; color: var(--ink); background: var(--paper); }
+  .fact-grid { margin-top: 16px; }
+  .fact-grid h4 { margin-top: 0; }
+  .fact-rules { margin-left: 18px; }
+  .fact-rules li { margin-bottom: 6px; }
+  .fact-note { margin-top: 12px; font-size: 11.5px; color: var(--ink3); font-style: italic; }
+
   /* ── SECTION WRAPPER ── */
   .section { margin-bottom: 52px; }
 
@@ -459,6 +650,12 @@
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  @keyframes flashCard {
+    0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-color: var(--paper3); }
+    25%, 75% { box-shadow: 0 0 0 3px var(--comm-acc); border-color: var(--comm-acc); }
+    50%      { box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-color: var(--paper3); }
+  }
+  .pcard.flash { animation: flashCard 0.6s ease 2; }
   .pcard:nth-child(1) { animation-delay: 0.05s; }
   .pcard:nth-child(2) { animation-delay: 0.12s; }
   .pcard:nth-child(3) { animation-delay: 0.19s; }
@@ -504,24 +701,84 @@
       <div class="logo-sub">De la prospection à l'autonomie · 8 phases · 2 équipes</div>
     </div>
     <div class="header-meta">
-      <div style="margin-bottom:10px">
+      <div style="margin-bottom:10px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
         <button onclick="window.location.href='../launchpad/index.html'" style="background:transparent;border:1.5px solid var(--line);color:var(--ink3);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:7px 16px;border-radius:20px;cursor:pointer;letter-spacing:.03em">&#8617; Launchpad</button>
+        <div class="vue-switch">
+          <button id="btn-vue-client" class="on" onclick="switchVue('client')">Workflow client</button>
+          <button id="btn-vue-facturation" onclick="switchVue('facturation')">Facturation</button>
+        </div>
       </div>
       <strong>Comité de Direction</strong>
-      Juin 2026 · Usage interne<br>
+      Octobre 2026 · Usage interne<br>
       Document confidentiel
     </div>
   </header>
 
-  <!-- LEGEND -->
-  <div class="legend">
-    <div class="legend-item">
-      <span class="legend-dot comm"></span>
-      Équipe « commerciale »
+  <!-- ═════════════════════════════════════════════
+       VUE 1 — WORKFLOW CLIENT (la vue affichée par défaut)
+       Tout ce qui est entre <div id="vue-client"> et sa balise de
+       fermeture disparaît quand on clique sur « Facturation ».
+  ═════════════════════════════════════════════ -->
+  <div class="vue on" id="vue-client">
+
+  <!-- ═══════════════════════════════
+       TIMELINE - OPTION A : 8 ÉTAPES
+  ════════════════════════════════ -->
+  <div class="timeline-a">
+    <div class="tl-a-step" onclick="jumpTo(0)">
+      <div class="tl-a-dot"></div>
+      <div class="tl-a-num">01</div>
+      <div class="tl-a-label">Génération de leads</div>
+      <div class="tl-a-crm">CRM : Fixer un RDV</div>
     </div>
-    <div class="legend-item">
-      <span class="legend-dot ai"></span>
-      Équipe « IA Factory »
+    <div class="tl-a-step" onclick="jumpTo(1)">
+      <div class="tl-a-line"></div>
+      <div class="tl-a-dot"></div>
+      <div class="tl-a-num">02</div>
+      <div class="tl-a-label">Prise de contact</div>
+      <div class="tl-a-crm">CRM : Fixer un RDV → RDV planifié</div>
+    </div>
+    <div class="tl-a-step" onclick="jumpTo(2)">
+      <div class="tl-a-line"></div>
+      <div class="tl-a-dot"></div>
+      <div class="tl-a-num">03</div>
+      <div class="tl-a-label">Démonstration</div>
+      <div class="tl-a-crm">CRM : RDV planifié → Offre Envoyée</div>
+    </div>
+    <div class="tl-a-step" onclick="jumpTo(3)">
+      <div class="tl-a-line"></div>
+      <div class="tl-a-dot"></div>
+      <div class="tl-a-num">04</div>
+      <div class="tl-a-label">Offre commerciale</div>
+      <div class="tl-a-crm">CRM : Offre Envoyée → Offre Signée (Module 2)</div>
+    </div>
+    <div class="tl-a-step" onclick="jumpTo(4)">
+      <div class="tl-a-line"></div>
+      <div class="tl-a-dot"></div>
+      <div class="tl-a-num">05</div>
+      <div class="tl-a-label">Contrat &amp; signature</div>
+      <div class="tl-a-crm">CRM : Contrat Envoyé → Contrat Signé</div>
+    </div>
+    <div class="tl-a-step split" onclick="jumpTo(5)">
+      <div class="tl-a-line"></div>
+      <div class="tl-a-dot"></div>
+      <div class="tl-a-num">06</div>
+      <div class="tl-a-label">Bienvenue &amp; Set-Up</div>
+      <div class="tl-a-crm">CRM : Contrat Signé → Onboarding en cours</div>
+    </div>
+    <div class="tl-a-step" onclick="jumpTo(6)">
+      <div class="tl-a-line"></div>
+      <div class="tl-a-dot"></div>
+      <div class="tl-a-num">07</div>
+      <div class="tl-a-label">IA Factory &amp; Go-Live</div>
+      <div class="tl-a-crm">CRM : Onboarding en cours → Go-Live - Suivi de 3 mois</div>
+    </div>
+    <div class="tl-a-step" onclick="jumpTo(7)">
+      <div class="tl-a-line"></div>
+      <div class="tl-a-dot"></div>
+      <div class="tl-a-num">08</div>
+      <div class="tl-a-label">Entrainement</div>
+      <div class="tl-a-crm">CRM : Go-Live - Suivi de 3 mois</div>
     </div>
   </div>
 
@@ -532,7 +789,6 @@
     <div class="section-header">
       <span class="section-badge badge-comm">Prospection</span>
       <div class="section-rule"></div>
-      <span class="section-team">Antoine · Cédric · Éric · Luc · Maxime</span>
     </div>
     <div class="section-name">Phases 1 - 2</div>
 
@@ -583,7 +839,7 @@
         Dès qu'un formulaire est soumis (toute source confondue), Odoo crée automatiquement un contact et une opportunité dans le pipeline commercial. Un commercial est affecté automatiquement selon la province du bureau - sans intervention manuelle.
         <div class="kv-grid" style="margin-top:14px">
           <span class="kv-k">Identification source</span><span class="kv-v">Le système doit prévoir une identification des différentes sources dans le CRM Odoo</span>
-          <span class="kv-k">Statut Odoo</span><span class="kv-v">Fixer un RDV Démo</span>
+          <span class="kv-k">Statut Odoo</span><span class="kv-v">Fixer un RDV</span>
         </div>
       </div>
     </div>
@@ -598,7 +854,7 @@
         <h4>Accès au Launchpad &amp; Module Découverte</h4>
         Le courtier reçoit ensuite un <span class="mail-trigger" onclick="openMail('m02')">mail</span> lui donnant accès à un espace sécurisé « Launchpad » (profil prédéfini, seul un mot de passe reste à créer) afin de compléter le Module Découverte : 10 questions, moins de 5 minutes. Les données sont enregistrées dans la base Supabase, puis répercutées sur le contact dans Odoo.
         <div class="kv-grid" style="margin-top:14px">
-          <span class="kv-k">Statut Odoo</span><span class="kv-v">RDV démo planifié</span>
+          <span class="kv-k">Statut Odoo</span><span class="kv-v">RDV planifié</span>
           <span class="kv-k">Relance automatique</span><span class="kv-v">Mail envoyé si le Module Découverte n'est pas complété après 48h - objet : « Préparons votre démonstration »</span>
           <span class="kv-k">Notification interne</span><span class="kv-v">Commercial alerté dès complétion → prépare la démo sur base des réponses</span>
         </div>
@@ -613,7 +869,6 @@
     <div class="section-header">
       <span class="section-badge badge-comm">Acquisition client</span>
       <div class="section-rule"></div>
-      <span class="section-team">Antoine · Cédric · Éric · Luc · Maxime</span>
     </div>
     <div class="section-name">Phases 3 - 4 - 5</div>
 
@@ -636,9 +891,9 @@
         <div class="pcard-accent accent-comm"></div>
         <div class="pcard-num">Phase 4</div>
         <div class="pcard-title">Offre commerciale</div>
-        <div class="pcard-desc">Tarification réalisée en clôture du rendez-vous démo via le Launchpad. L'offre est envoyée au courtier avec un CTA de validation, qui débloque le Module Contractualisation.</div>
+        <div class="pcard-desc">Tarification réalisée en clôture du rendez-vous démo dans Pricing. L'offre est envoyée au courtier avec un CTA de validation, qui débloque le Module Contractualisation.</div>
         <div class="tags">
-          <span class="tag tag-c">Tarification Launchpad</span>
+          <span class="tag tag-c">Tarification Pricing</span>
           <span class="tag tag-c">CTA validation offre</span>
           <span class="tag tag-n">Module Contractualisation</span>
         </div>
@@ -649,9 +904,9 @@
         <div class="pcard-accent accent-comm"></div>
         <div class="pcard-num">Phase 5</div>
         <div class="pcard-title">Contrat &amp; signature</div>
-        <div class="pcard-desc">Gianni reçoit la notification et dispose de 48h pour réaliser le draft du contrat via le module Signature d'Odoo et le faire suivre au courtier pour signature électronique.</div>
+        <div class="pcard-desc">Anne reçoit la notification et dispose de 48h pour rédiger le contrat à partir du bon de commande signé et l'envoyer au courtier pour signature électronique dans Odoo Sign.</div>
         <div class="tags">
-          <span class="tag tag-c">Draft contrat · 48h · Gianni</span>
+          <span class="tag tag-c">Draft contrat · 48h · Anne</span>
           <span class="tag tag-c">e-signature Odoo</span>
           <span class="tag tag-n">Module Paramétrage</span>
         </div>
@@ -677,7 +932,7 @@
         <h4>Question de clôture</h4>
         À la fin de la démonstration, on pose simplement la question : « Combien d'adresses mails ? »
         <div class="kv-grid" style="margin-top:14px">
-          <span class="kv-k">Démo concluante</span><span class="kv-v">Tarification réalisée via le Launchpad, <span class="mail-trigger" onclick="openMail('m04')">mail avec</span> offre envoyé au courtier via Odoo Sign</span>
+          <span class="kv-k">Démo concluante</span><span class="kv-v">Tarification réalisée dans Pricing, <span class="mail-trigger" onclick="openMail('m04')">mail avec</span> offre envoyé au courtier via Odoo Sign</span>
           <span class="kv-k">Statut Odoo</span><span class="kv-v">Offre Envoyée</span>
           <span class="kv-k">Démo non concluante</span><span class="kv-v">Motif tracé, relance possible à 30 jours · statut Odoo <span class="flag flag-urg">à définir</span></span>
         </div>
@@ -688,15 +943,20 @@
       <div class="drawer-inner">
         <span class="drawer-tag">Phase 4 · Offre commerciale</span>
         <h4>Tarification en clôture du rendez-vous démo</h4>
-        Tarif ajusté selon la taille du bureau et les modules activés. La tarification est établie directement à l'issue du rendez-vous démo à l'aide du Launchpad.
+        Tarif ajusté selon la taille du bureau et les modules activés. La tarification est établie directement à l'issue du rendez-vous démo dans Pricing. Jusqu'à <strong>3 offres</strong> peuvent être faites pour un même courtier, chacune valable <strong>30 jours</strong>.
+        <h4>Remises</h4>
+        Les remises sur le setup et le tarif de lancement sont plafonnées selon le nombre d'ETP : Pricing bloque l'envoi d'une offre qui dépasse le plafond. Le détail des plafonds est dans la vue <span class="mail-trigger" onclick="switchVue('facturation')">Facturation</span>.
         <h4>Envoi de l'offre au courtier</h4>
-        L'offre est transmise au courtier via Odoo Sign, ainsi le courtier valide l'offre en la signant ou demande par retour de mail une nouvelle offre.
+        L'offre est transmise au courtier via Odoo Sign, ainsi le courtier valide l'offre en la signant ou demande par retour de mail une nouvelle offre. Dès qu'il signe un bon de commande, les autres bons de commande encore en attente sont annulés automatiquement.
         <h4>Validation de l'offre → Module Contractualisation</h4>
-        Lorsque le courtier signe, cela débloque le Module Contractualisation dans le Launchpad. Un <span class="mail-trigger" onclick="openMail('m05')">mail</span> est alors envoyé au courtier. Le module comporte 13 questions, environ 10 minutes.
+        Lorsque le courtier signe, cela débloque le Module Contractualisation dans le Launchpad. Un <span class="mail-trigger" onclick="openMail('m05')">mail</span> est alors envoyé au courtier. Le module comporte 14 questions, environ 12 minutes.
+        <h4>Renégociation <span class="flag flag-urg">Règle</span></h4>
+        Toute renégociation, même après signature, passe par un <strong>nouveau bon de commande</strong> : c'est le bon de commande signé qui fixe les chiffres facturés, pas le contrat.
         <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Suivi commercial</span><span class="kv-v">À l'envoi de la première offre, activité automatique « Vérifier si le bon de commande a été accepté », à échéance de la validité</span>
           <span class="kv-k">Relance automatique</span><span class="kv-v">Mail envoyé si le Module Contractualisation n'est pas complété après 24h · objet : « Votre contrat est en préparation »</span>
-          <span class="kv-k">Notification interne</span><span class="kv-v">Commercial et Gianni alertés dès complétion → préparation contrat par Gianni</span>
-          <span class="kv-k">Statut Odoo</span><span class="kv-v">Offre Envoyée</span>
+          <span class="kv-k">Notification interne</span><span class="kv-v">Commercial et Gianni alertés dès complétion → préparation du contrat par Anne</span>
+          <span class="kv-k">Statut Odoo</span><span class="kv-v">Offre Envoyée → Offre Signée à la signature du bon de commande</span>
         </div>
       </div>
     </div>
@@ -705,11 +965,13 @@
       <div class="drawer-inner">
         <span class="drawer-tag">Phase 5 · Contrat &amp; signature</span>
         <h4>Déclenchement de l'étape</h4>
-        Cette étape ne démarre que lorsque Gianni et le commercial sont notifiés de la fin du Module Contractualisation dans le Launchpad.
-        <h4>Draft du contrat - Gianni, 48h</h4>
-        Gianni dispose de 48h pour réaliser le draft du contrat, via le module Signature d'Odoo, et le faire suivre au courtier pour signature. À terme, le contrat pourrait se compléter automatiquement à partir des informations reprises sur le contact.
+        Cette étape ne démarre que lorsque Anne et le commercial sont notifiés de la fin du Module Contractualisation dans le Launchpad.
+        <h4>Draft du contrat - Anne, 48h</h4>
+        Anne dispose de 48h pour rédiger le contrat à partir des chiffres du bon de commande signé et des réponses du Module Contractualisation, puis l'envoie au courtier pour signature dans Odoo Sign. La génération automatique du contrat est prévue.
+        <h4>Référence de la demande de signature <span class="flag flag-urg">Règle</span></h4>
+        La référence est tapée à la main dans Odoo Sign. Elle doit commencer par <strong>Contrat_</strong> et avoir l'<strong>ID de la piste</strong> en troisième position, par exemple <strong>Contrat_DupontAssurances_7058</strong>. Avec une autre référence, la signature du contrat ne déclenche rien : ni facture de setup, ni mails de bienvenue.
         <h4>Signature électronique</h4>
-        Signature 100% digitale, sans impression, via le module Signature d'Odoo. Contrat généré automatiquement depuis les Conditions Particulières issues du Module Contractualisation. Niveau de signature à valider :
+        Signature 100% digitale, sans impression, via le module Signature d'Odoo. Niveau de signature à valider :
         <ul>
           <li><strong>Basique (SES)</strong> - signature électronique simple.</li>
           <li><strong>Avancée (AES)</strong> - via SMS, coût de 0,15 € par signature.</li>
@@ -719,6 +981,8 @@
           <span class="kv-k">Statut Odoo (début)</span><span class="kv-v">Emission Contrat - arrive automatiquement quand le Module Contractualisation est complété</span>
           <span class="kv-k">Relance J+3</span><span class="kv-v">Relance automatique si le contrat n'est pas signé après 3 jours</span>
           <span class="kv-k">À la signature</span><span class="kv-v">Mail « Bienvenue chez Procyo » envoyé automatiquement - vu de manière plus complète en Phase 6</span>
+          <span class="kv-k">Facture de setup</span><span class="kv-v">Créée automatiquement en brouillon à la signature, confirmée et envoyée par Gianni · détail dans la vue <span class="mail-trigger" onclick="switchVue('facturation')">Facturation</span></span>
+          <span class="kv-k">Module 3</span><span class="kv-v">Ouvert dans le Launchpad à la signature</span>
           <span class="kv-k">Notification interne</span><span class="kv-v">Le commercial est notifié dès que le contrat est signé</span>
           <span class="kv-k">Statut Odoo (fin)</span><span class="kv-v">Contrat Signé - arrive automatiquement via la signature digitale</span>
         </div>
@@ -740,7 +1004,6 @@
     <div class="section-header">
       <span class="section-badge badge-ai">Onboarding &amp; suivi</span>
       <div class="section-rule"></div>
-      <span class="section-team">Maxime · IA Factory</span>
     </div>
     <div class="section-name">Phases 6 - 7 - 8</div>
 
@@ -768,6 +1031,7 @@
           <span class="tag tag-a">Chargement tables + prompts</span>
           <span class="tag tag-a">Contrôle qualité</span>
           <span class="tag tag-n">Go-Live Teams</span>
+          <span class="tag tag-n">Bouton GoLive · facturation</span>
         </div>
         <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
       </div>
@@ -793,9 +1057,9 @@
         <h4>Déclencheur - Tâche Odoo automatique</h4>
         La signature du contrat déclenche la création automatique d'une <strong>Tâche</strong> dans le projet Odoo « Onboarding - Client », avec l'ensemble de ses sous-tâches (non cochées au départ). Cette tâche sert de fil conducteur et de checklist pour tout le suivi des Phases 6 et 7.
         <h4>Mail J0 - Bienvenue</h4>
-        Dès la signature, un mail automatique « Comment va se passer l'Onboarding » est envoyé au courtier.
+        Dès la signature, un mail automatique « Bienvenue chez Procyo » est envoyé au courtier. Il présente le parcours en 6 étapes, de la clé API jusqu'à l'accompagnement de 3 mois.
         <h4>Mail J+1 - Demande de clé API</h4>
-        Le lendemain de la signature (J+1), un mail automatique indique au courtier la procédure de demande de clé API auprès de Brio/Portima. <span class="flag flag-urg">template à présenter</span>
+        Le lendemain de la signature (J+1), à 7 h, le mail « Étape 1 - Procyo - Préparation de votre intégration - API » indique au courtier la procédure de demande de clé API auprès de Brio/Portima. Le courtier transfère ensuite les deux mails reçus de Portima (clé et mot de passe) à <strong>onboarding@procyo2.odoo.com</strong>.
         <h4>Demande de clé Brio effectuée</h4>
         Le courtier effectue sa demande de clé auprès de Brio/Portima (action manuelle). Dès traitement de la demande, <strong>Onboarding</strong> reçoit l'avis et en avertit le <strong>Sales</strong> <span class="flag flag-urg">manuel - à automatiser ?</span>, qui crée alors l'accès Dashboard Procyo pour le courtier.
         <h4>Création de l'accès Dashboard - trois mails</h4>
@@ -808,10 +1072,10 @@
         <h4>Actions manuelles du courtier</h4>
         Le courtier intègre lui-même sa clé API Brio dans le Dashboard, puis valide lui-même l'autorisation de connexion Microsoft Graph. Ces deux actions sont indépendantes et à rythme variable selon le courtier.
         <h4>Mail J+2 - Module Paramétrage</h4>
-        Le surlendemain de la signature (J+2), un mail automatique invite le courtier à démarrer le Module Paramétrage dans le Launchpad. <span class="flag flag-urg">template à présenter</span> Ce module peut également être complété lors d'un RDV Teams au besoin.
+        Le surlendemain de la signature (J+2), à 7 h, le mail « Étape 2 - Procyo - Configurons votre environnement » invite le courtier à démarrer le Module Paramétrage dans le Launchpad, environ 15 minutes. Ce module peut également être complété lors d'un RDV Teams au besoin.
         <div class="kv-grid" style="margin-top:14px">
           <span class="kv-k">Relance automatique</span><span class="kv-v">Rappel toutes les 48h si le Module Paramétrage n'est pas complété</span>
-          <span class="kv-k">Relance conditionnelle</span><span class="kv-v">Mail de rappel vers Brio (courtier en copie) à J+7 après l'avis de demande de clé API, si la clé n'est toujours pas renseignée</span>
+          <span class="kv-k">Relance conditionnelle</span><span class="kv-v">Activité pour le commercial à J+8 : clé pas demandée → rappel au courtier · clé demandée → rappel à Brio avec le courtier en copie</span>
           <span class="kv-k">Notification interne</span><span class="kv-v">Une fois le Module Paramétrage complété, information envoyée à Onboarding (pour action) et au Sales (pour information)</span>
         </div>
         <h4>Checklist Odoo (sous-tâches)</h4>
@@ -831,7 +1095,7 @@
         <h4>Préparation IA Factory</h4>
         L'IA Factory intègre les paramètres du courtier dans les assistants : chargement des tables (sinistres, objets de risques, contrats, clients, codes produits, etc.) et personnalisation des prompts et des actions Brio.
         <h4>Mail RDV formation &amp; Go-Live</h4>
-        Au moment où le courtier intègre sa clé API dans le Dashboard, un mail automatique lui est envoyé pour fixer le rendez-vous de formation et de Go-Live. Le rendez-vous est ensuite confirmé manuellement entre le Sales et le courtier.
+        À J+13 après la signature du contrat, une activité rappelle au commercial de vérifier que la clé API est intégrée dans le Dashboard, puis d'envoyer le mail pour fixer le rendez-vous de formation et de Go-Live. <span class="flag flag-urg">à confirmer</span> Le rendez-vous est ensuite confirmé manuellement entre le Sales et le courtier.
         <h4>Mail Add-in ChatBox</h4>
         Le lendemain de l'intégration de la clé API, un mail automatique est envoyé au courtier pour le téléchargement et l'installation de l'add-in Outlook (Chatbox Procyo IA). <span class="flag flag-urg">template à prévoir</span>
         <h4>Contrôle qualité avant formation</h4>
@@ -844,7 +1108,12 @@
           <li>personnaliser plus si besoin ;</li>
           <li>montrer le catalogue de prompts et son fonctionnement.</li>
         </ul>
+        <h4>Bouton GoLive - début de la facturation</h4>
+        À l'issue du Go-Live, le commercial clique sur le bouton GoLive de la piste. Odoo crée l'abonnement, qui démarre le 1er du mois suivant, et la facture au prorata des jours restants du mois, tous deux en brouillon pour Gianni. Le bouton disparaît après le clic. Le détail des calculs est dans la vue <span class="mail-trigger" onclick="switchVue('facturation')">Facturation</span>.
+        <h4>Avant de cliquer <span class="flag flag-urg">À faire</span></h4>
+        Cocher sur le contact les modules facturés chaque mois. Pour l'instant c'est manuel : sans cela, le module est payé au setup mais jamais dans l'abonnement. Un lien avec le site Procyo le fera automatiquement dès qu'une offre est acceptée.
         <div class="kv-grid" style="margin-top:14px">
+          <span class="kv-k">Statut Odoo</span><span class="kv-v">Go-Live - Suivi de 3 mois, posé automatiquement par le bouton GoLive</span>
           <span class="kv-k">Après Go-Live</span><span class="kv-v">Le courtier effectue sa première connexion sur la plateforme</span>
           <span class="kv-k">Support renforcé</span><span class="kv-v">Activation du support de 3 mois post-Go-Live <span class="flag flag-urg">automatisé ou manuel - à confirmer</span></span>
         </div>
@@ -877,16 +1146,431 @@
     </div>
   </section>
 
+  </div><!-- /#vue-client -->
+
+  <!-- ═════════════════════════════════════════════
+       VUE 2 — FACTURATION
+       Version métier de la documentation de facturation. La version
+       technique complète (champs Odoo, identifiants, points d'attention,
+       codes) reste privée : ce fichier est public sur GitHub.
+       Les tiroirs de cette vue utilisent les id d201 à d206.
+  ═════════════════════════════════════════════ -->
+  <div class="vue" id="vue-facturation">
+
+    <div class="timeline-a">
+      <div class="tl-a-step" onclick="jumpTo(0)">
+        <div class="tl-a-dot"></div>
+        <div class="tl-a-num">01</div>
+        <div class="tl-a-label">Offre</div>
+        <div class="tl-a-crm">CRM : Offre Envoyée</div>
+      </div>
+      <div class="tl-a-step" onclick="jumpTo(1)">
+        <div class="tl-a-line"></div>
+        <div class="tl-a-dot"></div>
+        <div class="tl-a-num">02</div>
+        <div class="tl-a-label">Bon de commande signé</div>
+        <div class="tl-a-crm">CRM : Offre Signée</div>
+      </div>
+      <div class="tl-a-step" onclick="jumpTo(2)">
+        <div class="tl-a-line"></div>
+        <div class="tl-a-dot"></div>
+        <div class="tl-a-num">03</div>
+        <div class="tl-a-label">Contrat</div>
+        <div class="tl-a-crm">CRM : Contrat Envoyé</div>
+      </div>
+      <div class="tl-a-step" onclick="jumpTo(3)">
+        <div class="tl-a-line"></div>
+        <div class="tl-a-dot"></div>
+        <div class="tl-a-num">04</div>
+        <div class="tl-a-label">Contrat signé</div>
+        <div class="tl-a-crm">Facture de setup</div>
+      </div>
+      <div class="tl-a-step" onclick="jumpTo(4)">
+        <div class="tl-a-line"></div>
+        <div class="tl-a-dot"></div>
+        <div class="tl-a-num">05</div>
+        <div class="tl-a-label">GoLive</div>
+        <div class="tl-a-crm">Prorata + abonnement</div>
+      </div>
+      <div class="tl-a-step" onclick="jumpTo(5)">
+        <div class="tl-a-line"></div>
+        <div class="tl-a-dot"></div>
+        <div class="tl-a-num">06</div>
+        <div class="tl-a-label">Chaque mois</div>
+        <div class="tl-a-crm">Facture le 1er à 10 h</div>
+      </div>
+    </div>
+
+    <div class="drawer-inner fact-intro">
+      <h4>Le principe</h4>
+      Toute la facturation lit des <strong>champs sur la fiche contact d'Odoo</strong>. À chaque étape, les chiffres sont recopiés dans un nouveau jeu de champs : ceux de l'offre, puis ceux du bon de commande signé, puis ceux du contrat. Ce sont ces derniers qui servent à facturer. Les trois documents produits, la facture de setup, la facture au prorata et l'abonnement, sont créés <strong>en brouillon</strong> : Gianni les vérifie et les confirme, rien ne part chez le client sans lui.
+    </div>
+
+    <!-- SECTION A — DE L'OFFRE AU CONTRAT -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-badge badge-comm">De l'offre au contrat</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="section-name">Étapes 1 - 2 - 3</div>
+
+      <div class="grid-3">
+        <div class="pcard" onclick="tog('d201',this)">
+          <div class="pcard-accent accent-comm"></div>
+          <div class="pcard-num">Étape 1</div>
+          <div class="pcard-title">Offre</div>
+          <div class="pcard-desc">Le commercial configure l'offre dans Pricing et l'envoie au courtier. Jusqu'à trois offres par client, chacune gardée séparément dans Odoo.</div>
+          <div class="tags">
+            <span class="tag tag-c">Pricing</span>
+            <span class="tag tag-c">3 offres max.</span>
+            <span class="tag tag-n">Odoo Sign</span>
+          </div>
+          <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+        </div>
+
+        <div class="pcard" onclick="tog('d202',this)">
+          <div class="pcard-accent accent-comm"></div>
+          <div class="pcard-num">Étape 2</div>
+          <div class="pcard-title">Bon de commande signé</div>
+          <div class="pcard-desc">Le courtier signe l'un des bons de commande. Ses chiffres deviennent la référence pour toute la suite ; les autres offres sont effacées.</div>
+          <div class="tags">
+            <span class="tag tag-c">Courtier</span>
+            <span class="tag tag-n">Module 2 Launchpad</span>
+          </div>
+          <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+        </div>
+
+        <div class="pcard" onclick="tog('d203',this)">
+          <div class="pcard-accent accent-comm"></div>
+          <div class="pcard-num">Étape 3</div>
+          <div class="pcard-title">Contrat</div>
+          <div class="pcard-desc">Anne rédige le contrat à partir des chiffres du bon de commande signé et l'envoie en signature dans Odoo Sign.</div>
+          <div class="tags">
+            <span class="tag tag-c">Anne · manuel</span>
+            <span class="tag tag-n">À automatiser</span>
+          </div>
+          <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+        </div>
+      </div>
+
+      <div class="drawer" id="d201">
+        <div class="drawer-inner">
+          <span class="drawer-tag">Étape 1 · Offre</span>
+          <h4>Ce que le commercial choisit</h4>
+          Le nombre d'ETP et d'adresses, les modules (conformité, commercial, portefeuille), le logiciel de gestion du courtier (BMS), un éventuel groupement, la remise sur le setup et le tarif de lancement. La validité est toujours de 30 jours et l'engagement toujours mensuel.
+          <h4>Les remises autorisées</h4>
+          Pricing bloque l'envoi si une remise dépasse le plafond. Dans Odoo, les champs de remise sont en lecture seule.
+          <table class="fact-table">
+            <thead><tr><th>ETP</th><th>Remise setup</th><th>Tarif de lancement</th></tr></thead>
+            <tbody>
+              <tr><td>1 à 5</td><td>jusqu'à 10 %</td><td>aucun</td></tr>
+              <tr><td>6 à 14</td><td>jusqu'à 10 %</td><td>1 mois, jusqu'à −50 %</td></tr>
+              <tr><td>15 et plus</td><td>jusqu'à 20 %</td><td>2 mois, jusqu'à −50 %</td></tr>
+              <tr><td>Groupement</td><td>entre 15 et 20 %</td><td>selon les ETP</td></tr>
+            </tbody>
+          </table>
+          <h4>Ce qui se passe dans Odoo</h4>
+          Les chiffres sont rangés dans les champs « offre 1 », « offre 2 » ou « offre 3 » du contact, selon le numéro de l'offre. Le PDF devient un bon de commande à signer dans Odoo Sign, et le courtier reçoit le lien de signature par e-mail.
+          <div class="kv-grid" style="margin-top:14px">
+            <span class="kv-k">Statut Odoo</span><span class="kv-v">Offre Envoyée</span>
+            <span class="kv-k">Validité</span><span class="kv-v">30 jours</span>
+            <span class="kv-k">Signature</span><span class="kv-v">Toujours en page 2 du PDF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer" id="d202">
+        <div class="drawer-inner">
+          <span class="drawer-tag">Étape 2 · Bon de commande signé</span>
+          <h4>Ce qui se passe dans Odoo</h4>
+          <ul>
+            <li>Les chiffres de l'offre signée sont recopiés dans les champs « offre signée » du contact.</li>
+            <li>Les trois offres sont effacées, et les autres bons de commande encore en attente sont annulés.</li>
+            <li>Le module 2 du Launchpad s'ouvre : le courtier y donne ses données légales et son <strong>e-mail de facturation</strong>, utilisé ensuite pour envoyer les factures.</li>
+          </ul>
+          <div class="kv-grid" style="margin-top:14px">
+            <span class="kv-k">Statut Odoo</span><span class="kv-v">Offre Signée</span>
+            <span class="kv-k">E-mails</span><span class="kv-v">Courtier : « Préparation de votre contrat » · Commercial : « Bon de commande signé »</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer" id="d203">
+        <div class="drawer-inner">
+          <span class="drawer-tag">Étape 3 · Contrat</span>
+          <h4>La référence du contrat</h4>
+          Dans Odoo Sign, la référence de la demande de signature est tapée à la main. Elle doit commencer par <strong>Contrat_</strong> et avoir l'<strong>ID de la piste</strong> en troisième position, par exemple <strong>Contrat_DupontAssurances_7058</strong>. Avec une autre référence, la signature du contrat ne déclenche rien : ni facture de setup, ni e-mails de bienvenue.
+          <h4>Une renégociation repasse par un bon de commande <span class="flag flag-urg">Règle</span></h4>
+          Odoo facture les chiffres du bon de commande signé, pas le texte du contrat. Si les conditions changent, le commercial refait une offre dans Pricing et le courtier signe un nouveau bon de commande. Modifier seulement le contrat ne change rien à ce qui est facturé.
+          <div class="kv-grid" style="margin-top:14px">
+            <span class="kv-k">Statut Odoo</span><span class="kv-v">Contrat Envoyé</span>
+            <span class="kv-k">À venir</span><span class="kv-v">Génération automatique du contrat et de sa référence</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="sep">
+      <div class="sep-line"></div>
+      <div class="sep-diamond"></div>
+      <div class="sep-line"></div>
+    </div>
+
+    <!-- SECTION B — FACTURATION -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-badge badge-ai">Facturation</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="section-name">Étapes 4 - 5 - 6</div>
+
+      <div class="grid-3">
+        <div class="pcard" onclick="tog('d204',this)">
+          <div class="pcard-accent accent-ai"></div>
+          <div class="pcard-num">Étape 4</div>
+          <div class="pcard-title">Contrat signé</div>
+          <div class="pcard-desc">Les chiffres du bon de commande deviennent ceux du contrat. Odoo crée la facture de setup et lance l'onboarding du client.</div>
+          <div class="tags">
+            <span class="tag tag-a">Facture de setup</span>
+            <span class="tag tag-n">Gianni confirme</span>
+          </div>
+          <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+        </div>
+
+        <div class="pcard" onclick="tog('d205',this)">
+          <div class="pcard-accent accent-ai"></div>
+          <div class="pcard-num">Étape 5</div>
+          <div class="pcard-title">GoLive</div>
+          <div class="pcard-desc">Quand le client est en production, le commercial clique sur GoLive : l'abonnement démarre le 1er du mois suivant, et le mois en cours est facturé au prorata.</div>
+          <div class="tags">
+            <span class="tag tag-a">Facture prorata</span>
+            <span class="tag tag-a">Abonnement</span>
+            <span class="tag tag-n">Bouton à usage unique</span>
+          </div>
+          <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+        </div>
+
+        <div class="pcard" onclick="tog('d206',this)">
+          <div class="pcard-accent accent-ai"></div>
+          <div class="pcard-num">Étape 6</div>
+          <div class="pcard-title">Chaque mois</div>
+          <div class="pcard-desc">Odoo facture le 1er du mois, fait baisser les compteurs de remise et recalcule l'abonnement dès qu'un chiffre du client change.</div>
+          <div class="tags">
+            <span class="tag tag-a">Automatique</span>
+            <span class="tag tag-n">1er du mois</span>
+          </div>
+          <div class="pcard-cta"><span class="cta-arrow">›</span> Voir le détail</div>
+        </div>
+      </div>
+
+      <div class="drawer" id="d204">
+        <div class="drawer-inner">
+          <span class="drawer-tag">Étape 4 · Contrat signé</span>
+          <h4>La facture de setup</h4>
+          Palier choisi selon le nombre d'<strong>ETP</strong>, plus 500 € par module, moins la remise setup du bon de commande. Elle est adressée à l'e-mail de facturation donné dans le module 2, s'il est différent de l'e-mail du contact.
+          <table class="fact-table">
+            <thead><tr><th>Palier</th><th>ETP</th><th class="num">Setup HT</th></tr></thead>
+            <tbody>
+              <tr><td>Starter</td><td>1 à 3</td><td class="num">1 500 €</td></tr>
+              <tr><td>Pro</td><td>4 à 10</td><td class="num">2 500 €</td></tr>
+              <tr><td>Business</td><td>11 à 30</td><td class="num">4 000 €</td></tr>
+              <tr><td>Enterprise</td><td>31 à 50</td><td class="num">6 000 €</td></tr>
+              <tr><td>Corporate</td><td>51 et plus</td><td class="num">10 000 €</td></tr>
+              <tr><td>Chaque module</td><td>—</td><td class="num">500 €</td></tr>
+            </tbody>
+          </table>
+          <h4>L'onboarding lancé en même temps</h4>
+          <ul>
+            <li>Tout de suite : e-mail de bienvenue au courtier.</li>
+            <li>J+1 à 7 h : demande de la clé API Portima / Brio.</li>
+            <li>J+2 à 7 h : accès au module 3 du Launchpad.</li>
+            <li>Pour le commercial : vérifier la clé API à J+8, fixer le RDV de formation et GoLive à J+13.</li>
+          </ul>
+          <div class="kv-grid" style="margin-top:14px">
+            <span class="kv-k">Statut Odoo</span><span class="kv-v">Contrat Signé</span>
+            <span class="kv-k">Facture</span><span class="kv-v">En brouillon, confirmée et envoyée par Gianni</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer" id="d205">
+        <div class="drawer-inner">
+          <span class="drawer-tag">Étape 5 · GoLive</span>
+          <h4>L'abonnement mensuel</h4>
+          Palier choisi selon le nombre d'<strong>adresses</strong>, et non plus selon les ETP : un client peut être Business pour son setup et Pro pour son abonnement.
+          <table class="fact-table">
+            <thead><tr><th>Palier</th><th>Adresses</th><th class="num">Base / mois</th><th class="num">Incluses</th><th class="num">Adresse en plus</th></tr></thead>
+            <tbody>
+              <tr><td>Starter</td><td>1 à 3</td><td class="num">150 €</td><td class="num">1</td><td class="num">125 €</td></tr>
+              <tr><td>Pro</td><td>4 à 10</td><td class="num">500 €</td><td class="num">4</td><td class="num">115 €</td></tr>
+              <tr><td>Business</td><td>11 à 30</td><td class="num">1 250 €</td><td class="num">11</td><td class="num">100 €</td></tr>
+              <tr><td>Enterprise</td><td>31 à 50</td><td class="num">3 500 €</td><td class="num">31</td><td class="num">95 €</td></tr>
+              <tr><td>Corporate</td><td>51 et plus</td><td class="num">6 000 €</td><td class="num">51</td><td class="num">90 €</td></tr>
+            </tbody>
+          </table>
+          Modules par mois : conformité et commercial à 10 € par adresse, portefeuille à 10 % de la base. Puis les remises, chacune sur une ligne séparée, dans cet ordre :
+          <ul>
+            <li><strong>Brokercloud</strong> : −10 %, permanente.</li>
+            <li><strong>Tarif de lancement</strong> : −X % sur ce qui reste, pendant les N premiers mois complets.</li>
+            <li><strong>Réduction ponctuelle</strong> : un montant en euros pendant N mois, saisi à la main dans Odoo.</li>
+          </ul>
+          <h4>La facture au prorata</h4>
+          L'abonnement multiplié par les jours restants du mois, jour du GoLive compris. Seule la remise Brokercloud s'y applique : le tarif de lancement ne commence qu'au premier mois complet.
+          <h4>Avant de cliquer <span class="flag flag-urg">À faire</span></h4>
+          Les modules facturés chaque mois se cochent pour l'instant <strong>à la main</strong> sur le contact. Sans cela, le module est payé au setup mais jamais chaque mois. Un lien avec le site Procyo, prévu, le fera automatiquement dès qu'une offre est acceptée.
+          <div class="kv-grid" style="margin-top:14px">
+            <span class="kv-k">Statut Odoo</span><span class="kv-v">Go-Live - Suivi de 3 mois</span>
+            <span class="kv-k">Documents</span><span class="kv-v">Abonnement et facture prorata, en brouillon, confirmés par Gianni</span>
+            <span class="kv-k">Bouton</span><span class="kv-v">Disparaît après le clic : impossible de créer un doublon</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer" id="d206">
+        <div class="drawer-inner">
+          <span class="drawer-tag">Étape 6 · Chaque mois</span>
+          <h4>Le 1er du mois</h4>
+          <ul>
+            <li><strong>10 h</strong> : Odoo génère la facture d'abonnement du mois.</li>
+            <li><strong>12 h</strong> : les compteurs « mois de tarif de lancement » et « mois de réduction ponctuelle » baissent de 1. Arrivée à 0, la ligne de remise disparaît de l'abonnement.</li>
+          </ul>
+          Cet ordre compte : c'est parce que la facture part avant le compteur qu'un tarif de lancement de deux mois donne bien deux factures remisées. Si l'une des deux heures change, le client perd un mois de remise.
+          <h4>À tout moment</h4>
+          Dès qu'un chiffre de facturation change sur le contact (adresses, modules, BMS, remises), Odoo recalcule toutes les lignes de l'abonnement en cours. Les libellés « Période du … au … » se mettent aussi à jour après chaque facture.
+          <div class="kv-grid" style="margin-top:14px">
+            <span class="kv-k">Facture du mois</span><span class="kv-v">Le 1er à 10 h</span>
+            <span class="kv-k">Compteurs de remise</span><span class="kv-v">Le 1er à 12 h</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="sep">
+      <div class="sep-line"></div>
+      <div class="sep-diamond"></div>
+      <div class="sep-line"></div>
+    </div>
+
+    <!-- SECTION C — EXEMPLE CHIFFRE -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-badge badge-ai">Exemple chiffré</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="section-name">16 ETP · 12 adresses · conformité · Brokercloud</div>
+
+      <div class="drawer-inner fact-intro">
+        Remise setup de 20 %, tarif de lancement −50 % sur 2 mois, GoLive le 12 novembre 2026. Montants hors TVA, calculés avec les règles exactes d'Odoo.
+        <div class="grid-3 fact-grid">
+          <div>
+            <h4>Facture de setup</h4>
+            <table class="fact-table">
+              <tbody>
+                <tr><td>Plateforme Business</td><td class="num">4 000,00 €</td></tr>
+                <tr><td>Assistant conformité</td><td class="num">500,00 €</td></tr>
+                <tr><td>Remise setup 20 %</td><td class="num">−900,00 €</td></tr>
+                <tr class="tot"><td>Total</td><td class="num">3 600,00 €</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h4>Prorata du 12 au 30 nov.</h4>
+            <table class="fact-table">
+              <tbody>
+                <tr><td>Business × 19/30</td><td class="num">791,67 €</td></tr>
+                <tr><td>1 adresse en plus × 19/30</td><td class="num">63,33 €</td></tr>
+                <tr><td>Conformité × 19/30</td><td class="num">76,00 €</td></tr>
+                <tr><td>Brokercloud −10 %</td><td class="num">−93,10 €</td></tr>
+                <tr class="tot"><td>Total</td><td class="num">837,90 €</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h4>Abonnement par mois</h4>
+            <table class="fact-table">
+              <tbody>
+                <tr><td>Business</td><td class="num">1 250,00 €</td></tr>
+                <tr><td>1 adresse en plus</td><td class="num">100,00 €</td></tr>
+                <tr><td>Conformité, 12 × 10 €</td><td class="num">120,00 €</td></tr>
+                <tr><td>Brokercloud −10 %</td><td class="num">−147,00 €</td></tr>
+                <tr><td>Lancement −50 %, déc. et janv.</td><td class="num">−661,50 €</td></tr>
+                <tr class="tot"><td>Décembre, janvier</td><td class="num">661,50 €</td></tr>
+                <tr class="tot"><td>Dès février</td><td class="num">1 323,00 €</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION D — REGLES -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-badge badge-comm">Règles à respecter</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="drawer-inner fact-intro">
+        <ol class="fact-rules">
+          <li>Une renégociation passe par un <strong>nouveau bon de commande</strong>, jamais par le seul contrat.</li>
+          <li>La référence du contrat suit le format <strong>Contrat_&lt;texte&gt;_&lt;ID de la piste&gt;</strong>.</li>
+          <li>Les modules facturés chaque mois se cochent à la main sur le contact <strong>avant le GoLive</strong>.</li>
+          <li>Un changement de prix se fait à quatre endroits : Pricing et trois automatisations Odoo.</li>
+          <li>Le 1er du mois, la facture d'abonnement (10 h) doit rester avant les compteurs de remise (12 h).</li>
+        </ol>
+        <p class="fact-note">La documentation technique complète (champs Odoo, identifiants, points d'attention et codes) est privée et s'obtient sur demande.</p>
+      </div>
+    </section>
+
+  </div><!-- /#vue-facturation -->
+
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-logo">Procyo</div>
-    <div>Workflow commercial · Juin 2026 · Usage interne Direction</div>
-    <div>8 phases · 2 équipes · Confidentiel</div>
+    <div>Workflow commercial · Octobre 2026 · Usage interne Direction</div>
+    <div id="footer-meta">8 phases · 2 équipes · Confidentiel</div>
   </footer>
 
 </div>
 
 <script>
+  // Le titre de l'en-tete et le pied de page suivent la vue affichee.
+  const VUES = {
+    client: {titre: 'Workflow client', sous: "De la prospection \u00e0 l'autonomie \u00b7 8 phases \u00b7 2 \u00e9quipes", pied: '8 phases \u00b7 2 \u00e9quipes \u00b7 Confidentiel'},
+    facturation: {titre: 'Facturation', sous: "De l'offre sign\u00e9e \u00e0 l'abonnement mensuel \u00b7 6 \u00e9tapes", pied: 'Facturation \u00b7 Usage interne \u00b7 Confidentiel'}
+  };
+
+  function switchVue(nom) {
+    document.querySelectorAll('.vue').forEach(v => v.classList.remove('on'));
+    const vue = document.getElementById('vue-' + nom);
+    if (vue) vue.classList.add('on');
+    document.querySelectorAll('.vue-switch button').forEach(b => b.classList.remove('on'));
+    const btn = document.getElementById('btn-vue-' + nom);
+    if (btn) btn.classList.add('on');
+    // Un tiroir laisse ouvert dans l'autre vue resterait ouvert au retour.
+    document.querySelectorAll('.drawer.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.pcard.open').forEach(c => c.classList.remove('open'));
+    const meta = VUES[nom];
+    if (meta) {
+      document.querySelector('.logo').innerHTML = 'Procyo <em>-</em> ' + meta.titre;
+      document.querySelector('.logo-sub').textContent = meta.sous;
+      document.getElementById('footer-meta').textContent = meta.pied;
+    }
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  function jumpTo(index) {
+    // Les deux vues contiennent des .pcard : on ne cherche que dans
+    // celle qui est affichee, sinon les index se melangent.
+    const vueActive = document.querySelector('.vue.on') || document;
+    const card = vueActive.querySelectorAll('.pcard')[index];
+    if (!card) return;
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.remove('flash');
+    void card.offsetWidth;
+    card.classList.add('flash');
+    setTimeout(() => card.classList.remove('flash'), 1300);
+  }
+
   function tog(id, card) {
     const drawer = document.getElementById(id);
     const isOpen = drawer.classList.contains('open');
