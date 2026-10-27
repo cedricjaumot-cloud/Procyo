@@ -176,6 +176,10 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 .q-lbl .qn{color:var(--g400);font-weight:400;margin-right:5px}
 .q-lbl .req{color:var(--red);margin-left:2px}
 .q-hint{font-size:12px;color:var(--g400);margin-bottom:8px;line-height:1.5;font-style:italic}
+.vat-msg{font-size:12px;font-weight:500;margin-top:6px;line-height:1.4}
+.vat-wrap{display:flex;align-items:stretch}
+.vat-prefix{display:flex;align-items:center;padding:0 12px;border:1.5px solid var(--g200);border-right:none;border-radius:8px 0 0 8px;background:var(--g100);color:var(--g500);font-size:14px;font-weight:600;letter-spacing:.04em;user-select:none}
+.vat-wrap .vat-inp{border-radius:0 8px 8px 0}
 .other-field{animation:fadeIn .2s}
 .q-autofilled{background:var(--blue-pale);border-radius:var(--r);padding:12px 16px;border:1.5px solid var(--blue-mid);opacity:.85}
 .q-auto-badge{display:inline-block;font-size:10px;font-weight:600;color:var(--blue);background:white;border:1px solid var(--blue-mid);border-radius:10px;padding:2px 8px;margin-left:8px;vertical-align:middle;letter-spacing:.03em}
@@ -1846,7 +1850,14 @@ async function saveBatch(){
   const inputs=document.querySelectorAll('.q-input:not(.contact-inp)');
   const promises=[];
   inputs.forEach(inp=>{
-    const val=inp.value.trim();
+    let val=inp.value.trim();
+    if(inp.classList.contains('vat-inp')){
+      // Le champ n'affiche que les chiffres : on renvoie la forme normalisée,
+      // et jamais un numéro dont la clé de contrôle est fausse.
+      const d=vatDigits(val);
+      if(!vatValid(d)) return;
+      val='BE'+d;
+    }
     if(val&&localCache[inp.dataset.qid]!==val){
       localCache[inp.dataset.qid]=val;
       promises.push(sbUpsert('answers',{broker_id:currentUser.id,question_id:inp.dataset.qid,answer_value:val,updated_at:new Date().toISOString()},'broker_id,question_id'));
@@ -1865,6 +1876,32 @@ function showHome(){
   const greet = currentLang==='nl'?'Goeiedag':currentLang==='de'?'Hallo':currentLang==='en'?'Hello':'Bonjour';
   document.getElementById('greeting').textContent=greet+', '+name+' 👋';
   renderModules();renderGlobalProgress();
+}
+
+// Les réponses de type percent-split (M1Q3) sont enregistrées avec les libellés
+// comme clés, dans la langue utilisée au moment de la réponse. En changeant de
+// langue, les clés ne correspondaient plus : total à 0, question vue comme non
+// répondue, module affiché comme incomplet. Cette table rattache chaque libellé
+// connu à sa ligne, quelle que soit la langue d'origine.
+const PCT_ROWS_ALIAS = [
+  ['IARD particulier','Particuliere BOAR','Privat-Sach','Personal P&C'],
+  ['IARD entreprise','Zakelijke BOAR','Gewerblich-Sach','Commercial P&C'],
+  ['Assurance-vie et placements','Leven en beleggingen','Leben und Anlagen','Life and investments'],
+  ['Crédits (prêts hypothécaires et PAT)','Kredieten (hypotheken en PAT)','Kredite (Hypotheken und PAT)','Credits (mortgages and PAT)'],
+  ['Autres','Andere','Sonstiges','Other'],
+];
+
+// Renvoie la valeur enregistrée pour une ligne, en acceptant le libellé
+// de n'importe laquelle des quatre langues.
+function pctVal(savedObj, row){
+  if(!savedObj || typeof savedObj !== 'object') return '';
+  if(savedObj[row] !== undefined) return savedObj[row];
+  const grp = PCT_ROWS_ALIAS.find(function(g){ return g.indexOf(row) !== -1; });
+  if(!grp) return '';
+  for(let i=0;i<grp.length;i++){
+    if(savedObj[grp[i]] !== undefined) return savedObj[grp[i]];
+  }
+  return '';
 }
 
 function getProgress(mid){
@@ -1894,7 +1931,7 @@ function getProgress(mid){
     } else if(q.type==='percent-split'){
       // answered if at least one row filled and total == 100
       if(v&&typeof v==='object'){
-        const total=q.rows.reduce((s,r)=>s+(parseInt(v[r])||0),0);
+        const total=q.rows.reduce((s,r)=>s+(parseInt(pctVal(v,r))||0),0);
         if(total===100)ans++;
       }
     } else if(q.type==='radio-other'){
@@ -1978,30 +2015,121 @@ function openModule(idx){
     renderSections(mod);
     updateQProgress(mod);
     renderNotif(idx);
-    // Lecture seule si module complété
-    const isCompleted = !!currentUser[mod.id+'_completed_at'];
-    const stickyBar = document.getElementById('sticky-bar');
-    stickyBar.style.display = isCompleted ? 'none' : 'flex';
-    if(isCompleted){
-      setTimeout(function(){
-        document.querySelectorAll('#screen-questions .rbtn, #screen-questions .citem, #screen-questions .bm-ok, #screen-questions .cm-box, #screen-questions .fu-btn, #screen-questions .fu-del, #screen-questions .btn-cest-moi, #screen-questions .cm-add-btn').forEach(function(el){
-  el.style.pointerEvents = 'none';
-          el.style.opacity = '0.7';
-          el.style.cursor = 'not-allowed';
-        });
-        document.querySelectorAll('#screen-questions .opt-btn, #screen-questions .chip').forEach(function(el){
-          el.style.pointerEvents = 'none';
-          el.style.opacity = '0.7';
-        });
-      }, 100);
-    }
+    // Lecture seule si module complété. On exige aussi que la progression soit
+    // réellement pleine : sinon, ajouter une question au questionnaire
+    // verrouillerait définitivement les courtiers déjà clôturés, qui ne
+    // pourraient jamais y répondre.
+    const prog = getProgress(mod.id);
+    const isCompleted = !!currentUser[mod.id+'_completed_at'] && prog.tot>0 && prog.ans>=prog.tot;
+    if(isCompleted) setTimeout(function(){ setQuestionsLock(true); }, 100);
+    else setQuestionsLock(false);
+  }
+}
+
+// Verrouille (ou libère) toutes les réponses du module affiché.
+// Les boutons cliquables sont neutralisés, les champs de saisie désactivés —
+// ces derniers étaient oubliés jusqu'ici, d'où des réponses encore modifiables
+// alors que le bandeau annonçait la lecture seule.
+function setQuestionsLock(locked){
+  const root = document.getElementById('screen-questions');
+  if(!root) return;
+  root.querySelectorAll('.rbtn, .citem, .bm-ok, .cm-box, .fu-btn, .fu-del, .btn-cest-moi, .cm-add-btn, .opt-btn, .chip').forEach(function(el){
+    el.style.pointerEvents = locked ? 'none' : '';
+    el.style.opacity       = locked ? '0.7'  : '';
+    el.style.cursor        = locked ? 'not-allowed' : '';
+  });
+  root.querySelectorAll('.q-input, .q-slider, .pct-inp, .other-txt, .contact-inp').forEach(function(el){
+    el.disabled      = locked;
+    el.style.cursor  = locked ? 'not-allowed' : '';
+    el.style.opacity = locked ? '0.75' : '';
+  });
+  const bar = document.getElementById('sticky-bar');
+  if(bar) bar.style.display = locked ? 'none' : 'flex';
+}
+
+// Le courtier ne modifie jamais lui-même une réponse clôturée : des abonnements
+// peuvent déjà tourner sur ces données. Il décrit sa demande, qui part en
+// activité à son vendeur dans Odoo via le circuit des réponses.
+function showChangeRequest(){
+  const box = document.getElementById('chg-box');
+  if(!box) return;
+  box.style.display = '';
+  const ta = document.getElementById('chg-text');
+  if(ta) ta.focus();
+}
+
+async function sendChangeRequest(btn){
+  const ta  = document.getElementById('chg-text');
+  const msg = document.getElementById('chg-msg');
+  const txt = (ta.value||'').trim();
+  if(txt.length < 5){
+    msg.style.color = 'var(--red)';
+    msg.textContent = currentLang==='nl' ? '⚠ Beschrijf wat u wilt wijzigen.'
+                    : currentLang==='de' ? '⚠ Bitte beschreiben Sie, was geändert werden soll.'
+                    : currentLang==='en' ? '⚠ Please describe what you want changed.'
+                    : '⚠ Décrivez ce que vous souhaitez modifier.';
+    msg.style.display = 'block';
+    return;
+  }
+  btn.disabled = true;
+  const libelleOrigine = btn.textContent;
+  btn.textContent = '…';
+  try{
+    const mod = currentMod!==null ? getModules()[currentMod] : null;
+    const horo = new Date();
+    const cle  = 'DEMANDE_MODIF_' + horo.toISOString().replace(/[^0-9]/g,'').slice(0,14);
+    const entete = (mod ? ('Module ' + (currentMod+1) + ' — ') : '')
+      + (currentUser.company_name || currentUser.email) + ' (' + currentUser.email + ')';
+    // Identifiant unique par demande : chaque envoi est une insertion, donc
+    // toujours transmis, et l'historique des demandes est conservé.
+    await sbInsert('answers',{
+      broker_id: currentUser.id,
+      question_id: cle,
+      answer_value: entete + '\n\n' + txt,
+      updated_at: horo.toISOString()
+    });
+    document.getElementById('chg-form').style.display = 'none';
+    msg.style.color = 'var(--green)';
+    msg.textContent = currentLang==='nl' ? '✓ Uw aanvraag is verzonden. Uw adviseur neemt contact met u op.'
+                    : currentLang==='de' ? '✓ Ihre Anfrage wurde gesendet. Ihr Berater kontaktiert Sie.'
+                    : currentLang==='en' ? '✓ Your request has been sent. Your advisor will contact you.'
+                    : '✓ Votre demande a été envoyée. Votre conseiller va vous contacter.';
+    msg.style.display = 'block';
+  }catch(e){
+    btn.disabled = false;
+    btn.textContent = libelleOrigine;
+    msg.style.color = 'var(--red)';
+    msg.textContent = 'Erreur : ' + e.message;
+    msg.style.display = 'block';
   }
 }
 
 function renderNotif(idx){
   const {ans,tot}=getProgress(getModules()[idx].id);
   const n=document.getElementById('q-notif');
-  if(ans>=tot&&tot>0) n.innerHTML=`<div class="done-bar"><h3>🎉 ${currentLang==='nl'?'Module voltooid!':currentLang==='de'?'Modul abgeschlossen!':currentLang==='en'?'Module completed!':'Module complété !'}</h3><p>${t('notif_readonly')}</p></div>`;
+  if(ans>=tot&&tot>0){
+    const libelle = currentLang==='nl' ? '✏️ Wijziging aanvragen'
+                  : currentLang==='de' ? '✏️ Änderung beantragen'
+                  : currentLang==='en' ? '✏️ Request a change'
+                  : '✏️ Demander une modification';
+    const invite  = currentLang==='nl' ? 'Wat wilt u laten wijzigen?'
+                  : currentLang==='de' ? 'Was möchten Sie ändern lassen?'
+                  : currentLang==='en' ? 'What would you like changed?'
+                  : 'Que souhaitez-vous faire modifier ?';
+    const envoyer = currentLang==='nl' ? 'Aanvraag versturen'
+                  : currentLang==='de' ? 'Anfrage senden'
+                  : currentLang==='en' ? 'Send request'
+                  : 'Envoyer la demande';
+    n.innerHTML=`<div class="done-bar"><h3>🎉 ${currentLang==='nl'?'Module voltooid!':currentLang==='de'?'Modul abgeschlossen!':currentLang==='en'?'Module completed!':'Module complété !'}</h3><p>${t('notif_readonly')}</p>
+      <button class="unlock-btn" style="margin-top:12px" onclick="showChangeRequest()">${libelle}</button>
+      <div id="chg-box" style="display:none;margin-top:12px">
+        <div id="chg-form">
+          <textarea id="chg-text" rows="3" placeholder="${escA(invite)}" style="width:100%;padding:9px 13px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:var(--font);outline:none;resize:vertical"></textarea>
+          <button class="unlock-btn" style="margin-top:8px" onclick="sendChangeRequest(this)">${envoyer}</button>
+        </div>
+        <div id="chg-msg" style="display:none;font-size:13px;font-weight:500;margin-top:8px"></div>
+      </div></div>`;
+  }
   else n.innerHTML=`<div class="notif-bar"><span>📧</span><span>${t('notif_reminder')}</span></div>`;
 }
 
@@ -2126,7 +2254,17 @@ function buildQuestion(q,saved){
   const autoTag = isAutoFilled ? `<span class="q-auto-badge">${t('autofill_badge')}</span>` : '';
   const lbl=`<div class="q-lbl"><span class="qn">${q.id}.</span>${escH(q.label)}${autoTag}</div>`;
   let inp='';
-  if(q.type==='text') inp=`<input type="text" class="q-input${saved?' ans':''}" data-qid="${q.id}" value="${escA(saved||'')}" placeholder="${escA(q.placeholder||'Votre réponse…')}">`;
+  if(q.type==='text'){
+    if(q.id==='M2Q5'){
+      // Le "BE" est un préfixe fixe : le champ ne contient que les chiffres,
+      // ce qui évite de laisser croire qu'on peut y taper des lettres.
+      inp=`<div class="vat-outer"><div class="vat-wrap"><span class="vat-prefix">BE</span>`
+        +`<input type="text" class="q-input vat-inp${saved?' ans':''}" data-qid="${q.id}" value="${escA(saved||'')}" placeholder="0123.456.789"></div>`
+        +`<div class="vat-msg" style="display:none"></div></div>`;
+    } else {
+      inp=`<input type="text" class="q-input${saved?' ans':''}" data-qid="${q.id}" value="${escA(saved||'')}" placeholder="${escA(q.placeholder||'Votre réponse…')}">`;
+    }
+  }
   else if(q.type==='textarea') inp=`<textarea class="q-input${saved?' ans':''}" data-qid="${q.id}" rows="3" placeholder="${escA(q.placeholder||'Votre réponse…')}">${escH(saved||'')}</textarea>`;
   else if(q.type==='radio') inp='<div class="radios">'+q.options.map(o=>`<div class="rbtn${saved===o?' sel':''}" data-qid="${q.id}" data-val="${escA(o)}" onclick="pickRadio(this)">${escH(o)}</div>`).join('')+'</div>';
   else if(q.type==='radio-other'){
@@ -2155,10 +2293,10 @@ function buildQuestion(q,saved){
   else if(q.type==='percent-split'){
     // saved is object {row:pct, ...}
     const savedObj=saved&&typeof saved==='object'?saved:{};
-    const total=q.rows.reduce((s,r)=>s+(parseInt(savedObj[r])||0),0);
+    const total=q.rows.reduce((s,r)=>s+(parseInt(pctVal(savedObj,r))||0),0);
     inp=`<div class="pct-grid">`;
     q.rows.forEach(r=>{
-      const v=savedObj[r]!==undefined?savedObj[r]:'';
+      const v=pctVal(savedObj,r);
       inp+=`<div class="pct-row-label">${escH(r)}</div><div class="pct-row-input"><input type="number" min="0" max="100" class="pct-inp${v!==''?' ans':''}" data-qid="${q.id}" data-row="${escA(r)}" value="${escA(String(v))}" placeholder="0"><span class="pct-sym">%</span></div>`;
     });
     inp+=`</div><div class="pct-total${total===100?' ok':total>0?' err':''}">Total : <strong id="ptot-${q.id}">${total}</strong> / 100 %</div>`;
@@ -2347,10 +2485,11 @@ function buildQuestion(q,saved){
     },0);
   }
   setTimeout(()=>{
-    el.querySelectorAll('.q-input:not(.other-txt):not(.pct-inp):not(.contact-inp):not(.cm-search):not(.cm-add-inp)').forEach(i=>{
+    el.querySelectorAll('.q-input:not(.other-txt):not(.pct-inp):not(.contact-inp):not(.cm-search):not(.cm-add-inp):not(.vat-inp)').forEach(i=>{
       i.addEventListener('input',()=>{i.classList.toggle('ans',i.value.trim()!=='');debounceSave(i.dataset.qid,i.value);});
       i.addEventListener('blur',()=>{if(i.value.trim())persistAnswer(i.dataset.qid,i.value);});
     });
+    vatInit(el);
     // radio-other / checkbox-other text field
     el.querySelectorAll('.other-txt').forEach(i=>{
       i.addEventListener('input',()=>{
@@ -2997,6 +3136,28 @@ async function showDossier(brokerId){
     html+=`</div>`;
   });
 
+  // Demandes de modification du courtier, de la plus récente à la plus ancienne.
+  // Ce sont des lignes de `answers`, donc supprimées avec lui le jour venu.
+  const demandes=(answers||[])
+    .filter(a=>String(a.question_id||'').indexOf('DEMANDE_MODIF')===0)
+    .sort((x,y)=>String(y.question_id).localeCompare(String(x.question_id)));
+  if(demandes.length){
+    html+=`<div class="dos-module"><div class="dos-mod-title">Demandes de modification (${demandes.length})</div><div class="dos-section">`;
+    demandes.forEach(d=>{
+      const brut=String(d.answer_value||'');
+      const sep=brut.indexOf('\n\n');
+      const entete=sep>0?brut.slice(0,sep):'';
+      const texte=sep>0?brut.slice(sep+2):brut;
+      const quand=d.updated_at?new Date(d.updated_at):null;
+      const dateStr=quand?quand.toLocaleDateString('fr-BE')+' à '+quand.toLocaleTimeString('fr-BE',{hour:'2-digit',minute:'2-digit'}):'—';
+      html+=`<div class="dos-q">
+        <div class="dos-q-label">${escH(entete||'Demande')} — ${dateStr}</div>
+        <div class="dos-q-val" style="white-space:pre-wrap">${escH(texte)}</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  }
+
   body.innerHTML=html;
 }
 
@@ -3397,6 +3558,70 @@ function switchAdminTab(tab){
   document.getElementById('atab-admins').className     = 'admin-tab'+(tab==='admins'?' on':'')+(isSuperAdmin(currentUser)?'':' hidden');
   if(tab==='corbeille') showTrash();
   if(tab==='admins') loadAdminsList();
+}
+
+// ══════════════════════════════════════════════════════════════
+// NUMÉRO BCE (M2Q5)
+// Le numéro d'entreprise belge porte une clé de contrôle : les deux
+// derniers chiffres valent 97 moins les huit premiers modulo 97. Un
+// chiffre en trop, en moins ou inversé casse la clé, ce qui permet de
+// refuser la saisie avant qu'Odoo ne rejette l'écriture.
+// ══════════════════════════════════════════════════════════════
+function vatDigits(v){
+  let d = String(v||'').toUpperCase().replace(/^BE/,'').replace(/[^0-9]/g,'');
+  return d.slice(0,10);
+}
+// Le préfixe "BE" est affiché à côté du champ : on ne formate que les chiffres
+function vatFormat(d){
+  if(!d) return '';
+  let out = d.slice(0,4);
+  if(d.length > 4) out += '.' + d.slice(4,7);
+  if(d.length > 7) out += '.' + d.slice(7,10);
+  return out;
+}
+function vatValid(d){
+  if(d.length !== 10) return false;
+  if(d[0] !== '0' && d[0] !== '1') return false;      // un numéro belge commence par 0 ou 1
+  const base = parseInt(d.slice(0,8), 10);
+  const cle  = parseInt(d.slice(8,10), 10);
+  return cle === 97 - (base % 97);
+}
+
+function vatInit(root){
+  root.querySelectorAll('.vat-inp').forEach(function(inp){
+    if(inp.dataset.vatReady) return;
+    inp.dataset.vatReady = '1';
+    inp.setAttribute('inputmode','numeric');
+    inp.setAttribute('autocomplete','off');
+    const outer = inp.closest('.vat-outer');
+    const msg = outer && outer.querySelector('.vat-msg');
+    if(!msg) return;
+    // enregistre=false au chargement : on signale un ancien numéro invalide
+    // sans réécrire quoi que ce soit dans Odoo tant que le courtier n'y touche pas.
+    const check = function(enregistre){
+      const d = vatDigits(inp.value);
+      inp.value = vatFormat(d);                        // masque : 10 chiffres maximum
+      inp.classList.toggle('ans', d.length > 0);
+      if(!d.length){ msg.style.display='none'; return; }
+      if(vatValid(d)){
+        msg.style.display = 'none';
+        if(enregistre) debounceSave(inp.dataset.qid, 'BE' + d);  // envoyé à Odoo normalisé
+        return;
+      }
+      // Tant que le numéro est incomplet on n'alarme pas, mais on n'enregistre pas non plus
+      msg.textContent = d.length < 10
+        ? (currentLang==='nl' ? 'Nog ' + (10-d.length) + ' cijfer(s) nodig' : 'Encore ' + (10-d.length) + ' chiffre(s) à saisir')
+        : (currentLang==='nl' ? '⚠ Dit ondernemingsnummer is onjuist — controleer de cijfers'
+         : currentLang==='de' ? '⚠ Diese Unternehmensnummer ist falsch — bitte die Ziffern prüfen'
+         : currentLang==='en' ? '⚠ This company number is incorrect — please check the digits'
+         : '⚠ Ce numéro d\'entreprise est incorrect — vérifiez les chiffres');
+      msg.style.color = d.length < 10 ? 'var(--g400)' : 'var(--red)';
+      msg.style.display = 'block';
+    };
+    inp.addEventListener('input', function(){ check(true); });
+    inp.addEventListener('blur',  function(){ check(true); });
+    if(inp.value.trim()) check(false);   // reformate l'ancienne réponse et la contrôle
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3916,6 +4141,9 @@ async function loadPivot(){
 
     var qSet={}, bSet={}, map={};
     answers.forEach(function(a){
+      // Les demandes de modification portent un identifiant unique par demande :
+      // sans ce filtre, l'export gagnerait une colonne à chaque demande.
+      if(String(a.question_id||'').indexOf('DEMANDE_MODIF')===0) return;
       qSet[a.question_id]=1;
       bSet[a.broker_id]=1;
       if(!map[a.question_id]) map[a.question_id]={};
