@@ -1354,7 +1354,7 @@
           <div class="pcard-accent accent-ai"></div>
           <div class="pcard-num">Étape 6</div>
           <div class="pcard-title">Chaque mois</div>
-          <div class="pcard-desc">Odoo facture le 1er du mois, fait baisser les compteurs de remise et recalcule l'abonnement dès qu'un chiffre du client change.</div>
+          <div class="pcard-desc">Odoo facture le 1er du mois, applique les remises prévues pour le mois et recalcule l'abonnement dès qu'un chiffre du client change.</div>
           <div class="tags">
             <span class="tag tag-a">Automatique</span>
             <span class="tag tag-n">1er du mois</span>
@@ -1412,7 +1412,7 @@
           <ul>
             <li><strong>Brokercloud</strong> : −10 %, permanente.</li>
             <li><strong>Tarif de lancement</strong> : −X % sur ce qui reste, pendant les N premiers mois complets.</li>
-            <li><strong>Réduction ponctuelle</strong> : un montant en euros pendant N mois, saisi à la main dans Odoo.</li>
+            <li><strong>Réduction ponctuelle</strong> : un montant en euros par mois entre deux dates, saisi à la main dans Odoo. On compte en mois entiers, celui de début et celui de fin compris. Elle passe en dernier et ne fait jamais descendre la facture sous 0.</li>
           </ul>
           <h4>La facture au prorata</h4>
           L'abonnement multiplié par les jours restants du mois, jour du GoLive compris. Seule la remise Brokercloud s'y applique : le tarif de lancement ne commence qu'au premier mois complet.
@@ -1431,15 +1431,17 @@
           <span class="drawer-tag">Étape 6 · Chaque mois</span>
           <h4>Le 1er du mois</h4>
           <ul>
+            <li><strong>4 h</strong>, chaque jour : la réduction ponctuelle est ajoutée ou retirée de l'abonnement selon le mois de la prochaine facture.</li>
             <li><strong>10 h</strong> : Odoo génère la facture d'abonnement du mois.</li>
-            <li><strong>12 h</strong> : les compteurs « mois de tarif de lancement » et « mois de réduction ponctuelle » baissent de 1. Arrivée à 0, la ligne de remise disparaît de l'abonnement.</li>
+            <li><strong>12 h</strong> : le compteur « mois de tarif de lancement » baisse de 1, seulement pour les abonnements déjà facturés. Arrivé à 0, la ligne de remise disparaît de l'abonnement.</li>
           </ul>
-          Cet ordre compte : c'est parce que la facture part avant le compteur qu'un tarif de lancement de deux mois donne bien deux factures remisées. Si l'une des deux heures change, le client perd un mois de remise.
+          Cet ordre compte. La réduction ponctuelle doit être en place avant la facture, et le compteur ne doit baisser qu'après elle : c'est pour cela qu'un tarif de lancement de deux mois donne bien deux factures remisées. Un abonnement confirmé après 10 h le 1er reçoit un mois de tarif de lancement en trop.
           <h4>À tout moment</h4>
           Dès qu'un chiffre de facturation change sur le contact (adresses, modules, BMS, remises), Odoo recalcule toutes les lignes de l'abonnement en cours. Les libellés « Période du … au … » se mettent aussi à jour après chaque facture.
           <div class="kv-grid" style="margin-top:14px">
+            <span class="kv-k">Réduction ponctuelle</span><span class="kv-v">Chaque jour à 4 h</span>
             <span class="kv-k">Facture du mois</span><span class="kv-v">Le 1er à 10 h</span>
-            <span class="kv-k">Compteurs de remise</span><span class="kv-v">Le 1er à 12 h</span>
+            <span class="kv-k">Compteur tarif de lancement</span><span class="kv-v">Le 1er à 12 h</span>
           </div>
         </div>
       </div>
@@ -1515,7 +1517,9 @@
           <li>La référence du contrat suit le format <strong>Contrat_&lt;texte&gt;_&lt;ID de la piste&gt;</strong>.</li>
           <li>Les modules facturés chaque mois se cochent à la main sur le contact <strong>avant le GoLive</strong>.</li>
           <li>Un changement de prix se fait à quatre endroits : Pricing et trois automatisations Odoo.</li>
-          <li>Le 1er du mois, la facture d'abonnement (10 h) doit rester avant les compteurs de remise (12 h).</li>
+          <li>Le 1er du mois, la facture d'abonnement (10 h) doit rester après la mise à jour de la réduction ponctuelle (4 h) et avant le compteur du tarif de lancement (12 h).</li>
+          <li>Gianni confirme un nouvel abonnement <strong>avant le 1er du mois à 10 h</strong>.</li>
+          <li>Adresses, modules et remises se remplissent toujours sur le contact principal, jamais sur un sous-contact.</li>
         </ol>
         <p class="fact-note">La documentation technique complète (champs Odoo, identifiants, points d'attention et codes) est privée et s'obtient sur demande.</p>
       </div>
