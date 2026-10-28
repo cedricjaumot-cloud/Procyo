@@ -1356,7 +1356,7 @@ const MODULES_DATA = {
         {id:'M2Q4',type:'text',label:'Dénomination sociale',required:true},
         {id:'M2Q5',type:'text',label:'Numéro BCE',required:true,placeholder:'BE 0xxx.xxx.xxx'},
         {id:'M2Q6',type:'address-fields',label:'Adresse du siège social',required:true},
-        {id:'M2Q7',type:'text',label:'Numéro d\'agrément FSMA',required:true,placeholder:'Ex. : 12345A'},
+        {id:'M2Q7',type:'text',label:'Numéro d\'agrément FSMA',required:false,hidden:true,derived:true},
         {id:'M2Q8',type:'radio',label:'Forme juridique',required:true,options:['SRL','SA','SNC','SPRL','Personne physique','Autre']},
         {id:'M2Q9',type:'text',label:'Responsable légal (administrateur)',required:true,placeholder:'Prénom Nom'},
         {id:'M2Q10',type:'text',label:'Email de facturation',required:true},
@@ -1428,7 +1428,7 @@ const MODULES_DATA = {
         {id:'M2Q4',type:'text',label:'Maatschappelijke benaming',required:true},
         {id:'M2Q5',type:'text',label:'KBO-nummer',required:true,placeholder:'BE 0xxx.xxx.xxx'},
         {id:'M2Q6',type:'address-fields',label:'Adres van de maatschappelijke zetel',required:true},
-        {id:'M2Q7',type:'text',label:'FSMA-erkenningsnummer',required:true,placeholder:'Bijv. : 12345A'},
+        {id:'M2Q7',type:'text',label:'FSMA-erkenningsnummer',required:false,hidden:true,derived:true},
         {id:'M2Q8',type:'radio',label:'Rechtsvorm',required:true,options:['BV','NV','VOF','BVBA','Natuurlijk persoon','Andere']},
         {id:'M2Q9',type:'text',label:'Wettelijk vertegenwoordiger (bestuurder)',required:true,placeholder:'Voornaam Naam'},
         {id:'M2Q10',type:'text',label:'Facturatie-e-mail',required:true},
@@ -1500,7 +1500,7 @@ const MODULES_DATA = {
         {id:'M2Q4',type:'text',label:'Firmenname',required:true},
         {id:'M2Q5',type:'text',label:'Unternehmensnummer (KBO/BCE)',required:true,placeholder:'BE 0xxx.xxx.xxx'},
         {id:'M2Q6',type:'address-fields',label:'Anschrift des Firmensitzes',required:true},
-        {id:'M2Q7',type:'text',label:'FSMA-Zulassungsnummer',required:true,placeholder:'z.B.: 12345A'},
+        {id:'M2Q7',type:'text',label:'FSMA-Zulassungsnummer',required:false,hidden:true,derived:true},
         {id:'M2Q8',type:'radio',label:'Rechtsform',required:true,options:['GmbH','AG','OHG','SARL','Natürliche Person','Andere']},
         {id:'M2Q9',type:'text',label:'Gesetzlicher Vertreter (Geschäftsführer)',required:true,placeholder:'Vorname Nachname'},
         {id:'M2Q10',type:'text',label:'Rechnungs-E-Mail',required:true},
@@ -1572,7 +1572,7 @@ const MODULES_DATA = {
         {id:'M2Q4',type:'text',label:'Company name',required:true},
         {id:'M2Q5',type:'text',label:'Company registration number',required:true,placeholder:'BE 0xxx.xxx.xxx'},
         {id:'M2Q6',type:'address-fields',label:'Registered office address',required:true},
-        {id:'M2Q7',type:'text',label:'FSMA approval number',required:true,placeholder:'e.g.: 12345A'},
+        {id:'M2Q7',type:'text',label:'FSMA approval number',required:false,hidden:true,derived:true},
         {id:'M2Q8',type:'radio',label:'Legal form',required:true,options:['SRL/BV','SA/NV','SNC','SPRL','Natural person','Other']},
         {id:'M2Q9',type:'text',label:'Legal representative (director)',required:true,placeholder:'First Last'},
         {id:'M2Q10',type:'text',label:'Billing email',required:true},
@@ -1909,6 +1909,9 @@ function getProgress(mid){
   if(mod.isObservation)return{ans:0,tot:0};
   let ans=0,tot=0;
   mod.sections.forEach(s=>s.questions.forEach(q=>{
+    // Une question dérivée est invisible et se remplit seule : la compter
+    // afficherait un total que le courtier ne peut pas rapprocher de l'écran.
+    if(q.derived) return;
     tot++;
     const v=localCache[q.id];
     if(q.type==='slider'){
@@ -2221,8 +2224,9 @@ function renderSections(mod){
 }
 
 function secProg(sec){
-  let sa=0,st=sec.questions.length;
-  sec.questions.forEach(q=>{const v=localCache[q.id];if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&v.length===0))sa++;});
+  const compte=sec.questions.filter(q=>!q.derived);
+  let sa=0,st=compte.length;
+  compte.forEach(q=>{const v=localCache[q.id];if(v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&v.length===0))sa++;});
   return{sa,st};
 }
 
@@ -2241,6 +2245,9 @@ function buildQuestion(q,saved){
   if(q.hidden){
     el.style.display='none';
     el.id='qi-'+q.id;
+    // Question dérivée (ex. FSMA recopié du BCE) : sa valeur est calculée
+    // depuis une autre réponse, surtout ne pas l'écraser avec 'NA'.
+    if(q.derived) return el;
     const defVal = q.defaultValue || 'NA';
     if(localCache[q.id]===undefined||localCache[q.id]===null||localCache[q.id]===''){
       localCache[q.id]=defVal;
@@ -3605,7 +3612,10 @@ function vatInit(root){
       if(!d.length){ msg.style.display='none'; return; }
       if(vatValid(d)){
         msg.style.display = 'none';
-        if(enregistre) debounceSave(inp.dataset.qid, 'BE' + d);  // envoyé à Odoo normalisé
+        if(enregistre){
+          debounceSave(inp.dataset.qid, 'BE' + d);  // envoyé à Odoo normalisé
+          fsmaFromVat('BE' + d);
+        }
         return;
       }
       // Tant que le numéro est incomplet on n'alarme pas, mais on n'enregistre pas non plus
@@ -3621,6 +3631,31 @@ function vatInit(root){
     inp.addEventListener('input', function(){ check(true); });
     inp.addEventListener('blur',  function(){ check(true); });
     if(inp.value.trim()) check(false);   // reformate l'ancienne réponse et la contrôle
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// NUMÉRO FSMA (M2Q7) RECOPIÉ DEPUIS LE BCE
+// L'agrément FSMA d'un courtier est aujourd'hui son numéro d'entreprise :
+// la question n'est donc plus posée (hidden + derived dans la définition du
+// module) et sa réponse est déduite du BCE, puis enregistrée comme n'importe
+// quelle autre réponse pour continuer à remonter dans Odoo.
+// ══════════════════════════════════════════════════════════════
+const FSMA_QID = 'M2Q7';
+
+function fsmaFromVat(valeur){
+  const stocke = localCache[FSMA_QID];
+  const actuel = (stocke === undefined || stocke === null) ? '' : String(stocke).trim();
+  if(actuel === valeur) return;                     // déjà à jour
+  // Un numéro saisi autrefois à la main, quand la question était posée
+  // (ancienne forme « 12345A »), n'est jamais écrasé : on ne remplace que ce
+  // qui a visiblement été déduit d'un numéro BCE.
+  if(actuel && !/^BE[0-9]{10}$/.test(actuel)) return;
+  // La réponse s'enregistre sans que le courtier ait cliqué : on rafraîchit
+  // la barre du module pour que la détection de complétion en tienne compte
+  // tout de suite, sans attendre une autre action de sa part.
+  persistAnswer(FSMA_QID, valeur).then(function(){
+    if(currentMod !== null) updateQProgress(getModules()[currentMod]);
   });
 }
 
