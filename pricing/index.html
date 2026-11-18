@@ -396,10 +396,20 @@ header img.logo{height:34px}
               <div class="tab" data-sub="1" id="tab-sub-1">1 mois</div>
               <div class="tab" data-sub="2" id="tab-sub-2">2 mois</div>
             </div>
+            <div class="psub hidden" id="abo-months-wrap" style="margin-top:0"><label id="lbl-abo-months">Nombre de mois</label><input type="number" id="remise-abo-months" value="" min="1" max="120" step="1"/></div>
             <div class="psub hidden" id="abo-pct-wrap" style="margin-top:0"><input type="number" id="remise-abo-pct" value="0" min="0" max="100" step="1"/><label id="lbl-abo-pct-remise">%</label></div>
           </div>
         </div>
         <div id="abo-remise-warning" style="display:none;color:#DC2626;font-size:12px;padding:6px 4px;font-weight:600;background:#FEF2F2;border-radius:6px;margin-top:6px;border-left:3px solid #DC2626;"></div>
+        <div class="frow" id="admin-cfg-row" style="align-items:flex-start">
+          <label id="lbl-admin-cfg">Configuration administrateur</label>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem">
+            <div class="tab-row"><div class="tab" id="admin-cfg-btn">&#128274; Configuration administrateur</div></div>
+            <div class="psub hidden" id="admin-cfg-pwd-wrap" style="margin-top:0"><input type="password" id="admin-cfg-pwd" placeholder="Mot de passe" autocomplete="off" style="width:150px"/><div class="tab" id="admin-cfg-ok">OK</div></div>
+            <div id="admin-cfg-err" style="display:none;color:#DC2626;font-size:12px;font-weight:600"></div>
+          </div>
+        </div>
+        <div id="admin-cfg-info" style="display:none;color:#B45309;font-size:12px;padding:6px 4px;font-weight:600;background:#FFFBEB;border-radius:6px;margin-top:6px;border-left:3px solid #D97706;"></div>
         <div class="frow" style="display:none">
           <label id="lbl-validite">Validité de l'offre</label>
           <div class="psub" style="margin-top:0"><span id="validite">30</span> <label id="lbl-jours">jours</label></div>
@@ -910,17 +920,28 @@ var PALIERS_REMISE = {
   "6-14": {setupMax:10, aboMaxMonths:1, aboMaxPct:50},
   "15+":  {setupMax:20, aboMaxMonths:2, aboMaxPct:50}
 };
+// ── CONFIGURATION ADMINISTRATEUR ─────────────────────────────
+// Empreinte SHA-256 du mot de passe administrateur (le mot de passe lui-même n'est jamais écrit dans la page).
+// Tant qu'elle est vide, le bouton « Configuration administrateur » affiche « mot de passe non défini ».
+var ADMIN_CFG_HASH = '4087c3a3087d209caf812d23014f9c22bb282003634e43781a53081377d7bb72';
+// Quand le mode est actif, les plafonds du palier sont ignorés (seul le minimum de 15 % imposé par un groupement reste) :
+// remise setup jusqu'à 100 %, remise abonnement jusqu'à 100 % sur le nombre de mois voulu.
+S.adminCfg = false;
 function aboPctCapEffectif(){
+  if(S.adminCfg) return 100;
   return (PALIERS_REMISE[S.palierRemise]||{aboMaxPct:0}).aboMaxPct;
 }
 function setupCapEffectif(){
+  if(S.adminCfg) return 100;
   if(S.groupement) return 20;
   return (PALIERS_REMISE[S.palierRemise]||{setupMax:0}).setupMax;
 }
 function setupMinEffectif(){
+  // Seule règle conservée en mode administrateur : un groupement impose 15 % minimum sur le setup
   return S.groupement ? 15 : 0;
 }
 function aboMaxMoisEffectif(){
+  if(S.adminCfg) return 120;
   return (PALIERS_REMISE[S.palierRemise]||{aboMaxMonths:0}).aboMaxMonths;
 }
 
@@ -1049,6 +1070,8 @@ function render(){
 
   // Remise abonnement : % choisi, plafonné par le palier
   document.getElementById("abo-pct-wrap").classList.toggle("hidden", sub<=0);
+  // Mode administrateur : champ libre « nombre de mois »
+  document.getElementById("abo-months-wrap").classList.toggle("hidden", !S.adminCfg);
   var aboWarn=document.getElementById("abo-remise-warning");
   var aboOverMax = (sub>0 && S.aboPct>aboPctCap);
   var aboVide    = (sub>0 && !(S.aboPct>0));
@@ -1538,6 +1561,7 @@ document.querySelectorAll("[data-sub]").forEach(function(b){b.addEventListener("
   document.querySelectorAll("[data-sub]").forEach(function(x){x.classList.remove("active");});
   b.classList.add("active");
   S.subMonths=parseInt(b.dataset.sub)||0;
+  if(S.adminCfg) document.getElementById('remise-abo-months').value = S.subMonths>0 ? S.subMonths : '';
   if(S.subMonths>0){
     // On démarre au minimum autorisé : 0 %, au commercial de saisir la remise
     S.aboPct=0;
@@ -1546,6 +1570,78 @@ document.querySelectorAll("[data-sub]").forEach(function(b){b.addEventListener("
   render();
 });});
 document.getElementById("remise-abo-pct").addEventListener("input",function(){S.aboPct=parseFloat(this.value)||0;render();});
+
+// ── Mode « Configuration administrateur » ────────────────────
+function adminTxt(k){
+  var nl=(typeof currentUILang!=='undefined' && currentUILang==='nl');
+  var T={
+    btnOff: nl?'\u{1F512} Beheerdersconfiguratie':'\u{1F512} Configuration administrateur',
+    btnOn:  nl?'✓ Beheerdersconfiguratie actief (klik om te deactiveren)':'✓ Configuration administrateur active (cliquer pour désactiver)',
+    pwd:    nl?'Wachtwoord':'Mot de passe',
+    wrong:  nl?'Onjuist wachtwoord.':'Mot de passe incorrect.',
+    undef:  nl?'Beheerderswachtwoord niet ingesteld.':'Mot de passe administrateur non défini.',
+    info:   nl?'⚠ Beheerdersmodus: de limieten van het palier worden genegeerd (tot 100 %, aantal maanden vrij). Enige uitzondering: een groepering vereist minstens 15 % setupkorting.':'⚠ Mode administrateur : les plafonds du palier sont ignorés (jusqu’à 100 %, nombre de mois libre). Seule exception : un groupement impose 15 % minimum de remise setup.',
+    months: nl?'Aantal maanden':'Nombre de mois'
+  };
+  return T[k];
+}
+function adminRefreshUI(){
+  var on=!!S.adminCfg;
+  var btn=document.getElementById('admin-cfg-btn');
+  btn.textContent=on?adminTxt('btnOn'):adminTxt('btnOff');
+  btn.classList.toggle('active',on);
+  document.getElementById('admin-cfg-pwd').placeholder=adminTxt('pwd');
+  var lm=document.getElementById('lbl-abo-months'); if(lm) lm.textContent=adminTxt('months');
+  var info=document.getElementById('admin-cfg-info');
+  info.textContent=adminTxt('info');
+  info.style.display=on?'block':'none';
+  if(on){ document.getElementById('admin-cfg-pwd-wrap').classList.add('hidden'); }
+  document.getElementById('admin-cfg-err').style.display='none';
+  document.getElementById('remise-abo-months').value = (on && S.subMonths>0) ? S.subMonths : '';
+}
+function adminDeactivate(){
+  S.adminCfg=false;
+  // Retour aux règles du palier : on remet les remises à zéro (puis le groupement réimpose son minimum éventuel)
+  S.setupDiscType="none"; S.remisePct=0; S.subMonths=0; S.aboPct=0;
+  document.getElementById("remise-pct").value=0;
+  document.getElementById("remise-abo-pct").value=0;
+  document.getElementById("pct-wrap").classList.add("hidden");
+  document.querySelectorAll("[data-promo]").forEach(function(x){x.classList.remove("active");});
+  document.getElementById("tab-aucune-setup").classList.add("active");
+  document.querySelectorAll("[data-sub]").forEach(function(x){x.classList.remove("active");});
+  document.getElementById("tab-sub-0").classList.add("active");
+  adminRefreshUI();
+  var g=document.getElementById("groupement-select");
+  if(g && g.value){ g.dispatchEvent(new Event('change')); } else { render(); }
+}
+async function adminTryUnlock(){
+  var err=document.getElementById('admin-cfg-err');
+  var val=document.getElementById('admin-cfg-pwd').value;
+  err.style.display='none';
+  if(!ADMIN_CFG_HASH){ err.textContent=adminTxt('undef'); err.style.display='block'; return; }
+  var h=await sha256(val);
+  document.getElementById('admin-cfg-pwd').value='';
+  if(h!==ADMIN_CFG_HASH){ err.textContent=adminTxt('wrong'); err.style.display='block'; return; }
+  S.adminCfg=true;
+  adminRefreshUI();
+  render();
+}
+document.getElementById('admin-cfg-btn').addEventListener('click',function(){
+  if(S.adminCfg){ adminDeactivate(); return; }
+  var w=document.getElementById('admin-cfg-pwd-wrap');
+  w.classList.toggle('hidden');
+  if(!w.classList.contains('hidden')) document.getElementById('admin-cfg-pwd').focus();
+});
+document.getElementById('admin-cfg-ok').addEventListener('click',adminTryUnlock);
+document.getElementById('admin-cfg-pwd').addEventListener('keypress',function(e){ if(e.key==='Enter') adminTryUnlock(); });
+// Champ libre : nombre de mois de remise (mode administrateur seulement)
+document.getElementById('remise-abo-months').addEventListener('input',function(){
+  if(!S.adminCfg) return;
+  var v=parseInt(this.value);
+  S.subMonths = isNaN(v) ? 0 : Math.max(0,Math.min(120,v));
+  document.querySelectorAll("[data-sub]").forEach(function(x){x.classList.toggle("active", parseInt(x.dataset.sub)===S.subMonths);});
+  render();
+});
 // Liste des groupements : gérée depuis l'admin du Launchpad (table `groupements`)
 async function chargerGroupements(){
   var sel=document.getElementById("groupement-select");
@@ -2614,6 +2710,8 @@ function applyUILang() {
   setTextIfFound('tab-sub-1', lang === 'nl' ? '1 maand' : '1 mois');
   setTextIfFound('tab-sub-2', lang === 'nl' ? '2 maanden' : '2 mois');
   setTextIfFound('lbl-palier-remise', lang === 'nl' ? 'Kortingsschijf' : 'Palier de remise');
+  setTextIfFound('lbl-admin-cfg', lang === 'nl' ? 'Beheerdersconfiguratie' : 'Configuration administrateur');
+  if (typeof adminRefreshUI === 'function') adminRefreshUI();
   setTextIfFound('lbl-groupement', lang === 'nl' ? 'Groepering' : 'Groupement');
   setTextIfFound('opt-grp-aucun', lang === 'nl' ? 'Geen' : 'Aucun');
   setTextIfFound('lbl-validite', lang === 'nl' ? 'Geldigheid offerte' : 'Validité de l\'offre');
