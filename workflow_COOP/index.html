@@ -1608,10 +1608,9 @@ async function checkPwd() {
   const val = document.getElementById('pwd-input').value;
   const errEl = document.getElementById('pwd-err');
   if(!email || !val){ errEl.textContent='Email et mot de passe requis.'; return; }
-  if(!ADMIN_EMAILS.includes(email)){ errEl.textContent='Accès réservé aux administrateurs.'; return; }
   try{
     const h = await sha256(val);
-    const res = await fetch(SB_URL+'/rest/v1/brokers?email=eq.'+encodeURIComponent(email)+'&select=email,password_hash',{
+    const res = await fetch(SB_URL+'/rest/v1/brokers?email=eq.'+encodeURIComponent(email)+'&select=email,password_hash,is_admin',{
       headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
     });
     const rows = await res.json();
@@ -1621,6 +1620,8 @@ async function checkPwd() {
       document.getElementById('pwd-input').focus();
       return;
     }
+    // Admin = flag is_admin en base (géré depuis le Launchpad) OU liste historique ADMIN_EMAILS.
+    if(!(rows[0].is_admin===true || ADMIN_EMAILS.includes(email))){ errEl.textContent='Accès réservé aux administrateurs.'; return; }
     sessionStorage.setItem('procyo_workflow','1');
     localStorage.setItem('procyo_session', JSON.stringify({email, password_hash: h}));
     grantAccess();
@@ -1633,10 +1634,22 @@ document.getElementById('pwd-input').addEventListener('keypress',e=>{if(e.key===
   if(sessionStorage.getItem('procyo_workflow')==='1'){ grantAccess(); return; }
   try{
     const s = JSON.parse(localStorage.getItem('procyo_session')||'null');
-    if(s && s.email && ADMIN_EMAILS.includes(s.email.toLowerCase())){
+    if(!s || !s.email) return;
+    if(ADMIN_EMAILS.includes(s.email.toLowerCase())){
       sessionStorage.setItem('procyo_workflow','1');
       grantAccess();
+      return;
     }
+    // Admin ajouté depuis le Launchpad : vérifier le flag is_admin en base avec la session stockée.
+    if(!s.password_hash) return;
+    fetch(SB_URL+'/rest/v1/brokers?email=eq.'+encodeURIComponent(s.email.toLowerCase())+'&select=password_hash,is_admin',{
+      headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
+    }).then(r=>r.json()).then(rows=>{
+      if(rows && rows.length && rows[0].is_admin===true && rows[0].password_hash===s.password_hash){
+        sessionStorage.setItem('procyo_workflow','1');
+        grantAccess();
+      }
+    }).catch(()=>{});
   }catch(e){}
 })();
 </script>
