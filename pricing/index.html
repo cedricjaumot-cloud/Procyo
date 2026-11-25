@@ -410,6 +410,25 @@ header img.logo{height:34px}
           </div>
         </div>
         <div id="admin-cfg-info" style="display:none;color:#B45309;font-size:12px;padding:6px 4px;font-weight:600;background:#FFFBEB;border-radius:6px;margin-top:6px;border-left:3px solid #D97706;"></div>
+        <div id="cond-derog-block" style="display:none">
+        <div class="frow" style="align-items:flex-start">
+          <label id="lbl-cond-duree">Modalités particulières dérogatoires (durée, renouvellement, résiliation)</label>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.35rem;width:320px;max-width:100%">
+            <textarea id="cond-duree" rows="3" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid #D1D5DB;font-family:inherit;font-size:13px;resize:vertical;box-sizing:border-box"></textarea>
+            <div id="cond-duree-count" style="font-size:12px;font-weight:600;color:#6B7280">0 / 150</div>
+          </div>
+        </div>
+        <div id="cond-duree-warn" style="display:none;font-size:12px;padding:6px 4px;font-weight:600;border-radius:6px;margin-top:6px"></div>
+        <div class="frow" style="align-items:flex-start">
+          <label id="lbl-cond-derog">Dispositions particulières</label>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.35rem;width:320px;max-width:100%">
+            <textarea id="cond-derog" rows="3" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid #D1D5DB;font-family:inherit;font-size:13px;resize:vertical;box-sizing:border-box"></textarea>
+            <div id="cond-derog-count" style="font-size:12px;font-weight:600;color:#6B7280">0 / 150</div>
+          </div>
+        </div>
+        <div id="cond-derog-warn" style="display:none;font-size:12px;padding:6px 4px;font-weight:600;border-radius:6px;margin-top:6px"></div>
+        <div id="cond-derog-lang" style="display:none;color:#6B7280;font-size:12px;padding:6px 4px;font-weight:500;background:#F3F4F6;border-radius:6px;margin-top:6px;border-left:3px solid #9CA3AF;"></div>
+        </div>
         <div class="frow" style="display:none">
           <label id="lbl-validite">Validité de l'offre</label>
           <div class="psub" style="margin-top:0"><span id="validite">30</span> <label id="lbl-jours">jours</label></div>
@@ -916,7 +935,7 @@ var PALIERS = [
   {"key":"corporate",  "label":"Corporate",  "etpMin":51, "etpMax":9999,"addrIncl":51, "base":6000, "prixSuppl":90,  "setup":10000, "credits":200000, "mailsMois":40000, "creditsSuppl":3000, "mailsSuppl":600, "extraCall":0.015}
 ];
 
-var S = {nbEtp:5, nbAddr:5, modules:{regulia:false,relancia:false,portfolia:false}, setupDiscType:"none", remisePct:0, subMonths:0, aboPct:0, engagement:"monthly", validite:30, bms:null, palierRemise:"1-5", groupement:""};
+var S = {nbEtp:5, nbAddr:5, condDerog:"", condDuree:"", modules:{regulia:false,relancia:false,portfolia:false}, setupDiscType:"none", remisePct:0, subMonths:0, aboPct:0, engagement:"monthly", validite:30, bms:null, palierRemise:"1-5", groupement:""};
 function palierFromEtp(nbEtp){
   if(nbEtp>=15) return "15+";
   if(nbEtp>=6) return "6-14";
@@ -936,7 +955,7 @@ var PALIERS_REMISE = {
 // ── CONFIGURATION ADMINISTRATEUR ─────────────────────────────
 // Empreinte SHA-256 du mot de passe administrateur (le mot de passe lui-même n'est jamais écrit dans la page).
 // Tant qu'elle est vide, le bouton « Configuration administrateur » affiche « mot de passe non défini ».
-var ADMIN_CFG_HASH = '4087c3a3087d209caf812d23014f9c22bb282003634e43781a53081377d7bb72';
+var ADMIN_CFG_HASH = '8e10967b678e0875e6e152cecd95274af71eec27926a2c40d501f8d8bac5e97d';
 // Quand le mode est actif, les plafonds du palier sont ignorés (seul le minimum de 15 % imposé par un groupement reste) :
 // remise setup jusqu'à 100 %, remise abonnement jusqu'à 100 % sur le nombre de mois voulu.
 S.adminCfg = false;
@@ -1390,6 +1409,23 @@ function construirePDF(){
   y+=20;
   doc.setFontSize(7.5);doc.setFont("helvetica","italic");doc.setTextColor(MID[0],MID[1],MID[2]);
   doc.text(isNL?"Prijzen exclusief BTW, BTW (21%) en inclusief BTW. BTW is niet aftrekbaar door Belgische makelaars.":"Prix affich\u00e9s HTVA, TVA (21 %) et TVAC. La TVA n'est pas r\u00e9cup\u00e9rable par les courtiers belges.",105,y+3,{align:"center"});
+  // ---- Conditions derogatoires (petit, sous la signature : rien au-dessus ne bouge) ----
+  var _cDuree=(S.condDuree||'').trim(), _cDerog=(S.condDerog||'').trim();
+  if(_cDuree||_cDerog){
+    y+=12;
+    doc.setDrawColor(BRD[0],BRD[1],BRD[2]);doc.line(X+2,y-4,X+W-2,y-4);
+    doc.setFont("helvetica","bold");doc.setFontSize(7);doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+    doc.text(isNL?"Bijzondere voorwaarden overeengekomen met de klant":"Conditions particuli\u00e8res convenues avec le client",X+2,y);y+=4.5;
+    doc.setFontSize(6.5);
+    [[_cDuree,isNL?"Bijzondere afwijkende modaliteiten (duur, verlenging, opzegging) :":"Modalit\u00e9s particuli\u00e8res d\u00e9rogatoires (dur\u00e9e, renouvellement, r\u00e9siliation) :"],[_cDerog,isNL?"Bijzondere bepalingen :":"Dispositions particuli\u00e8res :"]].forEach(function(p){
+      if(!p[0]) return;
+      doc.setFont("helvetica","bold");doc.setTextColor(DARK[0],DARK[1],DARK[2]);
+      doc.text(p[1],X+2,y);y+=3.4;
+      doc.setFont("helvetica","normal");doc.setTextColor(MID[0],MID[1],MID[2]);
+      var ls=doc.splitTextToSize(p[0],W-4);
+      doc.text(ls,X+2,y);y+=ls.length*3.0+2.5;
+    });
+  }
   doc.setFillColor(NAVY[0],NAVY[1],NAVY[2]);doc.rect(0,282,210,15,"F");
   doc.setTextColor(TEAL2[0],TEAL2[1],TEAL2[2]);doc.setFont("helvetica","italic");doc.setFontSize(8.5);
   doc.text(isNL?"De AI die uw makelaarsvak begrijpt, niet andersom":"L'IA qui comprend votre m\u00e9tier de courtier, pas l'inverse",105,288.5,{align:"center"});
@@ -1545,6 +1581,8 @@ function genererPDF(){
       remise_abo_mois: S.subMonths > 0 ? S.subMonths : null,
       remise_abo_pct: S.subMonths > 0 ? S.aboPct : null,
       groupement: S.groupement || null,
+      conditions_derogatoires: (S.condDerog||'').trim() || null,
+      conditions_duree: (S.condDuree||'').trim() || null,
       bms: S.bms,
       validite: S.validite || 30,
     })
@@ -1584,6 +1622,35 @@ document.querySelectorAll("[data-sub]").forEach(function(b){b.addEventListener("
 });});
 document.getElementById("remise-abo-pct").addEventListener("input",function(){S.aboPct=parseFloat(this.value)||0;render();});
 
+// -- CONDITIONS DEROGATOIRES (2 textes libres, limite indicative de 150 caracteres, jamais bloquante) --
+function condChamp(id, cle){
+  var el=document.getElementById(id); if(!el) return 0;
+  var n=(el.value||'').length, nl=(typeof currentUILang!=='undefined' && currentUILang==='nl');
+  S[cle]=el.value||'';
+  var cnt=document.getElementById(id+'-count'), warn=document.getElementById(id+'-warn');
+  cnt.textContent=n+' / 150';
+  cnt.style.color = n>150 ? '#DC2626' : (n>=125 ? '#D97706' : '#6B7280');
+  if(n>150){
+    warn.style.display='block'; warn.style.color='#DC2626'; warn.style.background='#FEF2F2'; warn.style.borderLeft='3px solid #DC2626';
+    warn.textContent = nl ? '⚠ Let op: u overschrijdt 150 tekens, kans op problemen in de opmaak van het contract. (Niet blokkerend)' : '⚠ Attention : vous dépassez 150 caractères, risque de problème au niveau du contrat. (Non bloquant)';
+  } else if(n>=125){
+    warn.style.display='block'; warn.style.color='#B45309'; warn.style.background='#FFFBEB'; warn.style.borderLeft='3px solid #D97706';
+    warn.textContent = nl ? 'U nadert de limiet van 150 tekens. (Niet blokkerend)' : 'Vous approchez de la limite de 150 caractères. (Non bloquant)';
+  } else { warn.style.display='none'; }
+  return n;
+}
+function condDerogRefresh(){
+  var a=condChamp('cond-duree','condDuree'), b=condChamp('cond-derog','condDerog');
+  var nl=(typeof currentUILang!=='undefined' && currentUILang==='nl'), lang=document.getElementById('cond-derog-lang');
+  if(!lang) return;
+  if(a+b>0){
+    lang.style.display='block';
+    lang.textContent = nl ? 'ℹ Ter info: schrijf de voorwaarden in de taal van de makelaar. Vergeet niet uw tekst te kopiëren als u meerdere offertes wilt versturen, zodat u hem niet opnieuw moet schrijven.' : 'ℹ Pour information : écrivez les conditions dans la langue du courtier. N’oubliez pas de copier votre texte si vous voulez envoyer plusieurs offres, pour ne pas devoir réécrire.';
+  } else { lang.style.display='none'; }
+}
+document.getElementById('cond-duree').addEventListener('input', condDerogRefresh);
+document.getElementById('cond-derog').addEventListener('input', condDerogRefresh);
+
 // ── Mode « Configuration administrateur » ────────────────────
 function adminTxt(k){
   var nl=(typeof currentUILang!=='undefined' && currentUILang==='nl');
@@ -1611,9 +1678,12 @@ function adminRefreshUI(){
   if(on){ document.getElementById('admin-cfg-pwd-wrap').classList.add('hidden'); }
   document.getElementById('admin-cfg-err').style.display='none';
   document.getElementById('remise-abo-months').value = (on && S.subMonths>0) ? S.subMonths : '';
+  var cdb=document.getElementById('cond-derog-block'); if(cdb) cdb.style.display = on ? 'block' : 'none';
 }
 function adminDeactivate(){
   S.adminCfg=false;
+  ['cond-duree','cond-derog'].forEach(function(id){ var t=document.getElementById(id); if(t) t.value=''; });
+  if(typeof condDerogRefresh==='function') condDerogRefresh();
   // Retour aux règles du palier : on remet les remises à zéro (puis le groupement réimpose son minimum éventuel)
   S.setupDiscType="none"; S.remisePct=0; S.subMonths=0; S.aboPct=0;
   document.getElementById("remise-pct").value=0;
@@ -2719,6 +2789,9 @@ function applyUILang() {
   setTextIfFound('lbl-remise-setup', lang === 'nl' ? 'Setupkorting' : 'Remise setup');
   setTextIfFound('tab-aucune-setup', lang === 'nl' ? 'Geen' : 'Aucune');
   setTextIfFound('lbl-remise-abo', lang === 'nl' ? 'Abonnementskorting' : 'Remise abonnement');
+  setTextIfFound('lbl-cond-derog', lang === 'nl' ? 'Bijzondere bepalingen' : 'Dispositions particuli\u00E8res');
+  setTextIfFound('lbl-cond-duree', lang === 'nl' ? 'Bijzondere afwijkende modaliteiten (duur, verlenging, opzegging)' : 'Modalit\u00E9s particuli\u00E8res d\u00E9rogatoires (dur\u00E9e, renouvellement, r\u00E9siliation)');
+  if(typeof condDerogRefresh==='function') condDerogRefresh();
   setTextIfFound('tab-sub-0', lang === 'nl' ? 'Geen' : 'Aucune');
   setTextIfFound('tab-sub-1', lang === 'nl' ? '1 maand' : '1 mois');
   setTextIfFound('tab-sub-2', lang === 'nl' ? '2 maanden' : '2 mois');
