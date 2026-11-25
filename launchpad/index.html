@@ -855,6 +855,44 @@ body{font-family:var(--font);background:var(--g50);color:var(--g800);min-height:
 // ══════════════════════════════════════════════════════════════
 const SB_URL = 'https://rzeequxjvsoqvbetxmev.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6ZWVxdXhqdnNvcXZiZXR4bWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NDE3NDksImV4cCI6MjA5NTAxNzc0OX0.ogJp7NDVnVlU63fkzbbo8LTvuBtLd1IU6aDE5I8o2tM';
+
+// ══════════════════════════════════════════════════════════════
+// SESSION SÉCURISÉE (jeton) — commune à Launchpad / Pricing / Workflow / Codis
+// Le mot de passe est vérifié côté serveur (RPC app_login). Le navigateur ne
+// garde qu'un jeton de session, envoyé dans l'en-tête « x-procyo-token » de
+// chaque appel /rest/v1/ : les règles d'accès Supabase s'appuient dessus.
+// ══════════════════════════════════════════════════════════════
+function procyoGetSession(){ try{ return JSON.parse(localStorage.getItem('procyo_session')||'null'); }catch(e){ return null; } }
+function procyoSetSession(broker, token){ localStorage.setItem('procyo_session', JSON.stringify({id:broker.id, email:broker.email, token:token})); }
+function procyoClearSession(){ localStorage.removeItem('procyo_session'); }
+function procyoToken(){ var s=procyoGetSession(); return (s&&s.token)||''; }
+(function(){
+  if(window.__procyoFetchPatched) return;
+  window.__procyoFetchPatched=true;
+  var _fetch=window.fetch.bind(window);
+  window.fetch=function(input, init){
+    try{
+      var url=(typeof input==='string')?input:((input&&input.url)||'');
+      var tok=procyoToken();
+      if(tok && url.indexOf(SB_URL+'/rest/v1/')===0){
+        init=Object.assign({}, init||{});
+        var h=new Headers(init.headers||{});
+        h.set('x-procyo-token', tok);
+        init.headers=h;
+      }
+    }catch(e){}
+    return _fetch(input, init);
+  };
+})();
+async function procyoRpc(fn, args){
+  var r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',
+    headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify(args||{})});
+  var txt=await r.text(); var j=null;
+  try{ j=txt?JSON.parse(txt):null; }catch(e){}
+  if(!r.ok){ var err=new Error((j&&j.message)||('Erreur '+r.status)); err.status=r.status; throw err; }
+  return j;
+}
 const ADMIN_EMAILS = ['cedric.jaumot@procyo.be','gianni.luyckx@procyo.be','antoine.moriau@procyo.be','maxime.dejean@procyo.be','eric.vandoren@procyo.be','admin@procyo.be','luc.renard@procyo.be','procyo@procyo.be'];
 // Comptes habilités à créer/révoquer des accès admin (gestion des admins).
 const SUPER_ADMIN_EMAILS = ['cedric.jaumot@procyo.be'];
@@ -1677,12 +1715,11 @@ async function doLogin(){
   if(!email||!pwd){showMsg(errEl,t('err_fields_required'));return;}
   setLoading(true,'…');
   try{
-    const hash=await hashPassword(pwd);
-    const rows=await sbGet('brokers','email=eq.'+encodeURIComponent(email)+'&select=*');
-    if(!rows||rows.length===0){showMsg(errEl,t('err_login_failed'));return;}
-    if(rows[0].password_hash!==hash){showMsg(errEl,t('err_login_failed'));return;}
-    currentUser=rows[0];
-    localStorage.setItem('procyo_session',JSON.stringify({id:currentUser.id,email:currentUser.email,password_hash:hash}));
+    let res;
+    try{ res=await procyoRpc('app_login',{p_email:email,p_password:pwd}); }
+    catch(e){ showMsg(errEl,t('err_login_failed')); return; }
+    currentUser=res.broker;
+    procyoSetSession(currentUser,res.token);
     await loadAnswersCache();
     enterApp();
   }catch(e){showMsg(errEl,'Erreur : '+e.message);}
@@ -1703,12 +1740,14 @@ async function doRegister(){
   if(pwd!==pwd2){showMsg(errEl,t('err_pwd_match'));return;}
   setLoading(true,'…');
   try{
-    const existing=await sbGet('brokers','email=eq.'+encodeURIComponent(email)+'&select=id');
-    if(existing&&existing.length>0){showMsg(errEl,t('err_email_exists'));return;}
-    const hash=await hashPassword(pwd);
-    const rows=await sbInsert('brokers',{email,password_hash:hash,company_name:company||null});
-    currentUser=rows[0];
-    localStorage.setItem('procyo_session',JSON.stringify({id:currentUser.id,email:currentUser.email,password_hash:hash}));
+    let res;
+    try{ res=await procyoRpc('app_register',{p_email:email,p_password:pwd,p_company:company||null}); }
+    catch(e){
+      if(e.status===409){showMsg(errEl,t('err_email_exists'));return;}
+      throw e;
+    }
+    currentUser=res.broker;
+    procyoSetSession(currentUser,res.token);
     showMsg(okEl,'✓ '+t('ok_account_created'));
     setTimeout(()=>enterApp(),800);
   }catch(e){showMsg(errEl,'Erreur : '+e.message);}
@@ -1716,8 +1755,9 @@ async function doRegister(){
 }
 
 async function doLogout(){
+  try{ await procyoRpc('app_logout',{}); }catch(e){}
   currentUser=null;localCache={};
-  localStorage.removeItem('procyo_session');
+  procyoClearSession();
   document.getElementById('screen-auth').style.display='flex';
   document.getElementById('screen-app').classList.add('hidden');
   document.getElementById('login-pwd').value='';
@@ -1732,15 +1772,12 @@ async function checkToken(){
   if(!token) return false;
 
   // Chercher le broker avec ce token
-  const r = await fetch(SB_URL+'/rest/v1/brokers?invite_token=eq.'+encodeURIComponent(token)+'&invite_token_used=eq.false&select=id,email,company_name,invite_token_used', {
-    headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
-  });
-  const data = await r.json();
-  if(!data||!data.length){
+  let broker=null;
+  try{ broker = await procyoRpc('app_invite_info',{p_token:token}); }catch(e){ broker=null; }
+  if(!broker){
     // Token invalide ou déjà utilisé
     return false;
   }
-  const broker = data[0];
   // Afficher l'écran d'activation
   document.getElementById('act-email').value = broker.email;
   document.getElementById('screen-activate').style.display = 'flex';
@@ -1761,42 +1798,32 @@ async function doActivate(){
   if(pwd1.length < 8){ errEl.textContent='Le mot de passe doit faire au moins 8 caractères.'; return; }
   if(pwd1 !== pwd2){ errEl.textContent='Les mots de passe ne correspondent pas.'; return; }
 
-  // Hasher le mot de passe (même logique que doRegister)
-  const hash = await hashPassword(pwd1);
-
-  // Mettre à jour le broker
-  const r = await fetch(SB_URL+'/rest/v1/brokers?id=eq.'+window._activateBrokerId, {
-    method:'PATCH',
-    headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({password_hash:hash, invite_token_used:true})
-  });
-
-  if(r.ok){
-    okEl.textContent='Compte activé ! Connexion en cours…';
-    // Connecter automatiquement
-    setTimeout(async ()=>{
-      const broker = await sbGet('brokers','email=eq.'+encodeURIComponent(email)+'&password_hash=eq.'+encodeURIComponent(hash));
-      if(broker&&broker.length){
-        currentUser=broker[0];
-        localStorage.setItem('procyo_uid',currentUser.id);
-        document.getElementById('screen-activate').style.display='none';
-        // Nettoyer l'URL
-        window.history.replaceState({},'',window.location.pathname);
-        enterApp();
-      }
-    }, 1500);
-  } else {
+  // Le mot de passe est enregistré côté serveur (bcrypt) et une session est ouverte
+  let res;
+  try{
+    res = await procyoRpc('app_activate',{p_token:window._activateToken, p_password:pwd1});
+  }catch(e){
     errEl.textContent="Erreur lors de l'activation. Veuillez réessayer.";
+    return;
   }
+  okEl.textContent='Compte activé ! Connexion en cours…';
+  currentUser=res.broker;
+  procyoSetSession(currentUser,res.token);
+  document.getElementById('screen-activate').style.display='none';
+  // Nettoyer l'URL
+  window.history.replaceState({},'',window.location.pathname);
+  await loadAnswersCache();
+  enterApp();
 }
 
 async function checkSession(){
   try{
-    const s=JSON.parse(localStorage.getItem('procyo_session')||'null');
-    if(!s||!s.id)return;
+    const s=procyoGetSession();
+    if(!s||!s.token){ procyoClearSession(); return; }   // ancienne session (hash) : reconnexion
     setLoading(true,'Chargement…');
-    const rows=await sbGet('brokers','id=eq.'+s.id+'&select=*');
-    if(rows&&rows.length>0){currentUser=rows[0];await loadAnswersCache();enterApp();}
+    const me=await procyoRpc('app_me',{});
+    if(me){currentUser=me;await loadAnswersCache();enterApp();}
+    else procyoClearSession();
   }catch(e){console.warn('Session:',e);}
   finally{setLoading(false);}
 }
@@ -3440,8 +3467,7 @@ async function adminResetPassword(brokerId, email, btn){
   btn.disabled=true; btn.textContent='…';
   try{
     const tmpPwd = genTempPassword();
-    const hash = await hashPassword(tmpPwd);
-    await sbUpdate('brokers','id=eq.'+brokerId,{password_hash:hash});
+    await procyoRpc('app_admin_set_password',{p_broker:brokerId, p_password:tmpPwd});
     // Afficher la modal avec le mot de passe temporaire
     document.getElementById('modal-reset-pwd-value').textContent = tmpPwd;
     document.getElementById('modal-reset-email').textContent = email;
@@ -3488,11 +3514,9 @@ async function adminCreateBrokerManual(){
       return;
     }
     const token=genInviteToken();
-    // Mot de passe temporaire aléatoire en attendant l'activation par le courtier via le lien
-    const placeholderHash=await hashPassword(genTempPassword()+genTempPassword());
+    // Pas de mot de passe : le courtier le choisira en ouvrant le lien d'activation
     await sbInsert('brokers',{
       email, company_name: company||null,
-      password_hash: placeholderHash,
       invite_token: token,
       invite_token_used: false
     });
@@ -3574,17 +3598,14 @@ async function doChangePwd(){
   const btn = document.getElementById('chpwd-submit-btn');
   btn.disabled=true; btn.textContent='…';
   try{
-    const currentHash = await hashPassword(current);
-    if(currentUser.password_hash !== currentHash){
-      errEl.textContent=t('err_current_pwd');
+    try{
+      await procyoRpc('app_change_password',{p_current:current, p_new:new1});
+    }catch(e){
+      errEl.textContent = (e.status===403) ? t('err_current_pwd') : ('Erreur : '+e.message);
       errEl.style.display='block';
       btn.disabled=false; btn.textContent=t('chpwd_btn');
       return;
     }
-    btn.textContent='…';
-    const newHash = await hashPassword(new1);
-    await sbUpdate('brokers','id=eq.'+currentUser.id,{password_hash:newHash});
-    currentUser.password_hash = newHash;
     okEl.textContent=t('chpwd_ok');
     okEl.style.display='block';
     btn.textContent='✓';
@@ -4100,13 +4121,7 @@ async function adminCreateAdmin(){
   if(!pwd||pwd.length<8){msgEl.style.display='block';msgEl.style.color='var(--red)';msgEl.textContent='Mot de passe : 8 caractères minimum.';return;}
   btn.disabled=true;btn.textContent='…';
   try{
-    const hash=await hashPassword(pwd);
-    const existing=await sbGet('brokers','email=eq.'+encodeURIComponent(email)+'&select=id,is_admin');
-    if(existing&&existing.length>0){
-      await sbUpdate('brokers','id=eq.'+existing[0].id,{is_admin:true,password_hash:hash});
-    }else{
-      await sbInsert('brokers',{email,password_hash:hash,company_name:null,is_admin:true});
-    }
+    await procyoRpc('app_admin_grant_admin',{p_email:email, p_password:pwd});
     msgEl.style.display='block';msgEl.style.color='var(--green)';msgEl.textContent='✓ Accès admin créé pour '+email;
     document.getElementById('newadmin-email').value='';
     document.getElementById('newadmin-pwd').value='';
