@@ -1439,8 +1439,24 @@ function sha256Hex(text){
   });
 }
 
-// p_hash doit deja etre l'empreinte SHA-256 du mot de passe (pas le mot de passe en clair)
+// Session securisee : le mot de passe est verifie cote serveur (RPC app_login),
+// puis le JETON de session est transmis a get_comcom_data (parametre p_password_hash,
+// nom conserve pour compatibilite avec l'Edge Function refresh-comcom).
 var _comcomAuth = null;
+function procyoGetSession(){ try{ return JSON.parse(localStorage.getItem('procyo_session')||'null'); }catch(e){ return null; } }
+function codisLogin(email, password){
+  return fetch(SUPABASE_URL + '/rest/v1/rpc/app_login', {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_email: email, p_password: password })
+  }).then(function(r){
+    if(!r.ok){ throw new Error('Acces refuse.'); }
+    return r.json();
+  }).then(function(res){
+    localStorage.setItem('procyo_session', JSON.stringify({ id: res.broker.id, email: res.broker.email, token: res.token }));
+    return res;
+  });
+}
 function tryLogin(email, p_hash, onFail){
   return fetch(SUPABASE_URL + '/rest/v1/rpc/get_comcom_data', {
     method: 'POST',
@@ -1454,7 +1470,7 @@ function tryLogin(email, p_hash, onFail){
     if(!r.ok){ throw new Error('Acces refuse.'); }
     return r.json();
   }).then(function(data){
-    _comcomAuth = { email: email, password_hash: p_hash };
+    _comcomAuth = { email: email, token: p_hash };
     document.getElementById('login-screen').style.display='none';
     document.getElementById('loading-screen').style.display='none';
     document.getElementById('app-root').style.display='block';
@@ -1476,14 +1492,15 @@ document.getElementById('loginForm').addEventListener('submit', function(e){
   btn.disabled = true;
   btn.textContent = 'Connexion...';
 
-  sha256Hex(password).then(function(hash){
-    tryLogin(email, hash, function(err){
-      errEl.textContent = 'Acces refuse. Verifie ton email et mot de passe.';
-      errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Se connecter';
-    });
-  });
+  var onFail = function(err){
+    errEl.textContent = 'Acces refuse. Verifie ton email et mot de passe.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Se connecter';
+  };
+  codisLogin(email, password).then(function(res){
+    tryLogin(res.broker.email, res.token, onFail);
+  }).catch(onFail);
 });
 
 // ── RECONNEXION AUTOMATIQUE si deja connecte sur pricing/workflow_COOP ──
@@ -1492,11 +1509,11 @@ document.getElementById('loginForm').addEventListener('submit', function(e){
 // formulaire de login normal reste affiche, rien de casse.
 (function tryAutoSession(){
   try{
-    var s = JSON.parse(localStorage.getItem('procyo_session') || 'null');
-    if(s && s.email && s.password_hash){
+    var s = procyoGetSession();
+    if(s && s.email && s.token){
       document.getElementById('login-screen').style.display='none';
       document.getElementById('loading-screen').style.display='flex';
-      tryLogin(s.email, s.password_hash, function(err){
+      tryLogin(s.email, s.token, function(err){
         // session invalide/perimee -> on revient simplement au formulaire normal
         document.getElementById('loading-screen').style.display='none';
         document.getElementById('login-screen').style.display='flex';
@@ -1539,7 +1556,7 @@ document.getElementById('btnRefreshOdoo').addEventListener('click', function(){
       'Authorization': 'Bearer ' + SUPABASE_KEY,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ p_email: _comcomAuth.email, p_password_hash: _comcomAuth.password_hash })
+    body: JSON.stringify({ p_email: _comcomAuth.email, p_password_hash: _comcomAuth.token })
   }).then(function(r){
     return r.json().then(function(j){ return { ok: r.ok, body: j }; });
   }).then(function(res){

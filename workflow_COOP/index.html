@@ -1594,6 +1594,44 @@
 <script>
 const SB_URL = 'https://rzeequxjvsoqvbetxmev.supabase.co';
 const SB_KEY = 'sb_publishable_Vb-s-OrOKfHjYDxDBmb2MA_ReHEBEQ5';
+
+// ══════════════════════════════════════════════════════════════
+// SESSION SÉCURISÉE (jeton) — commune à Launchpad / Pricing / Workflow / Codis
+// Le mot de passe est vérifié côté serveur (RPC app_login). Le navigateur ne
+// garde qu'un jeton de session, envoyé dans l'en-tête « x-procyo-token » de
+// chaque appel /rest/v1/ : les règles d'accès Supabase s'appuient dessus.
+// ══════════════════════════════════════════════════════════════
+function procyoGetSession(){ try{ return JSON.parse(localStorage.getItem('procyo_session')||'null'); }catch(e){ return null; } }
+function procyoSetSession(broker, token){ localStorage.setItem('procyo_session', JSON.stringify({id:broker.id, email:broker.email, token:token})); }
+function procyoClearSession(){ localStorage.removeItem('procyo_session'); }
+function procyoToken(){ var s=procyoGetSession(); return (s&&s.token)||''; }
+(function(){
+  if(window.__procyoFetchPatched) return;
+  window.__procyoFetchPatched=true;
+  var _fetch=window.fetch.bind(window);
+  window.fetch=function(input, init){
+    try{
+      var url=(typeof input==='string')?input:((input&&input.url)||'');
+      var tok=procyoToken();
+      if(tok && url.indexOf(SB_URL+'/rest/v1/')===0){
+        init=Object.assign({}, init||{});
+        var h=new Headers(init.headers||{});
+        h.set('x-procyo-token', tok);
+        init.headers=h;
+      }
+    }catch(e){}
+    return _fetch(input, init);
+  };
+})();
+async function procyoRpc(fn, args){
+  var r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',
+    headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify(args||{})});
+  var txt=await r.text(); var j=null;
+  try{ j=txt?JSON.parse(txt):null; }catch(e){}
+  if(!r.ok){ var err=new Error((j&&j.message)||('Erreur '+r.status)); err.status=r.status; throw err; }
+  return j;
+}
 const ADMIN_EMAILS = ['cedric.jaumot@procyo.be','gianni.luyckx@procyo.be','antoine.moriau@procyo.be','maxime.dejean@procyo.be','eric.vandoren@procyo.be','admin@procyo.be','luc.renard@procyo.be','procyo@procyo.be'];
 async function sha256(msg) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
@@ -1609,21 +1647,21 @@ async function checkPwd() {
   const errEl = document.getElementById('pwd-err');
   if(!email || !val){ errEl.textContent='Email et mot de passe requis.'; return; }
   try{
-    const h = await sha256(val);
-    const res = await fetch(SB_URL+'/rest/v1/brokers?email=eq.'+encodeURIComponent(email)+'&select=email,password_hash,is_admin',{
-      headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
-    });
-    const rows = await res.json();
-    if(!rows || !rows.length || rows[0].password_hash !== h){
+    let res;
+    try{ res = await procyoRpc('app_login',{p_email:email, p_password:val}); }
+    catch(e){
       errEl.textContent='Mot de passe incorrect.';
       document.getElementById('pwd-input').value='';
       document.getElementById('pwd-input').focus();
       return;
     }
     // Admin = flag is_admin en base (géré depuis le Launchpad) OU liste historique ADMIN_EMAILS.
-    if(!(rows[0].is_admin===true || ADMIN_EMAILS.includes(email))){ errEl.textContent='Accès réservé aux administrateurs.'; return; }
+    if(!(res.broker.is_admin===true || ADMIN_EMAILS.includes(email))){
+      try{ await fetch(SB_URL+'/rest/v1/rpc/app_logout',{method:'POST',headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','x-procyo-token':res.token},body:'{}'}); }catch(e){}
+      errEl.textContent='Accès réservé aux administrateurs.'; return;
+    }
+    procyoSetSession(res.broker, res.token);
     sessionStorage.setItem('procyo_workflow','1');
-    localStorage.setItem('procyo_session', JSON.stringify({email, password_hash: h}));
     grantAccess();
   }catch(e){
     errEl.textContent='Erreur de connexion : '+e.message;
@@ -1631,26 +1669,18 @@ async function checkPwd() {
 }
 document.getElementById('pwd-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPwd();});
 (function tryAutoSession(){
-  if(sessionStorage.getItem('procyo_workflow')==='1'){ grantAccess(); return; }
-  try{
-    const s = JSON.parse(localStorage.getItem('procyo_session')||'null');
-    if(!s || !s.email) return;
-    if(ADMIN_EMAILS.includes(s.email.toLowerCase())){
+  // Session partagée avec le Launchpad : on la vérifie côté serveur (jeton)
+  const s = procyoGetSession();
+  if(!s || !s.token){ sessionStorage.removeItem('procyo_workflow'); return; }
+  procyoRpc('app_me',{}).then(me=>{
+    if(me && (me.is_admin===true || ADMIN_EMAILS.includes((me.email||'').toLowerCase()))){
       sessionStorage.setItem('procyo_workflow','1');
       grantAccess();
-      return;
+    } else {
+      sessionStorage.removeItem('procyo_workflow');
+      if(!me) procyoClearSession();
     }
-    // Admin ajouté depuis le Launchpad : vérifier le flag is_admin en base avec la session stockée.
-    if(!s.password_hash) return;
-    fetch(SB_URL+'/rest/v1/brokers?email=eq.'+encodeURIComponent(s.email.toLowerCase())+'&select=password_hash,is_admin',{
-      headers:{apikey:SB_KEY,'Authorization':'Bearer '+SB_KEY}
-    }).then(r=>r.json()).then(rows=>{
-      if(rows && rows.length && rows[0].is_admin===true && rows[0].password_hash===s.password_hash){
-        sessionStorage.setItem('procyo_workflow','1');
-        grantAccess();
-      }
-    }).catch(()=>{});
-  }catch(e){}
+  }).catch(()=>{});
 })();
 </script>
 
