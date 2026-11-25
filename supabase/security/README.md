@@ -28,6 +28,13 @@ et les règles RLS n'autorisent que :
 
 ## Points connus
 
+- La phase C supprimait `brokers.password_hash`, mais les Edge Functions
+  `broker-intake` et `remise-dans-le-flux` y écrivent encore `'PENDING'` :
+  colonne remise (vide) par `03_correctif_colonne_password_hash.sql`.
+  À retirer de ces fonctions, puis supprimer la colonne.
+- `send-reminders` lit des colonnes inexistantes (`M1_status`…) : les rappels ne
+  partent jamais (bug antérieur, colonnes réelles `module1_status`, `m1_unlocked_at`…).
+
 - Les mots de passe existants restent valables : ils sont convertis en bcrypt à
   la première connexion.
 - Phase C supprime `trigger_comcom_refresh` (non utilisée) qui contenait un jeton
