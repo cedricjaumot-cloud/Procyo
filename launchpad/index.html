@@ -3001,10 +3001,47 @@ async function showAdmin(){
   setLoading(true,'Chargement des courtiers…');
   try{
     autoPurgeTrash();
-    const brokers=(await sbGet('brokers','select=*&order=created_at.desc&deleted_at=is.null')).filter(b=>!isAdmin(b));
+    // Courtiers + compteurs (réponses / observations) chargés en parallèle,
+    // une seule fois par ouverture de l'écran Admin.
+    const [brokersRaw, counts] = await Promise.all([
+      sbGet('brokers','select=*&order=created_at.desc&deleted_at=is.null'),
+      loadAdminCounts()
+    ]);
+    const brokers=(brokersRaw||[]).filter(b=>!isAdmin(b));
     _adminBrokersCache = brokers||[];
+    _adminCounts = counts;
     renderAdminList();
   }finally{setLoading(false);}
+}
+
+// ── Compteurs Admin ─────────────────────────────────────────────
+// Avant : 2 requêtes PAR courtier à chaque affichage (et à chaque lettre
+// tapée dans la recherche) → des centaines de lectures disque Supabase.
+// Maintenant : 2 requêtes au total à l'ouverture de l'écran Admin ;
+// recherche et tri travaillent ensuite uniquement en mémoire.
+let _adminCounts = { answers:{}, obs:{} };
+
+async function _adminFetchAll(table, select, order){
+  const all=[]; let from=0;
+  while(true){
+    const rows=await sbGet(table,'select='+select+'&order='+order+'&limit=1000&offset='+from);
+    if(!rows||!rows.length) break;
+    all.push(...rows);
+    if(rows.length<1000) break;
+    from+=1000;
+  }
+  return all;
+}
+
+async function loadAdminCounts(){
+  const [ans, obs] = await Promise.all([
+    _adminFetchAll('answers','broker_id,question_id','broker_id,question_id'),
+    _adminFetchAll('observations','id,broker_id','id')
+  ]);
+  const answers={}, obsCount={};
+  ans.forEach(a=>{ if(!answers[a.broker_id]) answers[a.broker_id]=new Set(); answers[a.broker_id].add(a.question_id); });
+  obs.forEach(o=>{ obsCount[o.broker_id]=(obsCount[o.broker_id]||0)+1; });
+  return { answers, obs:obsCount };
 }
 
 function adminFilterSort(brokers){
@@ -3026,7 +3063,12 @@ function adminFilterSort(brokers){
   return out;
 }
 
-function adminSetSearch(v){ _adminSearch=v; renderAdminList(); }
+let _adminSearchTimer=null;
+function adminSetSearch(v){
+  _adminSearch=v;
+  clearTimeout(_adminSearchTimer);
+  _adminSearchTimer=setTimeout(renderAdminList,200);
+}
 function adminSetSort(v){ _adminSort=v; renderAdminList(); }
 
 async function renderAdminList(){
@@ -3036,8 +3078,9 @@ async function renderAdminList(){
     list.innerHTML='';
     if(!brokers||brokers.length===0){list.innerHTML='<p style="color:var(--g400);font-size:14px">Aucun courtier ne correspond.</p>';return;}
     for(const b of brokers){
-      const answers=await sbGet('answers','broker_id=eq.'+b.id+'&select=question_id');
-      const obsRows=await sbGet('observations','broker_id=eq.'+b.id+'&select=id');
+      // Lecture en mémoire (cache chargé par showAdmin) : aucune requête ici.
+      const ansSet=_adminCounts.answers[b.id]||new Set();
+      const obsCount=_adminCounts.obs[b.id]||0;
       const card=document.createElement('div');
       card.className='broker-card';
       // Module progress
@@ -3048,12 +3091,12 @@ async function renderAdminList(){
           let modAns=0,modTot=0;
           mod.sections.forEach(s=>s.questions.forEach(q=>{
             modTot++;
-            if((answers||[]).find(a=>a.question_id===q.id))modAns++;
+            if(ansSet.has(q.id))modAns++;
           }));
           const pct=modTot>0?Math.round(modAns/modTot*100):0;
           progHTML=`<div class="bmod-prog"><div class="bmod-prog-fill${modAns>=modTot&&modTot>0?' full':''}" style="width:${pct}%"></div></div><div class="bmod-count">${modAns}/${modTot}</div>`;
         } else {
-          progHTML=`<div class="bmod-count">${(obsRows||[]).length} obs.</div>`;
+          progHTML=`<div class="bmod-count">${obsCount} obs.</div>`;
         }
         const stLabel=st==='completed'?'✓ '+t('mod_accessible'):st==='active'?'● '+t('mod_accessible'):'○ '+t('mod_locked_s');
         return `<div class="bmod">
